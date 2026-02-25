@@ -1,6 +1,6 @@
 """Upgrade a ForgeOps environment to the latest updates"""
 
-import argparse
+from copy import copy
 import datetime
 import os
 from pathlib import Path
@@ -20,6 +20,18 @@ sys.path.insert(1, str(dependencies_dir) + site.USER_SITE.replace(site.USER_BASE
 from lib.python.defaults import SNAPSHOT_ROLE_NAME
 from lib.python.common import write_yaml_file, log
 import lib.python.utils as utils
+
+
+def copy_default_overlay_from_root(overlay_path, default_overlay):
+    """ Update the default overlay by copying from root """
+    root_default = Path(root_path) / 'kustomize' / 'overlay' / 'default'
+    if root_default.resolve() != default_overlay.resolve():
+        if root_default.is_dir():
+            log(f"Removing current default dir {default_overlay}", overlay_path)
+            shutil.rmtree(default_overlay)
+        log("Copying default overlay from ForgeOps root", overlay_path)
+        shutil.copytree(root_default, default_overlay)
+
 
 
 def update_secrets_2025_2_0(overlay_path, source_path):
@@ -151,6 +163,76 @@ def update_secrets_2025_2_1(helm_env_path):
         print(f"{values_file} doesn't exist, not updating. Check your environment and try again.")
 
 
+def update_secrets_2026_1_0(overlay_path, default_overlay):
+    """ Update image-defaulter (2026.1.0)"""
+    names = None
+    if default_overlay.is_dir():
+        kust_file = default_overlay / 'image-defaulter' / 'kustomization.yaml'
+        kust = {}
+        with open(kust_file, encoding='utf-8') as f:
+            kust = yaml.safe_load(f)
+        names = [d.get('name') for d in kust['images'] if 'name' in d]
+        if 'am-custom' not in names:
+            log("Default overlay out of date, copying from ForgeOps root.", overlay_path)
+            copy_default_overlay_from_root(overlay_path, default_overlay)
+    if overlay_path.is_dir():
+        log(f"Checking overlay {overlay_path}", overlay_path)
+        image_info = {
+            'name': None,
+            'newName': 'busybox',
+            'newTag': 'musl'
+        }
+        kust_file = overlay_path / 'image-defaulter' / 'kustomization.yaml'
+        kust = {}
+        do_update_kust = False
+        with open(kust_file, encoding='utf-8') as f:
+            kust = yaml.safe_load(f)
+        names = [d.get('name') for d in kust['images'] if 'name' in d]
+        for c_app in ['am-custom', 'idm-custom']:
+            if c_app not in names:
+                log(f"Adding {c_app}", overlay_path)
+                do_update_kust = True
+                data = copy(image_info)
+                data['name'] = c_app
+                kust['images'].append(data)
+        if do_update_kust:
+            write_yaml_file(kust, kust_file)
+
+        do_update_deploy = False
+        for app in ['am', 'idm']:
+            app_path = overlay_path / app
+            if not app_path.is_dir():
+                continue
+            deploy_file = app_path / 'deployment.yaml'
+            deployment = {}
+            with open(deploy_file, encoding='utf-8') as f:
+                deployment = yaml.safe_load(f)
+            if utils.key_exists(deployment, 'spec.template.spec.initContainers'):
+                init_containers = deployment['spec']['template']['spec']['initContainers']
+                found_custom = False
+                for c in init_containers:
+                    if c['name'] == 'fbc-init':
+                        log(f"Changing fbc-init to filesystem-init in {app} deployment", overlay_path)
+                        c['name'] = 'filesystem-init'
+                        do_update_deploy = True
+                    if c['name'] == 'custom-vol-init':
+                        found_custom = True
+                if not found_custom:
+                    log(f"Adding custom-vol-init to {app} deployment", overlay_path)
+                    do_update_deploy = True
+                    data = {
+                        'name': 'custom-vol-init',
+                        'resources': {}
+                    }
+                    init_containers.append(data)
+                if do_update_deploy:
+                    write_yaml_file(deployment, deploy_file)
+        if not (do_update_kust or do_update_deploy):
+            log(f"{overlay_path} already updated", overlay_path)
+    else:
+        print(f"{overlay_path} doesn't exist, not updating. Check your environment and try again.")
+
+
 def run(args, config):
     """ Run upgrades """
     def_overlay_path = config['overlay_root'] / 'default'
@@ -172,6 +254,10 @@ def run(args, config):
     # 2025.2.1 updates
     log('Checking 2025.2.1 updates', config['helm_env_path'])
     update_secrets_2025_2_1(config['helm_env_path'])
+
+    # 2026.1.0 updates
+    log('Checking 2026.1.0 updates', config['overlay_path'])
+    update_secrets_2026_1_0(config['overlay_path'], config['source_path'])
 
     footer=f"""#
 # End upgrade on {args.env_name} at {timestamp}

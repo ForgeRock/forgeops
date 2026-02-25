@@ -360,4 +360,31 @@ metadata:
     app.kubernetes.io/component: idm
 data:
   
-  {}
+  custom-vol-init.sh: |
+    #!/bin/sh
+  
+    if [ -d /custom/config ]; then
+        echo "Existing openidm configuration found in /custom. Skipping copy."
+    elif [ "$(ls -A /config)" ]; then
+        echo "Copying configuration files to the custom volume."
+        mkdir -p /custom/config
+        cp -rv /config/* /custom/config/
+        ls -F /custom
+    else
+        echo "No custom FBC found. Continuing with defaults."
+    fi
+  filesystem-init.sh: |
+    #!/bin/sh
+  
+    if [ -d /fbc/conf ]; then
+      echo "Existing openidm configuration found. Skipping copy."
+    elif [ -d /custom/config ]; then
+      echo "Found config in custom volume."
+      cd /opt/openidm
+      cp -rv ui conf script /fbc
+      cp -av /custom/config/* /fbc/
+    else
+      echo "Copying docker image configuration files to the shared volume"
+      cd /opt/openidm
+      cp -rv ui conf script /fbc
+    fi

@@ -126,7 +126,6 @@ EXPORT_COMPONENTS = {
 BUILD_COMPONENTS = {
     'am': ('am',),
     'idm': ('idm',),
-    'ig': ('ig',),
 }
 
 APP_CONF_PATH_FMT = {
