@@ -141,8 +141,8 @@ In this example, we'll use a ClusterIssuer called my_issuer. We make you select
 this so a production environment doesn't get mistakenly deployed with a
 self-signed certificate.
 
-So if we want a medium sized stage deployment with an FQDN of iam.example.com,
-we'd do this:
+So if we want a medium sized stage deployment with an FQDN of
+stage.iam.example.com, we'd do this:
 
 `./bin/forgeops env --fqdn stage.iam.example.com --medium --env-name stage --cluster-issuer my_issuer`
 
