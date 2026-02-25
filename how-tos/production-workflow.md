@@ -25,8 +25,10 @@ the steps in detail here, and just provide commands for any other workflows.
 ### Setup your git repos
 
 There are two different ways you can setup your git repo(s). The new and
-recommended method is to setup a custom ForgeOps root. The old method is to
-create a fork of the official ForgeOps repo.
+recommended method is to setup a custom ForgeOps artifacts repo. ForgeOps will
+work with artifacts in this repo instead of where ForgeOps lives. The old method
+is to create a fork of the official ForgeOps repo, and store your artifacts in
+that fork.
 
 #### Setup a custom ForgeOps data repo (Recommended)
 
@@ -50,7 +52,7 @@ git switch -c 2025.2.1
 cd ..
 cp -r forgeops/{kustomize,helm,docker} forgeops_data
 cp forgeops/forgeops.conf.example forgeops_data/forgeops.conf
-cat 'FORGEOPS_ROOT=${HOME}/git/forgeops_data' > ~/.forgeops.conf
+echo 'FORGEOPS_DATA=${HOME}/git/forgeops_data' > ~/.forgeops.conf
 cd forgeops_data
 git init
 git remote add origin https://github.com/MyOrg/forgeops_data
@@ -139,8 +141,8 @@ In this example, we'll use a ClusterIssuer called my_issuer. We make you select
 this so a production environment doesn't get mistakenly deployed with a
 self-signed certificate.
 
-So if we want a medium sized stage deployment with an FQDN of iam.example.com,
-we'd do this:
+So if we want a medium sized stage deployment with an FQDN of
+stage.iam.example.com, we'd do this:
 
 `./bin/forgeops env --fqdn stage.iam.example.com --medium --env-name stage --cluster-issuer my_issuer`
 
