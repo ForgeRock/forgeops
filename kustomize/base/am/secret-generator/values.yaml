@@ -52,3 +52,7 @@ am:
   image:
     repository: "am"
     tag: ""
+am_custom:
+  image:
+    repository: "am-custom"
+    tag: ""

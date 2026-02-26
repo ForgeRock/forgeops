@@ -164,3 +164,9 @@ ig:
       port: http-admin
       secretUser: metric
       secretPassword: password
+
+ig_fbc:
+  image:
+    repository: busybox
+    tag: musl
+    pullPolicy: IfNotPresent

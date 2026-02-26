@@ -11,7 +11,9 @@ spec:
       - name: openam
         resources: {}
       initContainers:
-      - name: fbc-init
+      - name: custom-vol-init
+        resources: {}
+      - name: filesystem-init
         resources: {}
       - name: truststore-init
         resources: {}
