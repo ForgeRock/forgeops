@@ -23,7 +23,7 @@ sys.path.insert(1, str(dependencies_dir) + site.USER_SITE.replace(site.USER_BASE
 from lib.python import utils
 
 HELP_DESCRIPTION = "Manage Ping Identity Platform configuration."
-HELP_BUILD_CMD_DESCRIPTION = "Build a custom image. PingAM, PingIDM, and PingGateway only."
+HELP_BUILD_CMD_DESCRIPTION = "Build an FBC image. PingAM, PingIDM, and PingGateway only."
 HELP_EXPORT_CMD_DESCRIPTION = "Export config from running instance to a given profile. PingAM and PingIDM only."
 HELP_EXPORT_BASELINE_PROFILE = """
 Specify a base profile to start with if the target profile doesn't
@@ -40,11 +40,11 @@ HELP_PATH_CMD_DESCRIPTION = "Resolve an absolute path to a location in the forge
 
 HELP_NAMESPACE = "Kubernetes namespace to target"
 
-HELP_BUILD_ENV_NAME = "ForgeOps environment to update after building custom image."
+HELP_BUILD_ENV_NAME = "ForgeOps environment to update after building FBC image."
 HELP_BUILD_PROFILE = "Config profile to bake into image."
 HELP_BUILD_DOCKER_ARGS = "Extra arguments to pass to docker. Use -- after config build arguments to specify."
 HELP_BUILD_PUSH_TO = "Container registry to push built images to."
-HELP_BUILD_TAG = "Tag to use on custom image."
+HELP_BUILD_TAG = "Tag to use on FBC image."
 
 HELP_PATH_DOCKER_CMD = """
 Resolve the path to a directory which contains a Dockerfile, optionally resolve
@@ -94,10 +94,10 @@ examples:
 
 HELP_BUILD_EXAMPLES = """
 examples:
-  # Build an am-custom image
+  # Build an am-fbc image
   $ ./bin/forgeops config build --env-name my_env am <my_profile>
 
-  # Build an idm-custom image passing extra flags to docker build
+  # Build an idm-fbc image passing extra flags to docker build
   $ ./bin/forgeops config build --env-name my_env idm <my_profile> -- --platform linux/amd64,linux/arm64
 """
 
@@ -327,7 +327,7 @@ def run_export(args, overrides):
 
 
 def run_build(args, overrides):
-    """ Build an custom container and use the image command to set it in a ForgeOps environment"""
+    """ Build an FBC container and use the image command to set it in a ForgeOps environment"""
 
     conf_path = _get_profile_path(args.component, args.profile, overrides['build_path'])
     app_path = pathlib.Path(overrides['build_path'].joinpath(args.component)).resolve()
@@ -337,7 +337,7 @@ def run_build(args, overrides):
     build_args = ''
     if args.profile != 'default':
         build_args = build_args + f" --build-arg CONFIG_PROFILE={args.profile}"
-    image = f"{args.component}-custom:{args.tag}"
+    image = f"{args.component}-fbc:{args.tag}"
     repo = getattr(args, 'push_to')
     if not repo:
         repo = 'none'
@@ -348,7 +348,7 @@ def run_build(args, overrides):
     docker_extra_args = ' '.join(getattr(args, 'docker_args', ''))
     if docker_extra_args == '' and os.getenv('DOCKER_BUILD_EXTRA_ARGS'):
         docker_extra_args = os.getenv('DOCKER_BUILD_EXTRA_ARGS', '')
-    docker_build_args = f"build {build_args} {docker_extra_args} -t {image} -f {app_path}/Dockerfile-custom {app_path}"
+    docker_build_args = f"build {build_args} {docker_extra_args} -t {image} -f {app_path}/Dockerfile-FBC {app_path}"
     docker_push_args = f"push {image}"
     docker_cmd = os.getenv('CONTAINER_ENGINE', 'docker')
     utils.run(docker_cmd, docker_build_args, dryrun=args.dryrun)
@@ -356,7 +356,7 @@ def run_build(args, overrides):
         utils.run(docker_cmd, docker_push_args, dryrun=args.dryrun)
     forgeops_cmd = f"{root_path}/bin/forgeops"
     image_args = ' '.join([
-        f"image -e {args.env_name} --custom",
+        f"image -e {args.env_name} --fbc",
         f"-k {overrides['kustomize_path']}",
         f"-H {overrides['helm_path']}",
         f"-b {overrides['build_path']}",

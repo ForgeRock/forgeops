@@ -5,9 +5,6 @@ images:
   - name: am
     newName: us-docker.pkg.dev/forgeops-public/images/am
     newTag: latest
-  - name: am-custom
-    newName: busybox
-    newTag: musl
   - name: amster
     newName: us-docker.pkg.dev/forgeops-public/images/amster
     newTag: latest
@@ -17,15 +14,9 @@ images:
   - name: idm
     newName: us-docker.pkg.dev/forgeops-public/images/idm
     newTag: latest
-  - name: idm-custom
-    newName: busybox
-    newTag: musl
   - name: ig
     newName: us-docker.pkg.dev/forgeops-public/images/ig
     newTag: latest
-  - name: ig-custom
-    newName: busybox
-    newTag: musl
   - name: admin-ui
     newName: us-docker.pkg.dev/forgeops-public/images/admin-ui
     newTag: latest
