@@ -3,7 +3,6 @@ kind: Kustomization
 
 resources:
   - am-entrypoint-configmap.yaml
-  - am-init-scripts-configmap.yaml
   - am-import-pem-certs-configmap.yaml
   - am-logback-configmap.yaml
   - am-service.yaml

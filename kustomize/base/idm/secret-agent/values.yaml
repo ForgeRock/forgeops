@@ -7,7 +7,3 @@ idm:
   image:
     repository: idm
     tag: ""
-idm_custom:
-  image:
-    repository: "idm-custom"
-    tag: ""
