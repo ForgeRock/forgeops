@@ -284,6 +284,12 @@ am:
       secretUser: prometheus
       secretPassword: prometheus
 
+am_custom:
+  image:
+    repository: busybox
+    tag: musl
+    pullPolicy: IfNotPresent
+
 amster:
   enabled: true
   force: false
@@ -469,6 +475,12 @@ idm:
       port: http
       secretUser: prometheus
       secretPassword: prometheus
+
+idm_custom:
+  image:
+    repository: busybox
+    tag: musl
+    pullPolicy: IfNotPresent
 
 # keystore-create job requries platform.secrets_enabled is true and
 # platform.secrets.keystore_create is uncommented.
