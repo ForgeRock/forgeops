@@ -41,7 +41,7 @@ HELP_PATH_CMD_DESCRIPTION = "Resolve an absolute path to a location in the forge
 HELP_NAMESPACE = "Kubernetes namespace to target"
 
 HELP_BUILD_ENV_NAME = "ForgeOps environment to update after building custom image."
-HELP_BUILD_PROFILE = "Config profile to bake into image."
+HELP_CONFIG_PROFILE = "Config profile to copy into image."
 HELP_BUILD_DOCKER_ARGS = "Extra arguments to pass to docker. Use -- after config build arguments to specify."
 HELP_BUILD_PUSH_TO = "Container registry to push built images to."
 HELP_BUILD_TAG = "Tag to use on custom image."
@@ -95,10 +95,10 @@ examples:
 HELP_BUILD_EXAMPLES = """
 examples:
   # Build an am-custom image
-  $ ./bin/forgeops config build --env-name my_env am <my_profile>
+  $ ./bin/forgeops config build --env-name my_env --config-profile <my_profile> am
 
   # Build an idm-custom image passing extra flags to docker build
-  $ ./bin/forgeops config build --env-name my_env idm <my_profile> -- --platform linux/amd64,linux/arm64
+  $ ./bin/forgeops config build --env-name my_env --config-profile <my_profile> idm -- --platform linux/amd64,linux/arm64
 """
 
 HELP_EXPORT_EXAMPLES = """
@@ -333,9 +333,7 @@ def run_build(args, overrides):
     if not conf_path.is_dir():
         msg = f"ERROR! No such profile ({args.profile}) at {conf_path}"
         utils.exit_msg(1, msg)
-    build_args = ''
-    if args.profile != 'default':
-        build_args = build_args + f" --build-arg CONFIG_PROFILE={args.profile}"
+    build_args = f" --build-arg CONFIG_PROFILE={args.profile}"
     image = f"{args.component}-custom:{args.tag}"
     repo = getattr(args, 'push_to')
     if not repo:
@@ -384,8 +382,15 @@ def main():
     common_bp = argparse.ArgumentParser(add_help=False,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
     common_bp.add_argument('--build-path',
-                        '-b',
-                        help=HELP_BUILD_PATH)
+                           '-b',
+                           help=HELP_BUILD_PATH)
+    common_cp = argparse.ArgumentParser(add_help=False,
+                                     formatter_class=argparse.RawDescriptionHelpFormatter)
+    common_cp.add_argument('--config-profile',
+                           '-p',
+                           dest='profile',
+                           default='default',
+                           help=HELP_CONFIG_PROFILE)
     common_dr = argparse.ArgumentParser(add_help=False,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
     common_dr.add_argument('--dryrun',
@@ -394,16 +399,16 @@ def main():
     common_hk = argparse.ArgumentParser(add_help=False,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
     common_hk.add_argument('--helm-path',
-                        '-H',
-                        help=HELP_HELM_PATH)
+                           '-H',
+                           help=HELP_HELM_PATH)
     common_hk.add_argument('--kustomize-path',
-                        '-k',
-                        help=HELP_KUSTOMIZE_PATH)
+                           '-k',
+                           help=HELP_KUSTOMIZE_PATH)
     common_ns = argparse.ArgumentParser(add_help=False,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
     common_ns.add_argument('--namespace',
-                        '-n',
-                        help=HELP_NAMESPACE)
+                           '-n',
+                           help=HELP_NAMESPACE)
     sub_cmd_parser = parser.add_subparsers(dest="cmd")
 
     # export sub command
@@ -430,10 +435,11 @@ def main():
     export_cmd_parser.set_defaults(func=run_export)
 
     # build sub command
+    build_parents = [common_bp, common_cp, common_dr, common_hk]
     build_cmd_parser = sub_cmd_parser.add_parser('build',
                                                 epilog=textwrap.dedent(HELP_BUILD_EXAMPLES),
                                                 formatter_class=argparse.RawTextHelpFormatter,
-                                                parents=[common_bp, common_dr, common_hk],
+                                                parents=build_parents,
                                                 description=HELP_BUILD_CMD_DESCRIPTION)
     build_cmd_parser.add_argument('--env-name', '-e', required=True, help=HELP_BUILD_ENV_NAME)
     build_cmd_parser.add_argument('--push-to', '-r', help=HELP_BUILD_PUSH_TO)
@@ -441,9 +447,6 @@ def main():
     build_cmd_parser.add_argument('component',
                                   choices=BUILD_COMPONENTS.keys(),
                                   help=HELP_CMD_COMPONENTS)
-    build_cmd_parser.add_argument('profile',
-                                  default='default',
-                                  help=HELP_BUILD_PROFILE)
     build_cmd_parser.add_argument('docker_args',
                                   nargs=argparse.REMAINDER,
                                   help=HELP_BUILD_DOCKER_ARGS)
