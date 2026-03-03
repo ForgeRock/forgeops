@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2024 Ping Identity Corporation. All Rights Reserved
+ * Copyright 2021-2026 Ping Identity Corporation. All Rights Reserved
  * 
  * This code is to be used exclusively in connection with Ping Identity 
  * Corporation software or services. Ping Identity Corporation only offers
@@ -11,28 +11,8 @@
 
 import com.forgerock.pipeline.reporting.PipelineRunLegacyAdapter
 
-productInfoUpgradeFrom = null
-productInfoUpgradeTo = null
-
-void runStage(PipelineRunLegacyAdapter pipelineRun, Random random, boolean generateSummaryReport) {
-
-    def clusterConfig = [:]
-    clusterConfig['PROJECT'] = cloud_config.commonConfig()['PROJECT']
-    clusterConfig['CLUSTER_DOMAIN'] = cloud_utils.clusterDomainFromClusterName('postcommit-forgeops')
-    clusterConfig['PIPELINE_NAME'] = isPR() ? 'forgeops-pr' : 'forgeops-postcommit'
-
-    def scaleClusterConfig = [:]
-    scaleClusterConfig['SCALE_CLUSTER'] = ['frontend': 5, 'default-pool': 20]
-
-    // Get the product info one time to be sure all the tests will use the same values
-    productInfoUpgradeFrom = upgrade.productInfoUpgradeFrom(commonModule.calculatePlatformImagesBranch())
-    productInfoUpgradeTo = upgrade.productInfoUpgradeTo(commonModule.platformImagesRevision)
-
+void runStage(PipelineRunLegacyAdapter pipelineRun) {
     try {
-        dockerUtils.insideGoogleCloudImage(dockerfilePath: 'docker/google-cloud', getDockerfile: true) {
-            cloud_utils.scaleClusterUp(clusterConfig + scaleClusterConfig)
-        }
-
         // Define group of tests to execute on a GCE VM, we can't run all the tests at the same time
         // otherwise we have lot of timeout issues with the cluster
         // Each group below is executed on a GCE VM
@@ -45,12 +25,10 @@ void runStage(PipelineRunLegacyAdapter pipelineRun, Random random, boolean gener
                         'Postcommit_am_k8s_upgrade',
                         'Postcommit_ds_k8s_postcommit',
                         'Postcommit_ds_k8s_upgrade',
-                ],
-                [
                         'Postcommit_ig_k8s_postcommit',
-                        'Postcommit_ig_k8s_upgrade',
-                        'Postcommit_platform_ui',
                         'Postcommit_set_images',
+                ],
+                    [
                         'Postcommit_guillotine_cli',
                         'Postcommit_guillotine_ds',
                         'Postcommit_guillotine_upgrade',
@@ -78,26 +56,18 @@ void runStage(PipelineRunLegacyAdapter pipelineRun, Random random, boolean gener
         parallel(
                 'postcommit-set-0': {
                     runPostcommitInNode(0, sleepTimesMinutes) {
-                        runPostcommitSet0(pipelineRun, random, clusterConfig)
+                        runPostcommitSet0(pipelineRun)
                     }
                 },
                 'postcommit-set-1': {
                     runPostcommitInNode(1, sleepTimesMinutes) {
-                        runPostcommitSet1(pipelineRun, random, clusterConfig)
+                        runPostcommitSet1(pipelineRun)
                     }
                 }
         )
     } catch (Exception exception) {
         println("Exception during parallel stage: ${exception}")
         throw exception
-    } finally {
-        if (generateSummaryReport) {
-            commonLodestarModule.generateSummaryTestReport()
-        }
-
-        dockerUtils.insideGoogleCloudImage(dockerfilePath: 'docker/google-cloud', getDockerfile: true) {
-            cloud_utils.scaleClusterDown(clusterConfig + scaleClusterConfig)
-        }
     }
 }
 
@@ -116,7 +86,7 @@ def runPostcommitInNode(int stageNumber, Integer[] sleepTimeMinutes, Closure run
     }
 }
 
-def runPostcommitSet0(PipelineRunLegacyAdapter pipelineRun, Random random, LinkedHashMap clusterConfig) {
+def runPostcommitSet0(PipelineRunLegacyAdapter pipelineRun) {
     def parallelTestsMap = [:]
 
     // **************
@@ -124,38 +94,25 @@ def runPostcommitSet0(PipelineRunLegacyAdapter pipelineRun, Random random, Linke
     // **************
     if (params.Postcommit_pit1) {
         parallelTestsMap.put('PIT1',
-                {
-                    commonLodestarModule.runSpyglaas(pipelineRun, random, 'PIT1', clusterConfig +
-                            [TESTS_SCOPE: 'tests/pit1']
-                    )
-                }
+            {
+                commonLodestarModule.runLodestar(pipelineRun, 'PIT1') { c -> cloud_tests.runCdmOrAicFuncPit1(c) }
+            }
         )
     }
 
     if (params.Postcommit_perf_postcommit) {
         parallelTestsMap.put('Perf Postcommit',
-                {
-                    commonLodestarModule.runPyrock(pipelineRun, random, 'Perf Postcommit', clusterConfig +
-                            [
-                                    TEST_NAME      : 'postcommit',
-                                    CONFIGFILE_NAME: 'conf-closed.yaml',
-                                    PROFILE_NAME   : 'small',
-                            ]
-                    )
-                }
+            {
+                commonLodestarModule.runLodestar(pipelineRun, 'Perf Postcommit') { c -> cloud_tests.runCdmPerfPostcommit(c) }
+            }
         )
     }
 
     if (params.Postcommit_perf_restore) {
         parallelTestsMap.put('Perf Restore',
-                {
-                    commonLodestarModule.runPyrock(pipelineRun, random, 'Perf Restore', clusterConfig +
-                            [
-                                    TEST_NAME      : 'platform',
-                                    CONFIGFILE_NAME: 'conf-postcommit-restore-100k-closed.yaml',
-                            ]
-                    )
-                }
+            {
+                commonLodestarModule.runLodestar(pipelineRun, 'Perf Restore') { c -> cloud_tests.runCdmPerfPostcommit(c) }
+            }
         )
     }
 
@@ -164,191 +121,122 @@ def runPostcommitSet0(PipelineRunLegacyAdapter pipelineRun, Random random, Linke
     // *************
     if (params.Postcommit_am_k8s_postcommit) {
         parallelTestsMap.put('AM K8s Postcommit',
-                {
-                    commonLodestarModule.runSpyglaas(pipelineRun, random, 'AM K8s Postcommit', clusterConfig +
-                            [TESTS_SCOPE: 'tests/k8s/postcommit/am']
-                    )
-                }
+            {
+                commonLodestarModule.runLodestar(pipelineRun, 'AM K8s Postcommit') { c -> cloud_tests.runCdmFuncAmK8sPostcommit(c) }
+            }
         )
     }
     if (params.Postcommit_am_k8s_upgrade) {
         parallelTestsMap.put('AM K8s Upgrade',
-                {
-                    def randomNumber = random.nextInt(99999) + 100000 // 6 digit random number to compute to namespace
-                    def upgradeCommonConfig = clusterConfig + productInfoUpgradeFrom + [
-                            TESTS_SCOPE         : 'tests/k8s/postcommit/am',
-                            DEPLOYMENT_NAMESPACE: cloud_config.commonConfig()['DEPLOYMENT_NAMESPACE'] + '-' +
-                                    randomNumber,
-                    ]
-
-                    def deploymentConfig = upgradeCommonConfig + [
-                            REPORT_NAME_PREFIX       : 'am_k8s_upgrade_deployment',
-                    ]
-
-                    def testConfig = upgradeCommonConfig + productInfoUpgradeTo + [
-                            REPORT_NAME_PREFIX       : 'am_k8s_upgrade_upgrade',
-                    ]
-
-                    commonLodestarModule.runUpgrade(pipelineRun, random, 'AM K8s Upgrade', deploymentConfig, testConfig)
-                }
+            {
+                commonLodestarModule.runLodestar(pipelineRun, 'AM K8s Upgrade') { c -> cloud_tests.runCdmFuncAmK8sUpgrade(c) }
+            }
         )
     }
 
     if (params.Postcommit_ds_k8s_postcommit) {
         parallelTestsMap.put('DS K8s Postcommit',
-                {
-                    commonLodestarModule.runSpyglaas(pipelineRun, random, 'DS K8s Postcommit', clusterConfig +
-                            [TESTS_SCOPE: 'tests/k8s/postcommit/ds']
-                    )
-                }
+            {
+                commonLodestarModule.runLodestar(pipelineRun, 'DS K8s Postcommit') { c -> cloud_tests.runCdmFuncDsK8sPostcommit(c) }
+            }
         )
     }
     if (params.Postcommit_ds_k8s_upgrade) {
+        println('yyyyy')
         parallelTestsMap.put('DS K8s Upgrade',
-                {
-                    def randomNumber = random.nextInt(99999) + 100000 // 6 digit random number to compute to namespace
-                    def upgradeCommonConfig = clusterConfig + productInfoUpgradeFrom + [
-                            TESTS_SCOPE         : 'tests/k8s/postcommit/ds/standard',
-                            DEPLOYMENT_NAMESPACE: cloud_config.commonConfig()['DEPLOYMENT_NAMESPACE'] + '-' +
-                                    randomNumber,
-                    ]
+            {
+                commonLodestarModule.runLodestar(pipelineRun, 'DS K8s Upgrade') { c -> cloud_tests.runCdmFuncDsK8sUpgrade(c) }
+            }
+        )
+    }
+    if (params.Postcommit_ig_k8s_postcommit) {
+        parallelTestsMap.put('IG K8s Postcommit',
+            {
+                commonLodestarModule.runLodestar(pipelineRun, 'IG K8s Postcommit') { c -> cloud_tests.runCdmFuncIgK8sPostcommit(c) }
+            }
+        )
+    }
 
-                    def deploymentConfig = upgradeCommonConfig + [
-                            REPORT_NAME_PREFIX       : 'ds_k8s_upgrade_deployment',
-                    ]
-
-                    def testConfig = upgradeCommonConfig + productInfoUpgradeTo + [
-                            REPORT_NAME_PREFIX       : 'ds_k8s_upgrade_upgrade',
-                    ]
-
-                    commonLodestarModule.runUpgrade(pipelineRun, random, 'DS K8s Upgrade', deploymentConfig, testConfig)
-                }
+    if (params.Postcommit_set_images) {
+        parallelTestsMap.put('Set Images',
+            {
+                commonLodestarModule.runLodestar(pipelineRun, 'Set Images', [STASH_PLATFORM_IMAGES_REF: 'sustaining/8.0.x']) { c -> cloud_tests.runCdmFuncSetImages(c) }
+            }
         )
     }
 
     parallel parallelTestsMap
 }
 
-def runPostcommitSet1(PipelineRunLegacyAdapter pipelineRun, Random random, LinkedHashMap clusterConfig) {
+def runPostcommitSet1(PipelineRunLegacyAdapter pipelineRun) {
     def parallelTestsMap = [:]
 
-    // *************
-    // DEV k8s tests
-    // *************
-    if (params.Postcommit_ig_k8s_postcommit) {
-        parallelTestsMap.put('IG K8s Postcommit',
-                {
-                    commonLodestarModule.runSpyglaas(pipelineRun, random, 'IG K8s Postcommit', clusterConfig +
-                            [TESTS_SCOPE: 'tests/k8s/postcommit/ig']
-                    )
-                }
-        )
-    }
-    if (params.Postcommit_ig_k8s_upgrade) {
-        parallelTestsMap.put('IG K8s Upgrade',
-                {
-                    def randomNumber = random.nextInt(99999) + 100000 // 6 digit random number to compute to namespace
-                    def upgradeCommonConfig = clusterConfig + productInfoUpgradeFrom + [
-                            TESTS_SCOPE         : 'tests/k8s/postcommit/ig',
-                            DEPLOYMENT_NAMESPACE: cloud_config.commonConfig()['DEPLOYMENT_NAMESPACE'] + '-' +
-                                    randomNumber,
-                    ]
+    // ****************
+    // Guillotine tests
+    // ****************
 
-                    def deploymentConfig = upgradeCommonConfig + [
-                            REPORT_NAME_PREFIX       : 'ig_k8s_upgrade_deployment',
-                    ]
-
-                    def testConfig = upgradeCommonConfig + productInfoUpgradeTo + [
-                            REPORT_NAME_PREFIX       : 'ig_k8s_upgrade_upgrade',
-                    ]
-
-                    commonLodestarModule.runUpgrade(pipelineRun, random, 'IG K8s Upgrade', deploymentConfig, testConfig)
-                }
-        )
-    }
-
-    if (params.Postcommit_platform_ui) {
-        parallelTestsMap.put('Platform UI',
-                {
-                    commonLodestarModule.runPlatformUi(pipelineRun, random, 'Platform UI', clusterConfig)
-                }
-        )
-    }
-
-    if (params.Postcommit_set_images) {
-        parallelTestsMap.put('Set Images',
-                {
-                    commonLodestarModule.runSpyglaas(pipelineRun, random, 'Set Images', clusterConfig +
-                            [TESTS_SCOPE              : 'tests/set_images',
-                             STASH_FORGEOPS_REF       : GIT_COMMIT,
-                             STASH_PLATFORM_IMAGES_REF: 'sustaining/8.0.x',
-                             STASH_LODESTAR_REF       : commonModule.lodestarRevision]
-                    )
-                }
-        )
-    }
 
     if (params.Postcommit_guillotine_cli) {
         parallelTestsMap.put('Guillotine - Forgeops cli',
-                {
-                    commonModule.runGuillotine(pipelineRun, 'Guillotine - Forgeops Test Group', '--test-names Forgeops', '')
-                }
+            {
+                commonModule.runGuillotine(pipelineRun, 'Guillotine - Forgeops Test Group', '--test-names Forgeops', '')
+            }
         )
     }
 
     if (params.Postcommit_guillotine_ds) {
         parallelTestsMap.put('Guillotine - DS',
-                {
-                    commonModule.runGuillotine(pipelineRun, 'Guillotine - DS', '--test-names Kustomize.DsBackup,Kustomize.DsBackupSnapshot,Kustomize.DsDebug', '')
-                }
+            {
+                commonModule.runGuillotine(pipelineRun, 'Guillotine - DS', '--test-names Kustomize.DsBackup,Kustomize.DsBackupSnapshot,Kustomize.DsDebug', '')
+            }
         )
     }
 
     if (params.Postcommit_guillotine_upgrade) {
         parallelTestsMap.put('Guillotine - Upgrade',
-                {
-                    commonModule.runGuillotine(pipelineRun, 'Guillotine - Upgrade', '--test-names Helm.UpgradeForgeops,Kustomize.UpgradePlatform74To75,Kustomize.UpgradeForgeops,Helm.BackwardsCompatibilityDev', '')
-                }
+            {
+                commonModule.runGuillotine(pipelineRun, 'Guillotine - Upgrade', '--test-names Helm.UpgradeForgeops,Kustomize.UpgradePlatform74To75,Kustomize.UpgradeForgeops,Helm.BackwardsCompatibilityDev', '')
+            }
         )
     }
 
     if (params.Postcommit_guillotine_ig) {
         parallelTestsMap.put('Guillotine - IG',
-                {
-                    commonModule.runGuillotine(pipelineRun, 'Guillotine - IG', '--test-names Kustomize.SmokeIG,Helm.SmokeIG', '')
-                }
+            {
+                commonModule.runGuillotine(pipelineRun, 'Guillotine - IG', '--test-names Kustomize.SmokeIG,Helm.SmokeIG', '')
+            }
         )
     }
 
     if (params.Postcommit_guillotine_acceptance) {
         parallelTestsMap.put('Guillotine - Acceptance',
-                {
-                    commonModule.runGuillotine(pipelineRun, 'Guillotine - Acceptance', '--test-names Kustomize.Acceptance,Helm.Acceptance,Helm.ChangeSizeDeployment', '')
-                }
+            {
+                commonModule.runGuillotine(pipelineRun, 'Guillotine - Acceptance', '--test-names Kustomize.Acceptance,Helm.Acceptance,Helm.ChangeSizeDeployment', '')
+            }
         )
     }
 
     if (params.Postcommit_guillotine_small_profile) {
         parallelTestsMap.put('Guillotine - Smoke - small profile',
-                {
-                    commonModule.runGuillotine(pipelineRun, 'Guillotine - Smoke - small profile', '--test-names Kustomize.SmallProfile', '')
-                }
+            {
+                commonModule.runGuillotine(pipelineRun, 'Guillotine - Smoke - small profile', '--test-names Kustomize.SmallProfile', '')
+            }
         )
     }
 
     if (params.Postcommit_guillotine_set_images) {
         parallelTestsMap.put('Guillotine - Set Images',
-                {
-                    commonModule.runGuillotine(pipelineRun, 'Guillotine - Set Images', '--test-names Kustomize.SetImages', '')
-                }
+            {
+                commonModule.runGuillotine(pipelineRun, 'Guillotine - Set Images', '--test-names Kustomize.SetImages', '')
+            }
         )
     }
 
     if (params.Postcommit_guillotine_misc) {
         parallelTestsMap.put('Guillotine - Misc',
-                {
-                    commonModule.runGuillotine(pipelineRun, 'Guillotine - Misc', '--test-names Kustomize.ForgeopsInfo,', '')
-                }
+            {
+                commonModule.runGuillotine(pipelineRun, 'Guillotine - Misc', '--test-names Kustomize.ForgeopsInfo,', '')
+            }
         )
     }
 

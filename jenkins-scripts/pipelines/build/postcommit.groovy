@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2024 Ping Identity Corporation. All Rights Reserved
+ * Copyright 2019-2026 Ping Identity Corporation. All Rights Reserved
  *
  * This code is to be used exclusively in connection with Ping Identity
  * Corporation software or services. Ping Identity Corporation only offers
@@ -13,10 +13,10 @@
 //===============================================
 
 import com.forgerock.pipeline.reporting.PipelineRunLegacyAdapter
-import com.forgerock.pipeline.stage.Status
 
 def initialSteps() {
     properties([
+            disableConcurrentBuilds(),
             buildDiscarder(logRotator(numToKeepStr: '20', artifactNumToKeepStr: '20')),
             parameters(commonLodestarModule.postcommitMandatoryStages(true)),
     ])
@@ -31,8 +31,7 @@ def initialSteps() {
  */
 def postBuildTests(PipelineRunLegacyAdapter pipelineRun) {
     try {
-        Random random = new Random()
-        postcommitTestsStage.runStage(pipelineRun, random, true)
+        postcommitTestsStage.runStage(pipelineRun)
     } catch (exception) {
         sendFailedSlackNotification("Error occurred while running postcommit tests")
         throw exception

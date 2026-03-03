@@ -68,10 +68,7 @@ node('gce-vm-forgeops-n2d-standard-4') {
     pipeline.initialSteps()
 
     if (commonModule.branchSupportsPitTests()) {
-        // Allow only one postcommit at a time accross all the branches
-        withPostcommitLock((isPR() && !commonLodestarModule.doRunPostcommitTests()) ? null : "postcommit-forgeops.${cloud_constants.getDefaultDomain()}") {
-            pipeline.postBuildTests(pipelineRun)
-        }
+        pipeline.postBuildTests(pipelineRun)
     }
 
     if (commonModule.branchSupportsIDCloudReleases() && !isPR()) {
@@ -80,14 +77,4 @@ node('gce-vm-forgeops-n2d-standard-4') {
     }
 
     pipeline.finalNotification()
-}
-
-def withPostcommitLock(String resourceName, Closure process) {
-    if (resourceName) {
-        lock(resource: resourceName) {
-            process()
-        }
-    } else {
-        process()
-    }
 }

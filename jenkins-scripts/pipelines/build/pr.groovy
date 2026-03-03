@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2025 ForgeRock AS. All Rights Reserved
+ * Copyright 2019-2026 ForgeRock AS. All Rights Reserved
  *
  * Use of this code requires a commercial software license with ForgeRock AS.
  * or with one of its affiliates. All use shall be exclusively subject
@@ -13,7 +13,6 @@
 import com.forgerock.pipeline.PullRequestBuild
 import com.forgerock.pipeline.reporting.PipelineRunLegacyAdapter
 import org.jenkinsci.plugins.workflow.steps.FlowInterruptedException
-import com.forgerock.pipeline.stage.Status
 
 def initialSteps() {
     properties([
@@ -58,24 +57,18 @@ def postBuildTests(PipelineRunLegacyAdapter pipelineRun) {
     }
 
     try {
-        Random random = new Random()
         if (params.PR_deployment_only) {
-            prTestsStage.runStage(pipelineRun, random)
+            prTestsStage.runStage(pipelineRun)
         }
 
         if (commonLodestarModule.doRunPostcommitTests()) {
-            postcommitTestsStage.runStage(pipelineRun, random, false)
+            postcommitTestsStage.runStage(pipelineRun)
         }
-
-        commonLodestarModule.generateSummaryTestReport()
     } catch (FlowInterruptedException exception) {
         sendBuildAbortedNotification()
         throw exception
     } catch (exception) {
         // If there is a pipeline error, or a timeout with the PIT/PERF tests, an exception is thrown.
-        if (currentBuild.result != 'ABORTED') {
-            commonLodestarModule.generateSummaryTestReport()
-        }
         sendBuildFailureNotification("PR tests failed. ${prReportMessage()}")
         throw exception
     }
@@ -153,7 +146,7 @@ def finalNotification() {
 }
 
 String prReportMessage() {
-    return "Report is available [here](${env.JOB_URL}/${env.BUILD_NUMBER}/${commonLodestarModule.SUMMARY_REPORT_NAME}/)"
+    return "Reports are available [here](${env.JOB_URL}/${env.BUILD_NUMBER}/)"
 }
 
 // TODO GitHub migration remove method when lodestar GitHub migration is complete
