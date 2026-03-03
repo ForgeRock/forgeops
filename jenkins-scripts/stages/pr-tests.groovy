@@ -11,27 +11,24 @@
 
 import com.forgerock.pipeline.reporting.PipelineRunLegacyAdapter
 
-void runStage(PipelineRunLegacyAdapter pipelineRun, Random random) {
+void runStage(PipelineRunLegacyAdapter pipelineRun) {
     def parallelTestsMap = [:]
 
     parallelTestsMap.put('PIT1',
         {
-            commonLodestarModule.runSpyglaas(pipelineRun, random, 'Pit1',
-                [
-                    TESTS_SCOPE: 'tests/pit1',
-                ]
-            )
+            commonLodestarModule.runLodestar(pipelineRun, 'PIT1') { c -> cloud_tests.runCdmOrAicFuncPit1(c) }
         }
     )
+
     parallelTestsMap.put('Perf postcommit',
         {
-            commonLodestarModule.runPyrock(pipelineRun, random, 'Perf Postcommit',
-                [
-                    TEST_NAME      : 'postcommit',
-                    CONFIGFILE_NAME: 'conf-closed.yaml',
-                    PROFILE_NAME   : 'small',
-                ]
-            )
+            commonLodestarModule.runLodestar(pipelineRun, 'Perf Postcommit') { c -> cloud_tests.runCdmPerfPostcommit(c) }
+        }
+    )
+
+    parallelTestsMap.put('AM K8s Postcommit',
+        {
+            commonLodestarModule.runLodestar(pipelineRun, 'AM K8s Postcommit') { c -> cloud_tests.runCdmFuncAmK8sPostcommit(c) }
         }
     )
 
@@ -80,7 +77,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun, Random random) {
     parallelTestsMap.put('Guillotine - Misc',
             {
                 commonModule.runGuillotine(pipelineRun, 'Guillotine - Misc', '--test-names Kustomize.ForgeopsInfo,', '')
-            }
+        }
     )
 
     parallel parallelTestsMap

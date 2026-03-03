@@ -27,6 +27,8 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
                         'Postcommit_ds_k8s_upgrade',
                         'Postcommit_ig_k8s_postcommit',
                         'Postcommit_set_images',
+                ],
+                    [
                         'Postcommit_guillotine_cli',
                         'Postcommit_guillotine_ds',
                         'Postcommit_guillotine_upgrade',
@@ -108,14 +110,9 @@ def runPostcommitSet0(PipelineRunLegacyAdapter pipelineRun) {
 
     if (params.Postcommit_perf_restore) {
         parallelTestsMap.put('Perf Restore',
-                {
-                    commonLodestarModule.runPyrock(pipelineRun, random, 'Perf Restore', clusterConfig +
-                            [
-                                    TEST_NAME      : 'platform',
-                                    CONFIGFILE_NAME: 'conf-postcommit-restore-100k-closed.yaml',
-                            ]
-                    )
-                }
+            {
+                commonLodestarModule.runLodestar(pipelineRun, 'Perf Restore') { c -> cloud_tests.runCdmPerfPostcommit(c) }
+            }
         )
     }
 
@@ -168,7 +165,6 @@ def runPostcommitSet0(PipelineRunLegacyAdapter pipelineRun) {
         )
     }
 
-<<<<<<< HEAD
     parallel parallelTestsMap
 }
 
@@ -185,111 +181,62 @@ def runPostcommitSet1(PipelineRunLegacyAdapter pipelineRun) {
             {
                 commonModule.runGuillotine(pipelineRun, 'Guillotine - Forgeops Test Group', '--test-names Forgeops', '')
             }
-=======
-    if (params.Postcommit_guillotine_cli) {
-        parallelTestsMap.put('Guillotine - Forgeops cli',
-                {
-                    commonModule.runGuillotine(pipelineRun, 'Guillotine - Forgeops Test Group', '--test-names Forgeops', '')
-                }
->>>>>>> 5f89cbc68 (FORGEOPS-6450 split testuites in parallel in jenkins)
         )
     }
 
     if (params.Postcommit_guillotine_ds) {
         parallelTestsMap.put('Guillotine - DS',
-<<<<<<< HEAD
             {
                 commonModule.runGuillotine(pipelineRun, 'Guillotine - DS', '--test-names Kustomize.DsBackup,Kustomize.DsBackupSnapshot,Kustomize.DsDebug', '')
             }
-=======
-                {
-                    commonModule.runGuillotine(pipelineRun, 'Guillotine - DS', '--test-names Kustomize.DsBackup,Kustomize.DsBackupSnapshot,Kustomize.DsDebug', '')
-                }
->>>>>>> 5f89cbc68 (FORGEOPS-6450 split testuites in parallel in jenkins)
         )
     }
 
     if (params.Postcommit_guillotine_upgrade) {
         parallelTestsMap.put('Guillotine - Upgrade',
-<<<<<<< HEAD
             {
                 commonModule.runGuillotine(pipelineRun, 'Guillotine - Upgrade', '--test-names Helm.UpgradeForgeops,Kustomize.UpgradePlatform74To75,Kustomize.UpgradeForgeops,Helm.BackwardsCompatibilityDev', '')
             }
-=======
-                {
-                    commonModule.runGuillotine(pipelineRun, 'Guillotine - Upgrade', '--test-names Helm.UpgradeForgeops,Kustomize.UpgradePlatform74To75,Kustomize.UpgradeForgeops,Helm.BackwardsCompatibilityDev', '')
-                }
->>>>>>> 5f89cbc68 (FORGEOPS-6450 split testuites in parallel in jenkins)
         )
     }
 
     if (params.Postcommit_guillotine_ig) {
         parallelTestsMap.put('Guillotine - IG',
-<<<<<<< HEAD
             {
                 commonModule.runGuillotine(pipelineRun, 'Guillotine - IG', '--test-names Kustomize.SmokeIG,Helm.SmokeIG', '')
             }
-=======
-                {
-                    commonModule.runGuillotine(pipelineRun, 'Guillotine - IG', '--test-names Kustomize.SmokeIG,Helm.SmokeIG', '')
-                }
->>>>>>> 5f89cbc68 (FORGEOPS-6450 split testuites in parallel in jenkins)
         )
     }
 
     if (params.Postcommit_guillotine_acceptance) {
         parallelTestsMap.put('Guillotine - Acceptance',
-<<<<<<< HEAD
             {
                 commonModule.runGuillotine(pipelineRun, 'Guillotine - Acceptance', '--test-names Kustomize.Acceptance,Helm.Acceptance,Helm.ChangeSizeDeployment', '')
             }
-=======
-                {
-                    commonModule.runGuillotine(pipelineRun, 'Guillotine - Acceptance', '--test-names Kustomize.Acceptance,Helm.Acceptance,Helm.ChangeSizeDeployment', '')
-                }
->>>>>>> 5f89cbc68 (FORGEOPS-6450 split testuites in parallel in jenkins)
         )
     }
 
     if (params.Postcommit_guillotine_small_profile) {
         parallelTestsMap.put('Guillotine - Smoke - small profile',
-<<<<<<< HEAD
             {
                 commonModule.runGuillotine(pipelineRun, 'Guillotine - Smoke - small profile', '--test-names Kustomize.SmallProfile', '')
             }
-=======
-                {
-                    commonModule.runGuillotine(pipelineRun, 'Guillotine - Smoke - small profile', '--test-names Kustomize.SmallProfile', '')
-                }
->>>>>>> 5f89cbc68 (FORGEOPS-6450 split testuites in parallel in jenkins)
         )
     }
 
     if (params.Postcommit_guillotine_set_images) {
         parallelTestsMap.put('Guillotine - Set Images',
-<<<<<<< HEAD
             {
                 commonModule.runGuillotine(pipelineRun, 'Guillotine - Set Images', '--test-names Kustomize.SetImages', '')
             }
-=======
-                {
-                    commonModule.runGuillotine(pipelineRun, 'Guillotine - Set Images', '--test-names Kustomize.SetImages', '')
-                }
->>>>>>> 5f89cbc68 (FORGEOPS-6450 split testuites in parallel in jenkins)
         )
     }
 
     if (params.Postcommit_guillotine_misc) {
         parallelTestsMap.put('Guillotine - Misc',
-<<<<<<< HEAD
             {
                 commonModule.runGuillotine(pipelineRun, 'Guillotine - Misc', '--test-names Kustomize.ForgeopsInfo,', '')
             }
-=======
-                {
-                    commonModule.runGuillotine(pipelineRun, 'Guillotine - Misc', '--test-names Kustomize.ForgeopsInfo,', '')
-                }
->>>>>>> 5f89cbc68 (FORGEOPS-6450 split testuites in parallel in jenkins)
         )
     }
 
