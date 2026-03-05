@@ -41,6 +41,8 @@ spec:
           emptyDir: {}
         - name: fbc
           emptyDir: {}
+        - name: writeable
+          emptyDir: {}
         - name: am-secrets
           projected:
             sources:
@@ -105,6 +107,8 @@ spec:
               name: custom
             - mountPath: /scripts
               name: am-init-scripts
+            - mountPath: /writeable
+              name: writeable
           command:
             - /scripts/filesystem-init.sh
         - name: truststore-init
@@ -195,6 +199,9 @@ spec:
               cpu: 250m
               memory: 1800Mi
           volumeMounts:
+            - name: writeable
+              mountPath: /home/forgerock
+              subPath: home/forgerock
             - name: new-truststore
               mountPath: /home/forgerock/amtruststore
               readOnly: true
@@ -209,6 +216,9 @@ spec:
               mountPath: /home/forgerock/logging
             - name: entrypoint-scripts
               mountPath: /home/forgerock/entrypoint-scripts
+            - name: writeable
+              mountPath: /tmp
+              subPath: tmp
       tolerations:
         - effect: NoSchedule
           key: kubernetes.io/arch

@@ -48,6 +48,8 @@ spec:
           emptyDir: {}
         - name: fbc
           emptyDir: {}
+        - name: writeable
+          emptyDir: {}
         - name: am-secrets
           projected:
             sources:
@@ -120,6 +122,8 @@ spec:
             name: custom
           - mountPath: /scripts
             name: am-init-scripts
+          - mountPath: /writeable
+            name: writeable
           command: [/scripts/filesystem-init.sh]
         - name: truststore-init
           image: "{{ .Values.am.image.repository }}:{{ .Values.am.image.tag | default .Chart.AppVersion }}"
@@ -222,6 +226,9 @@ spec:
           resources:
             {{- toYaml .Values.am.resources | nindent 12 }}
           volumeMounts:
+          - name: writeable
+            mountPath: /home/forgerock
+            subPath: home/forgerock
           - name: new-truststore
             mountPath: /home/forgerock/amtruststore
             readOnly: true
@@ -236,6 +243,9 @@ spec:
             mountPath: /home/forgerock/logging
           - name: entrypoint-scripts
             mountPath: /home/forgerock/entrypoint-scripts
+          - name: writeable
+            mountPath: /tmp
+            subPath: tmp
       {{- with .Values.am.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
