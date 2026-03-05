@@ -111,7 +111,7 @@ def withGitHubCredentialsForGuillotine(Closure process) {
 }
 
 
-def runGuillotine(PipelineRunLegacyAdapter pipelineRun, String stageName, String providerName, String options, String platformImageRef='') {
+def runGuillotine(PipelineRunLegacyAdapter pipelineRun, String stageName, String options, String platformImageRef='') {
     stage(stageName) {
         def normalizedStageName = normalizeStageName(stageName)
 

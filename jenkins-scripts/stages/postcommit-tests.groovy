@@ -51,13 +51,14 @@ void runStage(PipelineRunLegacyAdapter pipelineRun, Random random, boolean gener
                         'Postcommit_ig_k8s_upgrade',
                         'Postcommit_platform_ui',
                         'Postcommit_set_images',
-                        'Postcommit_fo_acceptance',
-                        'Postcommit_fo_smoke_small',
-                        'Postcommit_fo_set_images',
-                        'Postcommit_fo_dsbackup',
-                        'Postcommit_fo_am_only',
-                        'Postcommit_fo_ig_only',
-                        'Postcommit_fo_ds_only',
+                        'Postcommit_guillotine_cli',
+                        'Postcommit_guillotine_ds',
+                        'Postcommit_guillotine_upgrade',
+                        'Postcommit_guillotine_ig',
+                        'Postcommit_guillotine_acceptance',
+                        'Postcommit_guillotine_small_profile',
+                        'Postcommit_guillotine_set_images',
+                        'Postcommit_guillotine_misc',
                 ],
         ]
 
@@ -287,60 +288,69 @@ def runPostcommitSet1(PipelineRunLegacyAdapter pipelineRun, Random random, Linke
         )
     }
 
-    if (params.Postcommit_fo_acceptance) {
-        parallelTestsMap.put('FO Acceptance',
+    if (params.Postcommit_guillotine_cli) {
+        parallelTestsMap.put('Guillotine - Forgeops cli',
                 {
-                    commonModule.runGuillotine(pipelineRun, 'FO Acceptance', 'GKE', '--keyword ACCEPTANCE', '')
+                    commonModule.runGuillotine(pipelineRun, 'Guillotine - Forgeops Test Group', '--test-names Forgeops', '')
                 }
         )
     }
 
-    if (params.Postcommit_fo_smoke_small) {
-        parallelTestsMap.put('FO Smoke on Small profile',
+    if (params.Postcommit_guillotine_ds) {
+        parallelTestsMap.put('Guillotine - DS',
                 {
-                    commonModule.runGuillotine(pipelineRun, 'FO Smoke on Small profile', 'GKE', '--test-names Kustomize.Smoke --forgeops-profile small', '')
+                    commonModule.runGuillotine(pipelineRun, 'Guillotine - DS', '--test-names Kustomize.DsBackup,Kustomize.DsBackupSnapshot,Kustomize.DsDebug', '')
                 }
         )
     }
 
-    if (params.Postcommit_fo_set_images) {
-        parallelTestsMap.put('FO Set Images',
+    if (params.Postcommit_guillotine_upgrade) {
+        parallelTestsMap.put('Guillotine - Upgrade',
                 {
-                    commonModule.runGuillotine(pipelineRun, 'FO Set Images', 'GKE', '--test-names Kustomize.SetImages', '')
+                    commonModule.runGuillotine(pipelineRun, 'Guillotine - Upgrade', '--test-names Helm.UpgradeForgeops,Kustomize.UpgradePlatform74To75,Kustomize.UpgradeForgeops,Helm.BackwardsCompatibilityDev', '')
                 }
         )
     }
 
-    if (params.Postcommit_fo_dsbackup) {
-        parallelTestsMap.put('FO DsBackup',
+    if (params.Postcommit_guillotine_ig) {
+        parallelTestsMap.put('Guillotine - IG',
                 {
-                    commonModule.runGuillotine(pipelineRun, 'FO DsBackup', 'GKE', '--test-names Kustomize.DsBackup', '')
+                    commonModule.runGuillotine(pipelineRun, 'Guillotine - IG', '--test-names Kustomize.SmokeIG,Helm.SmokeIG', '')
                 }
         )
     }
 
-     if (params.Postcommit_fo_am_only) {
-         parallelTestsMap.put('FO AM only',
-                 {
-                     commonModule.runGuillotine(pipelineRun, 'FO AM only', 'GKE', '--test-names Deployment.AmOnly', '')
-                 }
-         )
-     }
+    if (params.Postcommit_guillotine_acceptance) {
+        parallelTestsMap.put('Guillotine - Acceptance',
+                {
+                    commonModule.runGuillotine(pipelineRun, 'Guillotine - Acceptance', '--test-names Kustomize.Acceptance,Helm.Acceptance,Helm.ChangeSizeDeployment', '')
+                }
+        )
+    }
 
-     if (params.Postcommit_fo_ig_only) {
-         parallelTestsMap.put('FO IG only',
-                 {
-                     commonModule.runGuillotine(pipelineRun, 'FO IG only', 'GKE', '--test-names Deployment.IgOnly', '')
-                 }
-         )
-     }
-     if (params.Postcommit_fo_ds_only) {
-         parallelTestsMap.put('FO DS only',
-                 {
-                     commonModule.runGuillotine(pipelineRun, 'FO DS only', 'GKE', '--test-names Deployment.DsOnly', '')
-                 }
-         )
-     }
+    if (params.Postcommit_guillotine_small_profile) {
+        parallelTestsMap.put('Guillotine - Smoke - small profile',
+                {
+                    commonModule.runGuillotine(pipelineRun, 'Guillotine - Smoke - small profile', '--test-names Kustomize.SmallProfile', '')
+                }
+        )
+    }
+
+    if (params.Postcommit_guillotine_set_images) {
+        parallelTestsMap.put('Guillotine - Set Images',
+                {
+                    commonModule.runGuillotine(pipelineRun, 'Guillotine - Set Images', '--test-names Kustomize.SetImages', '')
+                }
+        )
+    }
+
+    if (params.Postcommit_guillotine_misc) {
+        parallelTestsMap.put('Guillotine - Misc',
+                {
+                    commonModule.runGuillotine(pipelineRun, 'Guillotine - Misc', '--test-names Kustomize.ForgeopsInfo,', '')
+                }
+        )
+    }
 
     parallel parallelTestsMap
 }

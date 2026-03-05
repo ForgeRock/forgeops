@@ -35,10 +35,14 @@ ArrayList postcommitMandatoryStages(boolean enabled) {
         booleanParam(name: 'Postcommit_ig_k8s_upgrade', defaultValue: enabled),
         booleanParam(name: 'Postcommit_platform_ui', defaultValue: enabled),
         booleanParam(name: 'Postcommit_set_images', defaultValue: enabled),
-        booleanParam(name: 'Postcommit_fo_acceptance', defaultValue: enabled),
-        booleanParam(name: 'Postcommit_fo_smoke_small', defaultValue: enabled),
-        booleanParam(name: 'Postcommit_fo_set_images', defaultValue: enabled),
-        booleanParam(name: 'Postcommit_fo_dsbackup', defaultValue: enabled),
+        booleanParam(name: 'Postcommit_guillotine_cli', defaultValue: enabled),
+        booleanParam(name: 'Postcommit_guillotine_ds', defaultValue: enabled),
+        booleanParam(name: 'Postcommit_guillotine_upgrade', defaultValue: enabled),
+        booleanParam(name: 'Postcommit_guillotine_ig', defaultValue: enabled),
+        booleanParam(name: 'Postcommit_guillotine_acceptance', defaultValue: enabled),
+        booleanParam(name: 'Postcommit_guillotine_small_profile', defaultValue: enabled),
+        booleanParam(name: 'Postcommit_guillotine_set_images', defaultValue: enabled),
+        booleanParam(name: 'Postcommit_guillotine_misc', defaultValue: enabled),
     ]
 }
 
