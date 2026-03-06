@@ -78,8 +78,6 @@ spec:
               name: keys
             - mountPath: /var/run/secrets/cloud-credentials-cache/
               name: cloud-credentials-cache
-          # args:
-          # - init
           command:
             - sh
             - -c
