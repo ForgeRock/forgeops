@@ -67,13 +67,45 @@ spec:
           emptyDir: {}
         - name: cloud-credentials-cache
           emptyDir: {}
+        {{- if .Values.ds_cts.securityContext.readOnlyRootFilesystem }}
+        - name: ds-init-scripts
+          configMap:
+            name: ds-init-scripts
+            defaultMode: 0755
+        - name: writeable
+          emptyDir: {}
+        {{- end }}
       initContainers:
+        {{- if .Values.ds_cts.securityContext.readOnlyRootFilesystem }}
+        - name: filesystem-init
+          securityContext:
+            {{- toYaml .Values.ds_cts.securityContext | nindent 12 }}
+          image: "{{ .Values.ds_cts.image.repository }}:{{ .Values.ds_cts.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.ds_cts.image.pullPolicy }}
+          volumeMounts:
+          - name: writeable
+            mountPath: /writeable
+          - name: ds-init-scripts
+            mountPath: /scripts
+          command: [/scripts/filesystem-init.sh]
+        {{- end }}
         - name: init
           securityContext:
             {{- toYaml .Values.ds_cts.securityContext | nindent 12 }}
           image: "{{ .Values.ds_cts.image.repository }}:{{ .Values.ds_cts.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.ds_cts.image.pullPolicy }}
           volumeMounts:
+          {{- if .Values.ds_cts.securityContext.readOnlyRootFilesystem }}
+          - name: writeable
+            mountPath: /opt/opendj
+            subPath: opt/opendj
+          - name: writeable
+            mountPath: /home/forgerock
+            subPath: home/forgerock
+          - name: writeable
+            mountPath: /tmp
+            subPath: tmp
+          {{- end }}
           {{- if .Values.ds_cts.volumeClaimSpec }}
           - mountPath: /opt/opendj/data
             name: data
@@ -198,6 +230,17 @@ spec:
           resources:
             {{- toYaml .Values.ds_cts.resources | nindent 12 }}
           volumeMounts:
+          {{- if .Values.ds_cts.securityContext.readOnlyRootFilesystem }}
+          - name: writeable
+            mountPath: /opt/opendj
+            subPath: opt/opendj
+          - name: writeable
+            mountPath: /home/forgerock
+            subPath: home/forgerock
+          - name: writeable
+            mountPath: /tmp
+            subPath: tmp
+          {{- end }}
           {{- if .Values.ds_cts.volumeClaimSpec }}
           - mountPath: /opt/opendj/data
             name: data

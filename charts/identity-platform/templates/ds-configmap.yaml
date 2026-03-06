@@ -1,0 +1,15 @@
+{{- if and (or .Values.ds_cts.enabled .Values.ds_idrepo.enabled)
+    (or .Values.ds_cts.securityContext.readOnlyRootFilesystem .Values.ds_idrepo.securityContext.readOnlyRootFilesystem)}}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ds-init-scripts
+  labels:
+    {{- include "identity-platform.labels" . | nindent 4 }}
+    {{- with .Values.idm.podLabels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+data:
+  {{ (.Files.Glob "files/ds/init-scripts/**.sh").AsConfig | nindent 2 }}
+{{- end }}

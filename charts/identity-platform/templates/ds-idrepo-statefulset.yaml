@@ -68,13 +68,45 @@ spec:
           emptyDir: {}
         - name: cloud-credentials-cache
           emptyDir: {}
+        {{- if .Values.ds_idrepo.securityContext.readOnlyRootFilesystem }}
+        - name: writeable
+          emptyDir: {}
+        - name: ds-init-scripts
+          configMap:
+            name: ds-init-scripts
+            defaultMode: 0755
+        {{- end }}
       initContainers:
+        {{- if .Values.ds_idrepo.securityContext.readOnlyRootFilesystem }}
+        - name: filesystem-init
+          securityContext:
+            {{- toYaml .Values.ds_idrepo.securityContext | nindent 12 }}
+          image: "{{ .Values.ds_idrepo.image.repository }}:{{ .Values.ds_idrepo.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.ds_idrepo.image.pullPolicy }}
+          volumeMounts:
+          - name: writeable
+            mountPath: /writeable
+          - name: ds-init-scripts
+            mountPath: /scripts
+          command: [/scripts/filesystem-init.sh]
+        {{- end }}
         - name: init
           securityContext:
             {{- toYaml .Values.ds_idrepo.securityContext | nindent 12 }}
           image: "{{ .Values.ds_idrepo.image.repository }}:{{ .Values.ds_idrepo.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.ds_idrepo.image.pullPolicy }}
           volumeMounts:
+          {{- if .Values.ds_idrepo.securityContext.readOnlyRootFilesystem }}
+          - name: writeable
+            mountPath: /opt/opendj
+            subPath: opt/opendj
+          - name: writeable
+            mountPath: /home/forgerock
+            subPath: home/forgerock
+          - name: writeable
+            mountPath: /tmp
+            subPath: tmp
+          {{- end }}
           {{- if .Values.ds_idrepo.volumeClaimSpec }}
           - mountPath: /opt/opendj/data
             name: data
@@ -93,8 +125,6 @@ spec:
             name: keys
           - mountPath: /var/run/secrets/cloud-credentials-cache/
             name: cloud-credentials-cache
-          # args:
-          # - init
           command:
           - sh
           - -c
@@ -201,6 +231,17 @@ spec:
           resources:
             {{- toYaml .Values.ds_idrepo.resources | nindent 12 }}
           volumeMounts:
+          {{- if .Values.ds_idrepo.securityContext.readOnlyRootFilesystem }}
+          - name: writeable
+            mountPath: /opt/opendj
+            subPath: opt/opendj
+          - name: writeable
+            mountPath: /home/forgerock
+            subPath: home/forgerock
+          - name: writeable
+            mountPath: /tmp
+            subPath: tmp
+          {{- end }}
           {{- if .Values.ds_idrepo.volumeClaimSpec }}
           - mountPath: /opt/opendj/data
             name: data
