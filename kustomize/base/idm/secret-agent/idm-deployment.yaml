@@ -41,6 +41,8 @@ spec:
           emptyDir: {}
         - name: fbc
           emptyDir: {}
+        - name: writeable
+          emptyDir: {}
         - name: idm-secrets
           secret:
             secretName: idm
@@ -91,6 +93,8 @@ spec:
               name: fbc
             - mountPath: /custom
               name: custom
+            - mountPath: /writeable
+              name: writeable
             - mountPath: /scripts
               name: idm-init-scripts
           command:
@@ -226,6 +230,9 @@ spec:
               name: idm-logback-xml
             - mountPath: /var/run/openidm/logging
               name: idm-logging-properties
+            - name: writeable
+              mountPath: /opt/openidm
+              subPath: opt/openidm
             - name: fbc
               mountPath: /opt/openidm/conf
               subPath: conf
@@ -235,6 +242,9 @@ spec:
             - name: fbc
               mountPath: /opt/openidm/script
               subPath: script
+            - name: writeable
+              mountPath: /tmp
+              subPath: tmp
       tolerations:
         - effect: NoSchedule
           key: kubernetes.io/arch

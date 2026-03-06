@@ -12,3 +12,10 @@ else
   cd /opt/openidm
   cp -rv ui conf script /fbc
 fi
+
+echo "Setting up writeable volume."
+echo "Creating tmp"
+mkdir -p /writeable/tmp
+echo "Copying /opt/openidm"
+mkdir -p /writeable/opt
+cp -av /opt/openidm/ /writeable/opt/openidm
