@@ -190,8 +190,8 @@ if [ "$SECRETS" == "secret-agent" ] ; then
   SEC_REPO=oci://us-docker.pkg.dev/forgeops-public/charts/secret-agent
   SEC_CHART_NAME=secret-agent
   SEC_NAMESPACE=${SA_NAMESPACE:-secret-agent}
-  SEC_VERSION=${SA_VERSION:-v1.2.5}
-  SEC_INSTALLED=$(kubectl get crd secretagentconfigurations.secret-agent.secrets.forgerock.io 2>/dev/null || true)
+  SEC_VERSION=${SA_VERSION:-v1.2.8}
+  SEC_INSTALLED=$(kubectl get crd secretagentconfigurations.${SEC_NAMESPACE}.secrets.forgerock.io 2>/dev/null || true)
   SEC_OPTS="--set tolerations[0].'key'='kubernetes\.io/arch' \
 --set tolerations[0].'effect'='NoSchedule' \
 --set tolerations[0].'operator'='Exists'"
