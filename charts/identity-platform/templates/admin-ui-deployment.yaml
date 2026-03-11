@@ -43,6 +43,23 @@ spec:
       serviceAccountName: {{ include "identity-platform.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.admin_ui.podSecurityContext | nindent 8 }}
+      volumes:
+        - name: admin-ui-init-scripts
+          configMap:
+            name: admin-ui-init-scripts
+            defaultMode: 0755
+        - name: writeable
+          emptyDir: {}
+      initContainers:
+        - name: filesystem-init
+          image: "{{ .Values.admin_ui.image.repository }}:{{ .Values.admin_ui.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.admin_ui.image.pullPolicy }}
+          volumeMounts:
+            - mountPath: /scripts
+              name: admin-ui-init-scripts
+            - mountPath: /writeable
+              name: writeable
+          command: [/scripts/filesystem-init.sh]
       containers:
         - name: admin-ui
           securityContext:
@@ -85,6 +102,13 @@ spec:
             {{- end }}
           resources:
             {{- toYaml .Values.admin_ui.resources | nindent 12 }}
+          volumeMounts:
+            - mountPath: /tmp
+              name: writeable
+              subPath: tmp
+            - mountPath: /usr/share/nginx
+              name: writeable
+              subPath: usr/share/nginx
       {{- with .Values.admin_ui.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
