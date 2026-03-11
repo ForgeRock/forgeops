@@ -1,0 +1,13 @@
+{{- if .Values.admin_ui.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: admin-ui-init-scripts
+  labels:
+    {{- include "identity-platform.labels" . | nindent 4 }}
+    {{- with .Values.admin_ui.podLabels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+data:
+  {{ (.Files.Glob "files/admin-ui/init-scripts/**.sh").AsConfig | nindent 2 }}
+{{- end }}

@@ -34,6 +34,24 @@ spec:
     spec:
       serviceAccountName: default
       securityContext: {}
+      volumes:
+        - name: admin-ui-init-scripts
+          configMap:
+            name: admin-ui-init-scripts
+            defaultMode: 0755
+        - name: writeable
+          emptyDir: {}
+      initContainers:
+        - name: filesystem-init
+          image: admin-ui
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - mountPath: /scripts
+              name: admin-ui-init-scripts
+            - mountPath: /writeable
+              name: writeable
+          command:
+            - /scripts/filesystem-init.sh
       containers:
         - name: admin-ui
           securityContext: {}
@@ -79,6 +97,13 @@ spec:
             requests:
               cpu: 10m
               memory: 100Mi
+          volumeMounts:
+            - mountPath: /tmp
+              name: writeable
+              subPath: tmp
+            - mountPath: /usr/share/nginx
+              name: writeable
+              subPath: usr/share/nginx
       tolerations:
         - effect: NoSchedule
           key: kubernetes.io/arch
