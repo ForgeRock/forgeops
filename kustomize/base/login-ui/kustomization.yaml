@@ -3,5 +3,6 @@ kind: Kustomization
 
 resources:
 - login-ui-service.yaml
+- login-ui-configmap.yaml
 - login-ui-deployment.yaml
 - login-ui-ingress.yaml

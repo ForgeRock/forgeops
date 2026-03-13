@@ -1,0 +1,26 @@
+---
+# Source: identity-platform/templates/login-ui-configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: login-ui-init-scripts
+  labels:
+    helm.sh/chart: identity-platform-1.0.0
+    app.kubernetes.io/name: identity-platform
+    app.kubernetes.io/part-of: identity-platform
+    app.kubernetes.io/instance: identity-platform
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+    app: login-ui
+    app.kubernetes.io/component: login-ui
+data:
+  
+  filesystem-init.sh: |
+    #!/bin/sh
+  
+    echo "Setting up writeable volume."
+    echo "Creating tmp"
+    mkdir -p /writeable/tmp
+    echo "Creating usr/share"
+    mkdir -p /writeable/usr/share
+    cp -rp /usr/share/nginx /writeable/usr/share
