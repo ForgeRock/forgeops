@@ -34,6 +34,24 @@ spec:
     spec:
       serviceAccountName: default
       securityContext: {}
+      volumes:
+        - name: end-user-ui-init-scripts
+          configMap:
+            name: end-user-ui-init-scripts
+            defaultMode: 0755
+        - name: writeable
+          emptyDir: {}
+      initContainers:
+        - name: filesystem-init
+          image: end-user-ui
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - mountPath: /scripts
+              name: end-user-ui-init-scripts
+            - mountPath: /writeable
+              name: writeable
+          command:
+            - /scripts/filesystem-init.sh
       containers:
         - name: end-user-ui
           securityContext: {}

@@ -3,5 +3,6 @@ kind: Kustomization
 
 resources:
   - end-user-ui-service.yaml
+  - end-user-ui-configmap.yaml
   - end-user-ui-deployment.yaml
   - end-user-ui-ingress.yaml

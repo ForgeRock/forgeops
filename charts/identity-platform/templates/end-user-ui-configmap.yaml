@@ -1,0 +1,13 @@
+{{- if .Values.end_user_ui.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: end-user-ui-init-scripts
+  labels:
+    {{- include "identity-platform.labels" . | nindent 4 }}
+    {{- with .Values.end_user_ui.podLabels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+data:
+  {{ (.Files.Glob "files/end-user-ui/init-scripts/**.sh").AsConfig | nindent 2 }}
+{{- end }}
