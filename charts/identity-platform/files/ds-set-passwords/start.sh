@@ -1,7 +1,22 @@
 #!/usr/bin/env bash
 
-# Checking PingDS is up
+# Checking the dirmanager.pw is available before proceeding, as it is required to set the passwords for the PingDS accounts
+wait_dirmanager_pw() {
+    local max_retries=10
+    local retry_count=0
+    while [ ! -f /var/run/secrets/opendj-passwords/dirmanager.pw ]; do
+        if [ "$retry_count" -ge "$max_retries" ]; then
+            echo "ERROR: dirmanager.pw secret not available after ${max_retries} retries. Exiting."
+            exit 1
+        fi
+        echo "Waiting for dirmanager.pw secret to be mounted..."
+        sleep 5
+        retry_count=$((retry_count + 1))
+    done
+    echo "dirmanager.pw is available"
+}
 
+# Checking PingDS is up
 wait_repo() {
     local HOST="$1-0.$1"
     local USER_DN=$2
@@ -18,6 +33,8 @@ wait_repo() {
     done
     echo "$HOST is responding"
 }
+
+wait_dirmanager_pw
 
 ADMIN_PASS=$(cat /var/run/secrets/opendj-passwords/dirmanager.pw)
 
