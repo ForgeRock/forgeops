@@ -40,16 +40,20 @@ OPTIONS:
   -l|--release-name <release-name> : release to use for base images
   --reset                          : reset image-defaulter to git index
   -t|--tag <tag>                   : image tag to use
+  --skip-image-append              : don't append the image name to the repo
 
 Valid Components:
   ${COMPONENTS_VALID[*]}
 
 Examples:
   Normal operation:
-  $PROG -p prod -e prod --push-to gcr.io/my-project/forgeops am
+  $PROG -p prod -e prod --push-to gcr.io/my-project/forgeops --release-name prod am
 
   Do a dryrun:
-  $PROG -p prod -e prod --push-to gcr.io/my-project/forgeops --dryrun am
+  $PROG -p prod -e prod --push-to gcr.io/my-project/forgeops --release-name prod  --dryrun am
+
+  Use AWS ECR repo directly:
+  $PROG -p prod -e prod --push-to 1234567890.dkr.ecr.us-east-1.amazonaws.com/prod-am --skip-image-append --release-name prod am
 
 EOM
 )
@@ -122,7 +126,11 @@ for c in ${COMPONENTS[@]} ; do
 
   IMAGE=$c
   if [ -n "$PUSH_TO" ] && [ "$PUSH_TO" != 'none' ] ; then
-    IMAGE="${PUSH_TO}/${IMAGE}"
+    if [ "$SKIP_IMAGE_APPEND" = true ] ; then
+      IMAGE="${PUSH_TO}"
+    else
+      IMAGE="${PUSH_TO}/${IMAGE}"
+    fi
   fi
   TAG=${TAG:-latest}
   TAG_OPT="-t ${TAG}"
@@ -131,12 +139,17 @@ for c in ${COMPONENTS[@]} ; do
   runOrPrint $CONTAINER_ENGINE build $BUILD_ARGS_REAL -t $IMAGE -f $build_d/Dockerfile $build_d
 
   REPO_OPT=
-  if [ -n "$PUSH_TO" ] && [ "$PUSH_TO" != 'none' ] ; then
+  if [ -n "$PUSH_TO" ] && [ "$PUSH_TO" != 'none' ] && [[ "$IMAGE" =~ "/" ]] ; then
     runOrPrint $CONTAINER_ENGINE push $IMAGE
     REPO_OPT="--image-repo ${PUSH_TO}"
   else
     REPO_OPT="--image-repo none"
   fi
 
-  runOrPrint $SCRIPT_DIR/image -e $ENV_NAME -k $KUSTOMIZE_PATH -H $HELM_PATH $REPO_OPT $TAG_OPT $BUILD_PATH_OPT $c
+  IMG_APP_OPT=
+  if [ "$SKIP_IMAGE_APPEND" = true ] ; then
+    IMG_APP_OPT="--skip-image-append"
+  fi
+
+  runOrPrint $SCRIPT_DIR/image -e $ENV_NAME -k $KUSTOMIZE_PATH -H $HELM_PATH $REPO_OPT $TAG_OPT $BUILD_PATH_OPT $IMG_APP_OPT $c
 done

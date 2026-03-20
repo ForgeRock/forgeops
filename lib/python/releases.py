@@ -189,7 +189,7 @@ def select_tag(component, releases, release, image_names, tag=None, all_tags=Fal
     return selected_tag, image_names
 
 
-def set_image(image_name, tag, repo=None):
+def set_image(image_name, tag, repo=None, skip_image_append=False):
     """
     Create a dictionary entry for a component image
     image_name: string (Should be derived from image_names map)
@@ -197,7 +197,13 @@ def set_image(image_name, tag, repo=None):
     repo: string
     """
     data = { 'image': {} }
-    data['image']['repository'] = f"{repo}/{image_name}" if repo else image_name
+    repo_str = image_name
+    if repo and skip_image_append:
+        repo_str = repo
+    elif repo:
+        repo_str = f"{repo}/{image_name}"
+
+    data['image']['repository'] = repo_str
     if tag:
         data['image']['tag'] = tag
     return data

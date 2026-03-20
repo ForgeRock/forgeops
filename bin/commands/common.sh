@@ -101,6 +101,7 @@ processArgs() {
   RELEASE_NAME=
   SIZE=
   SKIP_CONFIRM=false
+  SKIP_IMAGE_APPEND=false
 
   # Setup prog for usage()
   PROG_NAME=$(basename $0)
@@ -126,6 +127,7 @@ processArgs() {
       -u|--upgrade) UPGRADE=true ; shift ;;
       -q|--quiet) QUIET=true ; shift ;;
       -y|--yes) SKIP_CONFIRM=true ; shift ;;
+      --skip-image-append) SKIP_IMAGE_APPEND=true ; shift ;;
       --reset) RESET=true ; shift ;;
       --ds-snapshots) DS_SNAPSHOTS="$2" ; shift 2 ;;
       --cdk) SIZE='cdk'; shift ;;

@@ -105,6 +105,13 @@ provided through the `forgeops` tool.
   * bin/config -> `forgeops config`
   * bin/am-config-upgrader -> `forgeops upgrade-am-config`
 
+### Adding ability to skip appending the image to a repo when building
+
+This is a user suggestion to make it easier to use AWS ECR repos. You can now
+use --skip-image-append with the image, build, and config build subcommands,
+and the software will use what was given as the image repository as the full
+image name minus the tag.
+
 ## Bugfixes
 
 ### Fixed bug in `base-generate.sh`

@@ -45,6 +45,7 @@ HELP_CONFIG_PROFILE = "Config profile to copy into image."
 HELP_BUILD_DOCKER_ARGS = "Extra arguments to pass to docker. Use -- after config build arguments to specify."
 HELP_BUILD_PUSH_TO = "Container registry to push built images to."
 HELP_BUILD_TAG = "Tag to use on custom image."
+HELP_BUILD_SKIP_IMG_APP = "Don't append image to the repo"
 
 HELP_PATH_DOCKER_CMD = """
 Resolve the path to a directory which contains a Dockerfile, optionally resolve
@@ -95,10 +96,14 @@ examples:
 HELP_BUILD_EXAMPLES = """
 examples:
   # Build an am-custom image
-  $ ./bin/forgeops config build --env-name my_env --config-profile <my_profile> am
+  $ ./bin/forgeops config build --env-name prod --config-profile prod --push-to my_image_repo am
 
   # Build an idm-custom image passing extra flags to docker build
-  $ ./bin/forgeops config build --env-name my_env --config-profile <my_profile> idm -- --platform linux/amd64,linux/arm64
+  $ ./bin/forgeops config build --env-name prod --config-profile prod --push-to my_image_repo idm -- --platform linux/amd64,linux/arm64
+
+  # Use an AWS ECR image repository
+  ECR_URL=1234567890.dkr.ecr.us-east-1.amazonaws.com
+  $ ./bin/forgeops config build --env-name prod --config-profile prod --push-to $ECR_URL/prod-idm-custom --skip-image-append idm 
 """
 
 HELP_EXPORT_EXAMPLES = """
@@ -334,14 +339,18 @@ def run_build(args, overrides):
         msg = f"ERROR! No such profile ({args.profile}) at {conf_path}"
         utils.exit_msg(1, msg)
     build_args = f" --build-arg CONFIG_PROFILE={args.profile}"
-    image = f"{args.component}-custom:{args.tag}"
+    image = f"{args.component}-custom"
     repo = getattr(args, 'push_to')
     if not repo:
         repo = 'none'
     if repo == 'none' and os.getenv('PUSH_TO'):
         repo = os.getenv('PUSH_TO')
     if repo != 'none':
-        image = f"{repo}/{image}"
+        if args.skip_image_append:
+            image = repo
+        else:
+            image = f"{repo}/{image}"
+    image = f"{image}:{args.tag}"
     docker_extra_args = ' '.join(getattr(args, 'docker_args', ''))
     if docker_extra_args == '' and os.getenv('DOCKER_BUILD_EXTRA_ARGS'):
         docker_extra_args = os.getenv('DOCKER_BUILD_EXTRA_ARGS', '')
@@ -349,15 +358,19 @@ def run_build(args, overrides):
     docker_push_args = f"push {image}"
     docker_cmd = os.getenv('CONTAINER_ENGINE', 'docker')
     utils.run(docker_cmd, docker_build_args, dryrun=args.dryrun)
-    if repo != 'none':
+    if repo != 'none' and '/' in image:
         utils.run(docker_cmd, docker_push_args, dryrun=args.dryrun)
     forgeops_cmd = f"{root_path}/bin/forgeops"
+    skip_img_app_opt=''
+    if args.skip_image_append:
+        skip_img_app_opt = '--skip-image-append'
     image_args = ' '.join([
         f"image -e {args.env_name} --custom",
         f"-k {overrides['kustomize_path']}",
         f"-H {overrides['helm_path']}",
         f"-b {overrides['build_path']}",
         f"--image-repo {repo} --tag {args.tag}",
+        skip_img_app_opt,
         args.component
     ])
     utils.run(forgeops_cmd, image_args, dryrun=args.dryrun)
@@ -444,6 +457,9 @@ def main():
     build_cmd_parser.add_argument('--env-name', '-e', required=True, help=HELP_BUILD_ENV_NAME)
     build_cmd_parser.add_argument('--push-to', '-r', help=HELP_BUILD_PUSH_TO)
     build_cmd_parser.add_argument('--tag', '-t', default='latest', help=HELP_BUILD_TAG)
+    build_cmd_parser.add_argument('--skip-image-append', dest='skip_image_append',
+                                   help=HELP_BUILD_SKIP_IMG_APP,
+                                   action='store_true', default=False)
     build_cmd_parser.add_argument('component',
                                   choices=BUILD_COMPONENTS.keys(),
                                   help=HELP_CMD_COMPONENTS)
