@@ -25,6 +25,8 @@ usage() {
   --dryrun                  : do a dry run
   -v|--verbose              : be verbose
   -f|--cfg /path/to/file    : file of overrides (default: /path/to/forgeops/prereqs.conf)
+  --nginx-controller        : controller to use for the nginx IngressClass
+  --nginx                   : use nginx instead of traefik
   --haproxy                 : use haproxy instead of nginx
   --secret-generator        : use secret-generator instead of secret-agent
   --upgrade                 : upgrade if already installed
@@ -32,7 +34,7 @@ usage() {
   Available prereqs: ${TARGETS_ALL[*]}
 
   You can use secret-agent or secrets-generator for the secrets target.
-  You can use nginx or haproxy for the ingress target.
+  You can use traefik, nginx, or haproxy for the ingress target.
 
   Examples:
   Install all prereqs with defaults:
@@ -41,8 +43,14 @@ usage() {
   Install all prereqs using haproxy and secret-generator:
   $prog --haproxy --secret-generator
 
-  Install only cert-manager and an ingress (nginx):
+  Install only cert-manager and an ingress (traefik):
   $prog cert-manager ingress
+
+  Do not use traefik controller to handle nginx ingress class:
+  $prog --nginx-controller k8s.io/ingress-nginx
+
+  Only install Nginx ingress:
+  $prog --nginx ingress
 
   Only install HAProxy ingress:
   $prog --haproxy ingress
@@ -94,11 +102,18 @@ applyChart() {
   fi
 }
 
+applyYaml() {
+  local yaml=$1
+
+  echo "$yaml" | kubectl create -f -
+}
+
 DEBUG=false
 DRYRUN=false
 VERBOSE=false
 
-INGRESS=${INGRESS:-nginx}
+INGRESS=${INGRESS:-traefik}
+NGINX_CONTROLLER=${NGINX_CONTROLLER:-traefik.io/ingress-controller}
 SECRETS=${SECRETS:-secret-agent}
 CONFIG_FILE=${PREREQS_CONF:-$SCRIPT_DIR/../prereqs.conf}
 TARGETS=()
@@ -117,6 +132,7 @@ while true ; do
     --dryrun) DRYRUN=true ; shift ;;
     -v|--verbose) VERBOSE=true ; shift ;;
     -f|--cfg) CONFIG_FILE=$2 ; shift 2 ;;
+    --nginx-controller) NGINX_CONTROLLER=$2 ; shift 2 ;;
     --haproxy) INGRESS=haproxy ; shift ;;
     --secret-generator) SECRETS=secret-generator ; shift ;;
     --upgrade) UPGRADE=true ; shift ;;
@@ -165,7 +181,40 @@ CM_OPTS="--set crds.enabled=true \
 --set webhook.tolerations[0].'effect'='NoSchedule' \
 --set webhook.tolerations[0].'operator'='Exists'"
 
-if [ "$INGRESS" = "nginx" ]; then
+if [ "$INGRESS" = "traefik" ]; then
+    ING_PRETTY="Traefik Proxy (Ingress/Gateway API)"
+    ING_REPO=https://traefik.github.io/charts
+    ING_CHART_NAME=traefik
+    ING_NAMESPACE=${TRAEFIK_NAMESPACE:-traefik}
+    ING_VERSION=${TRAEFIK_VERSION:-}
+    ING_INSTALLED=$(kubectl get clusterroles -l app.kubernetes.io/name=traefik 2>/dev/null)
+    ING_OPTS="--set deployment.replicas=2 \
+--set ingressClass.enabled=true \
+--set ingressRoute.dashboard.enabled=false \
+--set providers.kubernetesIngressNginx.enabled=true \
+--set providers.kubernetesIngressNginx.ingressClassByName=true \
+--set providers.kubernetesIngressNginx.publishService.enabled=true \
+--set providers.kubernetesIngress.publishedService.enabled=true \
+--set providers.kubernetesGateway.enabled=true \
+--set gateway.enabled=false \
+--set tolerations[0].'key'='kubernetes\.io/arch' \
+--set tolerations[0].'effect'='NoSchedule' \
+--set tolerations[0].'operator'='Exists'"
+    ING_CLASS=$(cat <<EOF
+apiVersion: networking.k8s.io/v1
+kind: IngressClass
+metadata:
+  name: nginx
+  labels:
+    app.kubernetes.io/component: controller
+    app.kubernetes.io/managed-by: forgeops-prereqs
+    app.kubernetes.io/name: traefik
+    app.kubernetes.io/part-of: traefik
+spec:
+  controller: $NGINX_CONTROLLER
+EOF
+)
+elif [ "$INGRESS" = "nginx" ]; then
     ING_PRETTY="NGINX Ingress"
     ING_REPO=https://kubernetes.github.io/ingress-nginx
     ING_CHART_NAME=ingress-nginx
@@ -241,6 +290,14 @@ for t in ${TARGETS[@]} ; do
       ;;
     ingress)
       applyChart "$ING_PRETTY" "$ING_REPO" "$ING_CHART_NAME" "$ING_NAMESPACE" "$ING_VERSION" "$ING_OPTS" "$ING_INSTALLED"
+      if [ "$INGRESS" = "traefik" ]; then
+        NGINX_CURRENT_CONTROLLER=$(kubectl get ingressclass nginx -o="jsonpath={.spec.controller}" 2>/dev/null || true)
+        if [ -z "$NGINX_CURRENT_CONTROLLER" ]; then
+          applyYaml "$ING_CLASS"
+        elif [ "$NGINX_CURRENT_CONTROLLER" != "$NGINX_CONTROLLER" ]; then
+          kubectl delete ingressclass nginx && applyYaml "$ING_CLASS"
+        fi
+      fi
       ;;
     secrets)
       applyChart "$SEC_PRETTY" "$SEC_REPO" "$SEC_CHART_NAME" "$SEC_NAMESPACE" "$SEC_VERSION" "$SEC_OPTS" "$SEC_INSTALLED"

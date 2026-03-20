@@ -81,7 +81,8 @@ processArgs() {
   NO_HELM=${NO_HELM:-false}
   NO_KUSTOMIZE=${NO_KUSTOMIZE:-false}
   IMAGE_REPO=${IMAGE_REPO:-}
-  INGRESS=${INGRESS:-nginx}
+  INGRESS=${INGRESS:-traefik}
+  NGINX_CONTROLLER=${NGINX_CONTROLLER:-traefik.io/ingress-controller}
   PUSH_TO=${PUSH_TO:-}
   QUIET=false
   SECRETS=${SECRETS:-secret-agent}
@@ -132,6 +133,8 @@ processArgs() {
       --small) SIZE='small' ; shift ;;
       --medium) SIZE='medium' ; shift ;;
       --large) SIZE='large' ; shift ;;
+      --nginx-controller) NGINX_CONTROLLER=$2 ; shift 2 ;;
+      --nginx) INGRESS='nginx' ; shift ;;
       --haproxy) INGRESS='haproxy' ; shift ;;
       --secret-generator) SECRETS='secret-generator' ; shift ;;
       -f|--force|--fqdn)

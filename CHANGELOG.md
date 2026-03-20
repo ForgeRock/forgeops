@@ -4,6 +4,11 @@ RELEASE=2026.1.0
 
 ## Highlights in this release
 
+### Traefik is now the default `prereqs` ingress controller
+
+The `prereqs` script now deploys Traefik proxy by default instead of Nginx
+Ingress.
+
 ### Upgrade your environments
 
 The new custom image requires changes to your environments and your default
