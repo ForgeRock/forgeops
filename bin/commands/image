@@ -186,6 +186,10 @@ examples:
     if args.custom and (getattr(args, 'release', None) or getattr(args, 'copy', None)):
         utils.exit_msg('You cannot supply --custom with --release or --copy')
 
+    if args.skip_image_append:
+        if 'platform' in args.components or len(args.components) > 1:
+            utils.exit_msg('You can only set the image for one component when using --skip-image-append')
+
     overrides = utils.process_overrides(root_path,
                                         getattr(args, 'helm_path', None),
                                         getattr(args, 'kustomize_path', None),
@@ -259,7 +263,7 @@ examples:
             if args.release:
                 tag = 'dev' if args.release == 'dev' else release_tags[component]
             if component == 'ds':
-                data = set_image(image_names[component], tag, repo)
+                data = set_image(image_names[component], tag, repo, args.skip_image_append)
                 values_images['ds_cts'] = data
                 values_images['ds_idrepo'] = data
                 images_kustomize[component] = data
@@ -267,7 +271,7 @@ examples:
                 c = component
                 if args.custom:
                     c = f"{component}-custom"
-                data = set_image(image_names[c], tag, repo)
+                data = set_image(image_names[c], tag, repo, args.skip_image_append)
                 values_images[c.replace('-', '_')] = data
                 images_kustomize[c] = data
 
