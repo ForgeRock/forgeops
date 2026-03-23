@@ -105,12 +105,6 @@ void sendInformationMessageToPR() {
                   |#### How to skip tests
                   |Add `notests` keyword at the begining of the PR title
                   |
-                  |#### How to add a task
-                  |Add the following line in a comment below
-                  |> 
-                  |> ```text
-                  |> - [ ] Please do that before merging
-                  |> ```
                 """.stripMargin()
         )
 
