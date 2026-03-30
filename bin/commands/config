@@ -255,16 +255,25 @@ def upgrade_am(am_conf, release_name=None):
 def export_ig(ig_conf, pod_name):
     """Export PingGateway config"""
     profile_path(ig_conf)
+
+    # Get IG_INSTANCE_DIR environment variable from the container to know where the config is located
+    dir_env_var = f"""
+    exec {pod_name} -- bash -c 'echo $IG_INSTANCE_DIR'
+    """.strip()
+    _, out, _ = utils.run(KUBECTL, dir_env_var,
+                                  cstdout=True, cstderr=True)
+
+    ig_instance_dir = out.decode().strip()
+
     # Copy from the PingGateway container to a local path
     cp_args = f"""
-    cp -c ig {pod_name}:/var/ig/config {ig_conf}
+    cp -c ig {pod_name}:{ig_instance_dir}/config {ig_conf}
     """.strip()
     try:
         utils.run(KUBECTL, cp_args)
     except utils.RunError as e:
         log.error(f'{e.cmd} had the following error: \n {e.stderr}')
         raise e
-
 
 def run_export(args, overrides):
     # Amster doesn't use a running instance
