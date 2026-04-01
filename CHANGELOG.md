@@ -35,11 +35,13 @@ Added the ability to send the output of `bin/debug-logs` directly to a file.
 
 ### New product versions available
 
-The following new versions are available:
-- IDM and DS 8.0.1 secure images 
-- AM 7.5.2 and 8.0.2 secure images
-- Secret Agent 1.2.8 
-- IG 2025.11.0 and 2025.11.1
+The following secure versions are available:
+- 8.1.0 now available for all products
+- PingIDM 8.0.1
+- PingDS 8.0.2
+- PingAM 7.5.2 and 8.0.2
+- Secret Agent 1.2.9
+- PingGateway 2025.11.0 and 2025.11.1
 
 ### Helm 4 supported
 
