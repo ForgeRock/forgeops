@@ -140,6 +140,13 @@ caused `forgeops upgrade-am-config` to break. The `forgeops upgrade-am-config`
 command now connects to the container as `root`. This is an ephemeral 
 container running outside the cluster and reduces the security impact.
 
+### The keystore-create job now uses the AM image directly
+
+Prior to 2026.1.0, the keystore-create job specified the AM image as an init
+container separately. This meant that once you select a new AM image it didn't
+update the keystore-create job. The job now uses the AM image as defined in
+both Helm and Kustomize.
+
 ## How-tos
 
 ### Included new procedures
