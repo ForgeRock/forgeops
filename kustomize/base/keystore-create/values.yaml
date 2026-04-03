@@ -1,4 +1,16 @@
 ---
+platform:
+  secrets_enabled: true
+  secrets:
+    keystore_create:
+      annotations:
+        length: 24
+        autogenerate:
+        - KEYSTORE_PASSWORD
+am:
+  image:
+    repository: "am"
+    tag: ""
 keystore_create:
   clusterRoleName: keystore-create
   appendNSToRole: false
