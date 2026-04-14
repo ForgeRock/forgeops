@@ -40,7 +40,7 @@ OPTIONS:
   -l|--release-name <release-name> : release to use for base images
   --reset                          : reset image-defaulter to git index
   -t|--tag <tag>                   : image tag to use
-  --skip-image-append              : don't append the image name to the repo
+  --skip-image-append              : do not append the image name to the repo
 
 Valid Components:
   ${COMPONENTS_VALID[*]}
