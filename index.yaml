@@ -2,6 +2,16 @@ apiVersion: v1
 entries:
   identity-platform:
   - apiVersion: v2
+    appVersion: 2026.1.0
+    created: "2026-04-17T18:39:36.894358213Z"
+    description: A Helm chart for Kubernetes
+    digest: 5db1ed583b6d35af1cd36df6ca3f4f5b4ca4e14142f42b1fcaa5c9520caa49cf
+    name: identity-platform
+    type: application
+    urls:
+    - https://github.com/ForgeRock/forgeops/releases/download/identity-platform-2026.1.0/identity-platform-2026.1.0.tgz
+    version: 2026.1.0
+  - apiVersion: v2
     appVersion: 2025.2.1
     created: "2025-10-07T13:46:51.261353052Z"
     description: A Helm chart for Kubernetes
@@ -51,4 +61,4 @@ entries:
     urls:
     - https://github.com/ForgeRock/forgeops/releases/download/identity-platform-2025.1.0/identity-platform-2025.1.0.tgz
     version: 2025.01.0
-generated: "2025-10-07T13:46:51.261369733Z"
+generated: "2026-04-17T18:39:36.89437628Z"
