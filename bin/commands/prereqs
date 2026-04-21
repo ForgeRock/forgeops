@@ -99,7 +99,7 @@ applyChart() {
     fi
     echo $msg
     runOrPrint "helm upgrade $chart_repo \
-        ${version:+--version=$version} --atomic \
+        ${version:+--version=$version} --rollback-on-failure \
         --namespace $namespace --install --reset-values \
         $opts --create-namespace"
   fi
@@ -237,7 +237,7 @@ if [ "$SECRETS" == "secret-agent" ] ; then
   SEC_REPO=oci://us-docker.pkg.dev/forgeops-public/charts/secret-agent
   SEC_CHART_NAME=secret-agent
   SEC_NAMESPACE=${SA_NAMESPACE:-secret-agent}
-  SEC_VERSION=${SA_VERSION:-v1.2.10}
+  SEC_VERSION=${SA_VERSION:-v1.2.11}
   SEC_INSTALLED=$(kubectl get crd secretagentconfigurations.${SEC_NAMESPACE}.secrets.forgerock.io 2>/dev/null || true)
   SEC_OPTS="--set tolerations[0].'key'='kubernetes\.io/arch' \
 --set tolerations[0].'effect'='NoSchedule' \
