@@ -35,6 +35,8 @@ node('gce-vm-forgeops-n2d-standard-4') {
 
         // Load the QaCloudUtils dynamically based on Lodestar commit promoted to Forgeops
         library "QaCloudUtils@${commonModule.lodestarRevision}"
+        // Lodestar stages info will be printed in build description
+        cloud_report.enableStagesReport()
 
         if (env.TAG_NAME) {
             currentBuild.result = 'ABORTED'
