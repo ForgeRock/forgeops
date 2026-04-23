@@ -12,3 +12,7 @@ RELEASE=2026.1.1
 
 ## How-tos
 
+### recreating-ds-sts
+
+This how-to describes how to recreate a DS sts without downtime when you need
+to make a significant change to a STS.
