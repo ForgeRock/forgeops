@@ -121,7 +121,6 @@ def process_overlay_dir(path, config, args):
 
     if ingress_path.is_file():
         if args.debug: print(f"{ingress_path} exists")
-        ingress_class_found = False
         ing = yaml.safe_load(open(ingress_path))
         if args.fqdn:
             ing = utils.replace_or_append_dict(ing, 'path', '/spec/rules/0/host', 'value', config['hosts'][0])
@@ -143,7 +142,7 @@ def process_overlay_dir(path, config, args):
 
         if args.ingress_no_cert_manager:
             for idx, item in enumerate(ing):
-                if 'cert-manager' and 'issuer' in item['path']:
+                if 'cert-manager' in item['path'] and 'issuer' in item['path']:
                     ing.pop(idx)
         elif config.get('issuer_kind') and config.get('issuer_name'):
             issuer = {
@@ -153,7 +152,7 @@ def process_overlay_dir(path, config, args):
             }
             issuer_found = False
             for idx, item in enumerate(ing):
-                if 'cert-manager' and 'issuer' in item['path']:
+                if 'cert-manager' in item['path'] and 'issuer' in item['path']:
                     if args.debug: print('Found a cert-manager issuer')
                     issuer_found = True
                     ing[idx] = issuer
