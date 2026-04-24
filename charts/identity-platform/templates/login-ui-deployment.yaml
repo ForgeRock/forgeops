@@ -102,6 +102,13 @@ spec:
             {{- end }}
           resources:
             {{- toYaml .Values.login_ui.resources | nindent 12 }}
+          volumeMounts:
+            - mountPath: /tmp
+              name: writeable
+              subPath: tmp
+            - mountPath: /usr/share/nginx
+              name: writeable
+              subPath: usr/share/nginx
       {{- with .Values.login_ui.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

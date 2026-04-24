@@ -97,6 +97,13 @@ spec:
             requests:
               cpu: 10m
               memory: 100Mi
+          volumeMounts:
+            - mountPath: /tmp
+              name: writeable
+              subPath: tmp
+            - mountPath: /usr/share/nginx
+              name: writeable
+              subPath: usr/share/nginx
       tolerations:
         - effect: NoSchedule
           key: kubernetes.io/arch

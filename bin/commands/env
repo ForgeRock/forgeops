@@ -55,7 +55,9 @@ def process_overlay_dir(path, config, args):
     """Process a dir inside an overlay"""
     skey = str(path.name).replace('-', '_')
 
-    isDS = True if (skey.startswith('ds') and 'snapshot' not in skey) else False
+    isDS = False
+    if skey.startswith('ds') and ('cts' in skey or 'idrepo' in skey):
+        isDS = True
     res_file = 'sts.yaml' if isDS else 'deployment.yaml'
 
     kust_path = path / 'kustomization.yaml'
@@ -75,9 +77,13 @@ def process_overlay_dir(path, config, args):
         if isDS:
             if args.cts_snap_enable and 'ds-cts' in path.name:
                 kust['resources'] = utils.replace_or_append_str(kust['resources'], 'ds/snapshot', '../../../base/ds/snapshot/cts')
+                if 'patches' not in kust:
+                    kust['patches'] = []
                 kust['patches'] = utils.replace_or_append_str(kust['patches'], 'snapshot-schedule', { 'path': 'snapshot-schedule.yaml' })
             if args.idrepo_snap_enable and 'ds-idrepo' in path.name:
                 kust['resources'] = utils.replace_or_append_str(kust['resources'], 'ds/snapshot', '../../../base/ds/snapshot/idrepo')
+                if 'patches' not in kust:
+                    kust['patches'] = []
                 kust['patches'] = utils.replace_or_append_str(kust['patches'], 'snapshot-schedule', { 'path': 'snapshot-schedule.yaml' })
 
         # Begin secret-generator/secret-agent logic for kustomization.yaml
@@ -366,6 +372,10 @@ def setup_args():
     issuer.add_argument('--issuer', dest='issuer', help='TLS cert Issuer')
     issuer.add_argument('--cluster-issuer', dest='cluster_issuer', help='TLS cert ClusterIssuer')
     issuer.add_argument('--skip-issuer', dest='skip_issuer', action='store_true', help='Skip TLS cert issuer setup')
+
+    secure = parser.add_mutually_exclusive_group()
+    secure.add_argument('--secure', action='store_true', help='Enable pod security features (Helm only)')
+    secure.add_argument('--insecure', action='store_true', help='Disable pod security features (Helm only)')
 
     # Flag to skip interactivity for testing
     parser.add_argument('--testing', dest='testing', action='store_true', help=argparse.SUPPRESS)
@@ -681,6 +691,104 @@ To: {config['overlay_path']}
         do_create = True
     # Finish Create or Update check
 
+    # Start secure/insecure settings
+    values_security = {}
+    # Defaults to insecure
+    security_bool = False # When the secure setting is True and insecure False
+    security_bool_opposite = True # When the secure setting is False and insecure True
+    sec_capabilities = {}
+    if do_create and args.insecure:
+        print("Creating env with --insecure given. Using insecure settings.")
+    elif do_create or args.secure:
+        security_bool = True
+        security_bool_opposite = False # allowPrivilegeEscalation
+        sec_capabilities = {
+            'drop': ['All']
+        }
+    if do_create or args.secure or args.insecure:
+        values_security = {
+            'am': {
+                'podSecurityContext': {
+                    'runAsUser': 11111,
+                },
+                'securityContext': {
+                    'allowPrivilegeEscalation': security_bool_opposite,
+                    'capabilities': sec_capabilities,
+                    'readOnlyRootFilesystem': security_bool,
+                    'runAsNonRoot': security_bool,
+                }
+            },
+            'idm': {
+                'podSecurityContext': {
+                    'runAsUser': 11111,
+                },
+                'securityContext': {
+                    'allowPrivilegeEscalation': security_bool_opposite,
+                    'capabilities': sec_capabilities,
+                    'readOnlyRootFilesystem': security_bool,
+                    'runAsNonRoot': security_bool,
+                }
+            },
+            'ds_cts': {
+                'podSecurityContext': {
+                    'runAsUser': 11111,
+                },
+                'securityContext': {
+                    'allowPrivilegeEscalation': security_bool_opposite,
+                    'capabilities': sec_capabilities,
+                    'readOnlyRootFilesystem': security_bool,
+                    'runAsNonRoot': security_bool,
+                    'runAsUser': 11111,
+                }
+            },
+            'ds_idrepo': {
+                'podSecurityContext': {
+                    'runAsUser': 11111,
+                },
+                'securityContext': {
+                    'allowPrivilegeEscalation': security_bool_opposite,
+                    'capabilities': sec_capabilities,
+                    'readOnlyRootFilesystem': security_bool,
+                    'runAsNonRoot': security_bool,
+                    'runAsUser': 11111,
+                }
+            },
+            'admin_ui': {
+                'podSecurityContext': {
+                    'runAsUser': 101,
+                },
+                'securityContext': {
+                    'allowPrivilegeEscalation': security_bool_opposite,
+                    'capabilities': sec_capabilities,
+                    'readOnlyRootFilesystem': security_bool,
+                    'runAsNonRoot': security_bool,
+                }
+            },
+            'login_ui': {
+                'podSecurityContext': {
+                    'runAsUser': 101,
+                },
+                'securityContext': {
+                    'allowPrivilegeEscalation': security_bool_opposite,
+                    'capabilities': sec_capabilities,
+                    'readOnlyRootFilesystem': security_bool,
+                    'runAsNonRoot': security_bool,
+                }
+            },
+            'end_user_ui': {
+                'podSecurityContext': {
+                    'runAsUser': 101,
+                },
+                'securityContext': {
+                    'allowPrivilegeEscalation': security_bool_opposite,
+                    'capabilities': sec_capabilities,
+                    'readOnlyRootFilesystem': security_bool,
+                    'runAsNonRoot': security_bool,
+                }
+            }
+        }
+    # End secure/insecure settings
+
     if not do_create and bool(config['size']):
         msg = """
 You are changing the size of an existing environment. If you have already deployed the environment, there could be extra steps needed to apply the size changes. In particular, when changing the size of your PingDS PVCs you will need to delete the changed StatefulSet(s) and re-deploy them. Any existing PVCs will need to be edited manually and resized. Refer to Kubernetes docs on resizing PVCs for more information.
@@ -770,7 +878,22 @@ If you have not yet deployed the environment, then you can ignore this message.
                 values = yaml.safe_load(f)
             if getattr(args, 'secret_agent', None):
                 values['platform']['secrets'] = {}
-        merge(values, config['size'], values_ingress, values_images, values_snap, values_amster, values_ds_set_passwords, values_secrets)
+        merge(values,
+            config['size'],
+            values_ingress,
+            values_images,
+            values_snap,
+            values_amster,
+            values_secrets,
+            values_ds_set_passwords,
+            values_security)
+
+        # Set insecure settings that don't get set by the merge
+        if args.insecure:
+            for k in values.keys():
+                if utils.key_exists(values[k], 'securityContext.capabilities'):
+                    values[k]['securityContext']['capabilities'] = {}
+
         write_yaml_file(values, values_file)
 
     ###

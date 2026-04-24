@@ -4,9 +4,23 @@ RELEASE=2026.2.0
 
 ## New Features/Updated functionality
 
-### New product versions available
+### Added initContainers to enable readOnlyRootFilesystem (Helm only)
 
-* Secret Agent 1.2.11
+The init containers have been reworked to allow users to enable the
+readOnlyRootFilesystem securityContext. This has no impact on the Deployments,
+but requires that the StatefulSets (DSes) be recreated.
+
+### Added --secure/--insecure flags to env (Helm only)
+
+With the addition of support for security features like readOnlyRootFilesystem,
+you are now able to toggle all security features with these new flags. By
+default, new envs will be created with --secure enabled.
+
+To enable the secure features on an existing env run the following command,
+then follow the instructions in <./how-tos/recreating-ds-sts.md> to apply the
+change.
+
+`forgeops env -e my-env --secure`
 
 ### No longer supporting 7.4 Ping Identity Platform images
 
@@ -29,4 +43,4 @@ Default is set to 7200 seconds.
 ### recreating-ds-sts
 
 This how-to describes how to recreate a DS sts without downtime when you need
-to make a significant change to a STS.
+to make a significant change to a STS. <./how-tos/recreateing-ds-sts.md>
