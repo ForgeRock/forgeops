@@ -24,6 +24,7 @@ import lib.python.utils as utils
 
 def copy_default_overlay_from_root(overlay_path, default_overlay):
     """ Update the default overlay by copying from root """
+    log("Default overlay out of date, copying from ForgeOps root.", overlay_path)
     root_default = Path(root_path) / 'kustomize' / 'overlay' / 'default'
     if root_default.resolve() != default_overlay.resolve():
         if root_default.is_dir():
@@ -31,7 +32,6 @@ def copy_default_overlay_from_root(overlay_path, default_overlay):
             shutil.rmtree(default_overlay)
         log("Copying default overlay from ForgeOps root", overlay_path)
         shutil.copytree(root_default, default_overlay)
-
 
 
 def update_secrets_2025_2_0(overlay_path, source_path):
@@ -173,7 +173,6 @@ def update_secrets_2026_1_0(overlay_path, default_overlay):
             kust = yaml.safe_load(f)
         names = [d.get('name') for d in kust['images'] if 'name' in d]
         if 'am-custom' not in names:
-            log("Default overlay out of date, copying from ForgeOps root.", overlay_path)
             copy_default_overlay_from_root(overlay_path, default_overlay)
     if overlay_path.is_dir():
         log(f"Checking overlay {overlay_path}", overlay_path)
