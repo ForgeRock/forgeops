@@ -74,7 +74,8 @@ setUserPasswordInLdifFile() {
 
     for pw in $pwds ; do
         # Set the JVM args to avoid blowing up the container memory.
-        local enc_pwd=$(OPENDJ_JAVA_ARGS="-Xmx256m -Djava.security.egd=file:/dev/./urandom" encode-password -s "PBKDF2-HMAC-SHA256" -c "${pw}")
+        local jvm_args="-Xmx256m -Djava.security.egd=file:/dev/./urandom"
+        local enc_pwd=$(DS_JAVA_ARGS="$jvm_args" OPENDJ_JAVA_ARGS="$jvm_args" encode-password -s "PBKDF2-HMAC-SHA256" -c "${pw}")
         if [ "$pwd_str" == "" ] ; then
             pwd_str="userPassword: ${enc_pwd}"
         else
