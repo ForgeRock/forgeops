@@ -20,11 +20,12 @@ DEFAULT_DS_JAVA_ARGS="
 ${DS_JAVA_ADDITIONAL_ARGS:-}
 "
 
-# OPENDJ_JAVA_ARGS is deprecated in 8.x and replaced by DS_JAVA_ARGS.  
-# Keeping OPENDJ_JAVA_ARGS for now to support 7.4 and 7.5 builds in forgeops
-export OPENDJ_JAVA_ARGS=${OPENDJ_JAVA_ARGS:-${DEFAULT_DS_JAVA_ARGS}}
+# DS_JAVA_ARGS is the primary env var for DS 8.x+.
+# OPENDJ_JAVA_ARGS is deprecated but still exported for DS 7.4/7.5 backward compatibility.
+export DS_JAVA_ARGS=${DS_JAVA_ARGS:-${DEFAULT_DS_JAVA_ARGS}}
+export OPENDJ_JAVA_ARGS=${DS_JAVA_ARGS}
 
-# Assume the directory admin and monitor passwords are available at the paths below. 
+# Assume the directory admin and monitor passwords are available at the paths below.
 export DS_SET_UID_ADMIN_AND_MONITOR_PASSWORDS=${DS_SET_UID_ADMIN_AND_MONITOR_PASSWORDS:-"true"}
 export DS_UID_MONITOR_PASSWORD_FILE=${DS_UID_MONITOR_PASSWORD_FILE:-"/var/run/secrets/opendj-passwords/monitor.pw"}
 export DS_UID_ADMIN_PASSWORD_FILE=${DS_UID_ADMIN_PASSWORD_FILE:-"/var/run/secrets/opendj-passwords/dirmanager.pw"}
@@ -79,7 +80,7 @@ export DS_ADVERTISED_LISTEN_ADDRESS=${DS_ADVERTISED_LISTEN_ADDRESS:-$(hostname -
 #
 
 # If you do not set the Bootstrap servers, the default is calculated below. This works for a single
-# cluster deployment. 
+# cluster deployment.
 if [[ "${DS_ADVERTISED_LISTEN_ADDRESS}" =~ [^.]+-[0-9]+\..+ ]]; then
     # Domain is everything after the first dot
     podDomain=${DS_ADVERTISED_LISTEN_ADDRESS#*.}
@@ -87,7 +88,7 @@ if [[ "${DS_ADVERTISED_LISTEN_ADDRESS}" =~ [^.]+-[0-9]+\..+ ]]; then
     podName=${DS_ADVERTISED_LISTEN_ADDRESS%%.*}
     podPrefix=${podName%-*}
 
-    ds0=${podPrefix}-0.${podDomain}:8989       
+    ds0=${podPrefix}-0.${podDomain}:8989
     ds1=${podPrefix}-1.${podDomain}:8989
     # Set the default bootstrap servers unless the user explicitly provides it
     export DS_BOOTSTRAP_REPLICATION_SERVERS=${DS_BOOTSTRAP_REPLICATION_SERVERS:-${ds0},${ds1}}

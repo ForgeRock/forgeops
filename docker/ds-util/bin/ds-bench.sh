@@ -7,7 +7,9 @@ HOST="${3:-ds-idrepo-0.ds-idrepo}"
 USERS="${4:-1000000}"
 BASE_DN="${BASE_DN:-ou=identities}"
 
-export OPENDJ_JAVA_ARGS="-Xmx512m"
+export DS_JAVA_ARGS="-Xmx512m"
+# Deprecated: kept for DS 7.4/7.5 backward compatibility
+export OPENDJ_JAVA_ARGS="$DS_JAVA_ARGS"
 
 ADMIN_PW=${ADMIN_PW:-password}
 
