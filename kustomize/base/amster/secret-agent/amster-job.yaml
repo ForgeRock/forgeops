@@ -112,6 +112,9 @@ spec:
             - configMapRef:
                 name: amster-function
                 optional: true
+          env:
+            - name: AMSTER_DURATION
+              value: "10"
           readinessProbe:
             exec:
               command:

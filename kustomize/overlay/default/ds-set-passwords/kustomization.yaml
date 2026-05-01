@@ -6,3 +6,9 @@ components:
 
 resources:
 - ../../../base/ds/set-passwords
+
+patches:
+- path: ds-set-passwords-ttl.yaml
+  target:
+    kind: Job
+    name: ds-set-passwords

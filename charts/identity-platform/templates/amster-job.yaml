@@ -124,6 +124,11 @@ spec:
           - configMapRef:
               name: amster-function
               optional: true
+          {{- if .Values.amster.env.DURATION }}
+          env:
+          - name: AMSTER_DURATION
+            value: {{ .Values.amster.env.DURATION | quote }}
+          {{- end }}
           readinessProbe:
             exec:
               command:
