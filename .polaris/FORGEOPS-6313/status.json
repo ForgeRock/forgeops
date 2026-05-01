@@ -11,7 +11,7 @@
     "setup": { "status": "completed" },
     "discuss": { "status": "completed" },
     "research": { "status": "completed" },
-    "planning": { "status": "pending" },
+    "planning": { "status": "completed" },
     "implementation": {
       "status": "pending",
       "currentTask": null,
