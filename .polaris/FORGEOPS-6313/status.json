@@ -6,9 +6,9 @@
   "entryType": "jira",
   "mode": "investigate",
   "autonomyMode": "supervised",
-  "currentPhase": "setup",
+  "currentPhase": "discuss",
   "phases": {
-    "setup": { "status": "in_progress" },
+    "setup": { "status": "completed" },
     "discuss": { "status": "pending" },
     "research": { "status": "pending" },
     "planning": { "status": "pending" },
