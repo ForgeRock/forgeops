@@ -7,9 +7,10 @@ dynamically set the Kubernetes Job's `ttlSecondsAfterFinished` field, controllin
 completed Amster job persists in the namespace. The story also fixes a pre-existing bug where
 `--amster-retain` writes an unused Helm key (`amster.amsterRetain`), and removes the word
 "infinity" from the `apply` command's help text. Research confirmed that the `default` overlay's
-`amster-ttl.yaml` is untracked and not wired into any `kustomization.yaml`, and that
-`amster.env.DURATION` in `values.yaml` is an orphan key never rendered by any Helm template — both
-must be addressed as part of this story.
+`amster-ttl.yaml` is untracked and not wired into any `kustomization.yaml`. The key decision
+reached after initial research: **fix the Helm template to render `amster.env.DURATION` into the
+pause container's `env:` section**, making the key functional so that `--amster-retain` has a
+working Helm effect.
 
 ## Functional Requirements
 
@@ -29,20 +30,26 @@ must be addressed as part of this story.
    `charts/identity-platform/templates/amster-job.yaml:18–19`)
 
 4. Fix the `--amster-retain` Helm bug: replace the current `values_amster` dict key
-   `amster.amsterRetain` with the correct key `amster.ttlSecondsAfterFinished`. — Source:
-   discuss.md Locked Decision 4; research-discuss.md Findings §2
-   (`bin/commands/env:494–498`). NOTE: see Open Questions — the correct Helm fix for
-   `--amster-retain` may be `amster.ttlSecondsAfterFinished` rather than `amster.env.DURATION`.
+   `amster.amsterRetain` with the correct key `amster.env.DURATION`, so that the value is rendered
+   by the Helm template into the pause container's `env:` section as `AMSTER_DURATION`. — Source:
+   discuss.md Locked Decision 4; research-discuss.md Findings §2 (`bin/commands/env:494–498`);
+   decision made after initial research.
 
-5. Remove the word "infinity" from the `--amster-retain` help text in `bin/commands/apply`. —
+5. Fix the Helm template (`charts/identity-platform/templates/amster-job.yaml`) to render
+   `Values.amster.env.DURATION` into the pause container's `env:` section as
+   `{name: AMSTER_DURATION, value: <value>}`. This makes `amster.env.DURATION` functional for Helm
+   deployments. — Source: decision made after initial research; pause container confirmed at
+   `amster-job.yaml:112–138`.
+
+6. Remove the word "infinity" from the `--amster-retain` help text in `bin/commands/apply`. —
    Source: Jira AC "Help command updated to not include `infinity`"; discuss.md Locked Decision 5;
    research-discuss.md Findings §6 (`bin/commands/apply:32–33`)
 
-6. The `--amster-retain` argument on `forgeops env` must reject non-integer input. — Source: Jira
+7. The `--amster-retain` argument on `forgeops env` must reject non-integer input. — Source: Jira
    AC "Add a string to --amster-retain will throw an error"; discuss.md Locked Decision 3 (already
    satisfied by `type=int` at `bin/commands/env:329`; no code change required).
 
-7. The `default` overlay's `amster-ttl.yaml` must be committed to git as a tracked file so that
+8. The `default` overlay's `amster-ttl.yaml` must be committed to git as a tracked file so that
    `shutil.copytree` includes it when `forgeops env` creates new environments. — Source: discuss.md
    Constraint 2; research Directive 4 (`kustomize/overlay/default/amster/amster-ttl.yaml` confirmed
    untracked via `git status`)
@@ -63,26 +70,50 @@ must be addressed as part of this story.
 
 ## Technical Context
 
-### Helm path: `amster.env.DURATION` is an orphan key
+### Helm: pause container location and current env handling
 
-Research Directive 1 produced a blocking finding. `amster.env.DURATION: "10"` exists in
-`charts/identity-platform/values.yaml:341` but is **never referenced by any Helm template**. The
-`amster-job.yaml` template's pause container (`charts/identity-platform/templates/amster-job.yaml:120`)
-runs `sleep ${AMSTER_DURATION:-10}` and loads env vars from `envFrom: configMapRef: platform-config`
-(`amster-job.yaml:121–123`). No template block renders `Values.amster.env` into any resource
-(confirmed by exhaustive grep across all templates in `charts/identity-platform/templates/`). The
-`amster.env.DURATION` key in `values.yaml` has no effect on the deployed cluster.
+The pause container is defined at `charts/identity-platform/templates/amster-job.yaml:112–138`. Its
+current configuration:
 
-For the Kustomize path, `AMSTER_DURATION` is set via `data.AMSTER_DURATION` in the `platform-config`
-ConfigMap, which `forgeops env` writes to `kustomize/overlay/<env>/base/platform-config.yaml`
-(`bin/commands/env:187`).
+- **args** (line 118–120): `bash -c sleep ${AMSTER_DURATION:-10}` — reads `AMSTER_DURATION` from
+  its environment, defaulting to 10 if unset.
+- **envFrom** (lines 121–126): loads `platform-config` ConfigMap and optionally `amster-function`
+  ConfigMap. There is no explicit `env:` block on this container.
+- There is no `env:` block — `AMSTER_DURATION` is expected to come from `platform-config` via
+  `envFrom`.
 
-### Helm path: existing `--amster-retain` bug
+Source: `charts/identity-platform/templates/amster-job.yaml:112–138`.
+
+### Helm: `amster.env.DURATION` is an orphan key — fix is in scope
+
+`amster.env.DURATION: "10"` exists at `charts/identity-platform/values.yaml:340–341` but is
+**never referenced by any Helm template**. Confirmed by exhaustive grep across all templates in
+`charts/identity-platform/templates/` — zero matches for `Values.amster.env`.
+
+The decided fix: add an `env:` block to the pause container in `amster-job.yaml` that renders
+`Values.amster.env.DURATION` as `{name: AMSTER_DURATION, value: <value>}`. This makes the
+`values.yaml` key functional.
+
+**Structural note**: `amster.env` in `values.yaml` uses a map (`DURATION: "10"`), not a list. All
+other components (`am`, `idm`, `ds_cts`, `ds_idrepo`) use `env: []` (a list of `{name, value}`
+objects) rendered via `{{- toYaml . | nindent N }}`. The amster pause container fix must render the
+map key directly (e.g., `{{- if .Values.amster.env.DURATION }}` / `- name: AMSTER_DURATION` /
+`value: {{ .Values.amster.env.DURATION }}`) rather than using the `toYaml` list pattern used
+elsewhere. Source: `charts/identity-platform/values.yaml:340–341`;
+`charts/identity-platform/templates/am-deployment.yaml:175–180` (reference pattern).
+
+### Helm: existing `--amster-retain` bug
 
 `bin/commands/env:494–498` writes `{'amster': {'amsterRetain': <value>}}` into the Helm values
-file. There is no `amster.amsterRetain` key in the chart; the correct key for Job TTL is
-`amster.ttlSecondsAfterFinished` (`values.yaml:299`). As a result, `--amster-retain` currently has
-no effect on Helm deployments.
+file. There is no `amster.amsterRetain` key in the chart. The correct key to write is
+`amster.env.DURATION`, which — once the template fix (FR5) is applied — will be rendered into
+`AMSTER_DURATION` on the pause container. Source: research-discuss.md Findings §2.
+
+### Helm: `ttlSecondsAfterFinished` rendering (working correctly)
+
+`charts/identity-platform/templates/amster-job.yaml:18–19` already renders
+`Values.amster.ttlSecondsAfterFinished` conditionally into `spec.ttlSecondsAfterFinished`. This
+path is functional. Source: `amster-job.yaml:18–19`.
 
 ### Kustomize: only `default` overlay is tracked
 
@@ -136,13 +167,23 @@ value reaches the container. The Kustomize path for `--amster-retain` is correct
 2. **`default` overlay's `amster-ttl.yaml` must be tracked in git**: Required for `shutil.copytree`
    to propagate the file to new environments. (discuss.md Constraint 2; Research Directive 4)
 
-3. **Helm path must use the correct chart keys**: `amster.ttlSecondsAfterFinished` for TTL.
-   (discuss.md Constraint 3; Research Directive 1 — see Open Questions re: `amster.env.DURATION`)
+3. **Helm path must use the correct chart keys**: `amster.ttlSecondsAfterFinished` for TTL;
+   `amster.env.DURATION` for pause container duration (once template is fixed). (discuss.md
+   Constraint 3; decision made after initial research)
 
-4. **Bash `common.sh` `--amster-retain` validation is out of scope**: This story is about `forgeops
+4. **Helm template fix is in scope**: The `amster-job.yaml` pause container must be updated to
+   render `Values.amster.env.DURATION` into an explicit `env:` block as `AMSTER_DURATION`. Without
+   this fix, writing `amster.env.DURATION` to the Helm values file has no effect. (Decision made
+   after initial research)
+
+5. **`amster.env` is a map, not a list**: The template fix must render the map key directly, not
+   via the `toYaml` list pattern used by other components. (Research finding:
+   `values.yaml:340–341`)
+
+6. **Bash `common.sh` `--amster-retain` validation is out of scope**: This story is about `forgeops
    env` only. (discuss.md Locked Decision 6)
 
-5. **Only one tracked overlay exists**: Only `kustomize/overlay/default/` is in git. Implementation
+7. **Only one tracked overlay exists**: Only `kustomize/overlay/default/` is in git. Implementation
    only needs to update that overlay's files. (Research Directive 2)
 
 ## Acceptance Criteria
@@ -172,27 +213,28 @@ value reaches the container. The Kustomize path for `--amster-retain` is correct
 7. `forgeops env -e <env> --amster-retain <n>` correctly sets `AMSTER_DURATION` in the Kustomize
    `platform-config.yaml` (existing behavior, verify no regression).
 
-8. `forgeops env -e <env> --amster-retain <n>` no longer writes the orphan `amster.amsterRetain`
-   key to the Helm values file. — Source: discuss.md Locked Decision 4
+8. `forgeops env -e <env> --amster-retain <n>` writes `amster.env.DURATION` (not
+   `amster.amsterRetain`) to the Helm values file, and the deployed pause container runs
+   `sleep <n>` when the Helm chart is rendered. — Source: discuss.md Locked Decision 4; decision
+   made after initial research.
+
+9. The Helm `amster-job.yaml` template renders `Values.amster.env.DURATION` into the pause
+   container's `env:` section as `name: AMSTER_DURATION`. — Source: decision made after initial
+   research.
 
 ## Open Questions
 
-1. **`amster.env.DURATION` is an orphan key with no effect** (Research Directive 1 finding):
-   `discuss.md` says the fix for `--amster-retain` in Helm should write `amster.env.DURATION`.
-   However, no Helm template renders `Values.amster.env` — the `AMSTER_DURATION` variable in the
-   pause container is sourced from `platform-config` ConfigMap, not from a Helm env block. Writing
-   `amster.env.DURATION` would have no effect on the deployed cluster. The implementer must decide
-   whether to: (a) fix the template to render `amster.env` into the pause container's env section,
-   making `amster.env.DURATION` functional; or (b) write `AMSTER_DURATION` into the
-   `platform.configMap.data` block (analogous to what the Kustomize path does); or (c) accept that
-   `--amster-retain` has no Helm equivalent and leave it with no Helm effect. This choice also
-   determines which key `values_amster` should write for `--amster-retain`.
-
-2. **Should `forgeops env --amster-ttl` create `amster-ttl.yaml` if it is absent**, or only mutate
+1. **Should `forgeops env --amster-ttl` create `amster-ttl.yaml` if it is absent**, or only mutate
    it if present? The `default` overlay will have the file once it is committed, and new environments
    will inherit it via `copytree`. But the code path that mutates the file should handle the
    creation case defensively in case the file is absent from an existing overlay.
 
-3. **What happens when `--amster-ttl` is not passed?** Should `forgeops env` leave the existing
+2. **What happens when `--amster-ttl` is not passed?** Should `forgeops env` leave the existing
    `amster-ttl.yaml` value unchanged, or should it write the default value (7200)? This affects
    idempotency of the `forgeops env` command.
+
+3. **Template guard for `amster.env.DURATION`**: Should the template render the env var
+   unconditionally (always emitting `AMSTER_DURATION` with the default `"10"`) or only when the
+   value is non-empty? An unconditional render is simpler; a conditional render (`{{- if
+   .Values.amster.env.DURATION }}`) allows users to suppress it by setting the key to empty, but
+   is unnecessary given it has a sensible default.
