@@ -1,4 +1,4 @@
-RELEASE=2026.1.1
+RELEASE=2026.2.0
 
 # Release Notes
 
@@ -7,6 +7,12 @@ RELEASE=2026.1.1
 ### New product versions available
 
 * Secret Agent 1.2.11
+
+### New amster and ds-set-passwords ttl options for `forgeops env` command(New envs only)
+
+New options added to the `forgeops env` command to allow the user to set the length  
+of the ttlSecondsAfterFinished value in the amster and ds-set-passwords jobs.
+Default is set to 7200 seconds. 
 
 ## Bugfixes
 

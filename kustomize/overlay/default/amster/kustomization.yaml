@@ -6,3 +6,9 @@ components:
 
 resources:
 - ../../../base/amster/secret-agent
+
+patches:
+- path: amster-ttl.yaml
+  target:
+    kind: Job
+    name: amster
