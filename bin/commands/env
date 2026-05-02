@@ -279,6 +279,17 @@ def process_overlay_dir(path, config, args):
         write_yaml_file(rn_patch_yaml, rn_patch_path)
         write_yaml_file(rb_patch_yaml, rb_patch_path)
 
+    if skey == 'amster' and getattr(args, 'amster_ttl', None):
+        ttl_patch_path = path / 'amster-ttl.yaml'
+        ttl_patch_yaml = [
+            {
+                'op': 'replace',
+                'path': '/spec/ttlSecondsAfterFinished',
+                'value': args.amster_ttl
+            }
+        ]
+        write_yaml_file(ttl_patch_yaml, ttl_patch_path)
+
     # Look for subdirs and process them
     for d in path.iterdir():
         if args.debug:
@@ -327,6 +338,7 @@ def setup_args():
     parser.add_argument('--ig-mem', dest='ig_mem', help='Specify memory setting for ig pods')
     parser.add_argument('--ig-rep', dest='ig_rep', type=int, help='Specify replicas for ig pods')
     parser.add_argument('--amster-retain', dest='amster_retain', type=int, help='Keep amster pod running for n seconds')
+    parser.add_argument('--amster-ttl', dest='amster_ttl', type=int, help='Set ttlSecondsAfterFinished on the Amster Job')
     parser.add_argument('--snap-role-name', help='Specify the base role name for the ds-snapshot ClusterRole')
     parser.add_argument('--pull-policy', dest='pull_policy', choices=['Always', 'IfNotPresent', 'Never'], help='Set policy for all platform images')
     parser.add_argument('--upgrade', '-u', dest='upgrade', action='store_true', help="Upgrade environment to latest ForgeOps")
@@ -493,9 +505,13 @@ def manage_env(args, config):
         config['amsterRetain'] = str(args.amster_retain)
         values_amster = {
             'amster': {
-                'amsterRetain': config['amsterRetain']
+                'env': {'DURATION': config['amsterRetain']}
             }
         }
+    if getattr(args, 'amster_ttl', None):
+        if args.debug:
+            print(f"amster_ttl={args.amster_ttl}")
+        merge(values_amster, {'amster': {'ttlSecondsAfterFinished': args.amster_ttl}})
 
     values_ingress = {}
     config['hosts'] = None
