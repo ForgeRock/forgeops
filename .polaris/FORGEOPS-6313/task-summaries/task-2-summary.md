@@ -33,3 +33,17 @@ Acceptance criteria confirmed manually:
 ## Deviations
 
 None.
+
+## Fix Iteration 1
+
+## Findings Addressed
+- Critical — both `--amster-ttl` guards used `getattr(args, 'amster_ttl', None)` (falsy check), silently discarding the valid value `0`: changed both guards to `isinstance(args.amster_ttl, int)`, consistent with the `am_rep`, `cts_rep`, `idm_rep`, `idrepo_rep`, and `ig_rep` guards throughout the same file.
+
+## Files Modified
+- `bin/commands/env` — line 282: `skey == 'amster' and getattr(args, 'amster_ttl', None)` → `skey == 'amster' and isinstance(args.amster_ttl, int)`; line 511: `getattr(args, 'amster_ttl', None)` → `isinstance(args.amster_ttl, int)`.
+
+## Verification
+- Tests: none available (repo has no automated test suite per CLAUDE.md)
+- Lint: skipped (no Python linter configured in repo)
+- Typecheck: `python3 -m py_compile bin/commands/env` — passed
+- Build: n/a

@@ -279,7 +279,7 @@ def process_overlay_dir(path, config, args):
         write_yaml_file(rn_patch_yaml, rn_patch_path)
         write_yaml_file(rb_patch_yaml, rb_patch_path)
 
-    if skey == 'amster' and getattr(args, 'amster_ttl', None):
+    if skey == 'amster' and isinstance(args.amster_ttl, int):
         ttl_patch_path = path / 'amster-ttl.yaml'
         ttl_patch_yaml = [
             {
@@ -508,7 +508,7 @@ def manage_env(args, config):
                 'env': {'DURATION': config['amsterRetain']}
             }
         }
-    if getattr(args, 'amster_ttl', None):
+    if isinstance(args.amster_ttl, int):
         if args.debug:
             print(f"amster_ttl={args.amster_ttl}")
         merge(values_amster, {'amster': {'ttlSecondsAfterFinished': args.amster_ttl}})
