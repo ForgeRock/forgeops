@@ -5,7 +5,7 @@
   "branch": "FORGEOPS-6313-add-ttl-option-to-forgeops-env",
   "entryType": "jira",
   "mode": "execute",
-  "autonomyMode": "supervised",
+  "autonomyMode": "autonomous",
   "currentPhase": "implementation",
   "phases": {
     "setup": { "status": "completed" },
@@ -28,7 +28,7 @@
     "finalization": { "status": "pending" }
   },
   "rejectionLoops": {
-    "perTaskReview": { "max": 2, "tasks": {} },
+    "perTaskReview": { "max": 2, "tasks": { "2": { "count": 1 } } },
     "qa": { "count": 0, "max": 2 },
     "holisticReview": { "count": 0, "max": 2 }
   }
