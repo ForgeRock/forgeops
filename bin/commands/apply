@@ -30,7 +30,6 @@ OPTIONS:
   -r|--dryrun                 : do a dry run
   -v|--verbose                : be verbose
   -a|--amster-retain <n>      : keep amster pod running for n seconds. (default: 10)
-                                add "infinity" to keep up indefinitely
   -c|--create-namespace       : create the namespace if it doesn't exist
   -e|--env-name ENV_NAME      : Name of environment to apply (default: demo)
   -f|--fqdn FQDN[,FQDN]       : list of FQDNs to use when generating a fresh overlay
