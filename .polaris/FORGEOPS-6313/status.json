@@ -6,7 +6,7 @@
   "entryType": "jira",
   "mode": "execute",
   "autonomyMode": "autonomous",
-  "currentPhase": "qa",
+  "currentPhase": "holisticReview",
   "phases": {
     "setup": { "status": "completed" },
     "discuss": { "status": "completed" },
@@ -24,8 +24,8 @@
         "5": { "status": "completed", "review": { "status": "approved", "iterations": 1 } }
       }
     },
-    "qa": { "status": "in_progress" },
-    "holisticReview": { "status": "pending" },
+    "qa": { "status": "completed" },
+    "holisticReview": { "status": "in_progress" },
     "finalization": { "status": "pending" }
   },
   "rejectionLoops": {
