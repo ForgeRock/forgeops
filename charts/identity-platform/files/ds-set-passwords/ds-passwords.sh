@@ -1,4 +1,6 @@
 #!/bin/bash
+# TODO: FORGEOPS-6600 TMP : TO BE REMOVED ONCE THE ISSUE IS FIXED
+set -x
 
 PS4='+ $(date "+%H:%M:%S")\011 '
 set -eo pipefail
@@ -16,6 +18,10 @@ chgPass () {
     SEARCH_RESPONSE=$?
     echo ""
     echo "- Changing password of ${FULL_USER_DN}"
+    # TODO: FORGEOPS-6600 TMP : TO BE REMOVED ONCE THE ISSUE IS FIXED
+    echo "FORGEOPS-6600 TMP : FULL_USER_DN=$FULL_USER_DN"
+    echo "FORGEOPS-6600 TMP : ADMIN_PASS=$ADMIN_PASS"
+    echo "FORGEOPS-6600 TMP : USER_PASS=$USER_PASS"
     case "${SEARCH_RESPONSE}" in
         "0")
             echo "ldapmodify ${CXN} -D \"uid=admin\" -w **** -a \"dn:${FULL_USER_DN}\" "
