@@ -39,10 +39,11 @@ usage: $PROG [OPTIONS] AM_CONF_PATH [RULES_PATH]
 Build container images for one or more Ping Identity Platform components.
 
 Notes:
-  * building amster images is not supported, use bin/amster
+  * Building amster images is not supported, use bin/amster
   * Only ${COMPONENTS_FBC[*]} respect --config-profile
   * Set PUSH_TO in forgeops.conf to configure for the team
   * Default rules: /path/to/forgeops/etc/am-upgrader-rules/
+  * Paths to profile and rules can be relative or absolute
 
 OPTIONS:
   -h|--help                        : display usage and exit
@@ -50,17 +51,26 @@ OPTIONS:
   --dryrun                         : do a dry run
   -v|--verbose                     : be verbose
   -b|--build-path <path>           : path to build dir (default: docker)
+
+  # Mutually exclusive
   -l|--release-name <release-name> : release to use for base images
+  -e|--env-name <env-name>         : forgeops env to use
 
-Examples:
+Examples (prod env, prod profile):
   Normal operation:
-  $PROG /path/to/docker/am/config-profiles/prod
+  $PROG -e prod prod
 
-  Specify alternate rules file:
-  $PROG /path/to/docker/am/config-profiles/prod /path/to/am-upgrader-rules/
+  Specify alternate rules file in FORGEOPS_DATA/my-rules/:
+  $PROG -e prod prod my-rules
+
+  Specify alternate rules at a specific path:
+  $PROG -e prod prod /path/to/my-rules/
+
+  Deprecated release file method:
+  $PROG -l prod prod
 
   Do a dryrun:
-  $PROG --dryrun /path/to/docker/am/config-profiles/prod
+  $PROG --dryrun -e prod prod
 
 EOM
 )
@@ -89,17 +99,33 @@ if [ "$DEBUG" = true ] ; then
   set -x
 fi
 
-RULES_VOLUME=""
+CONFIG_DIR=
+PROFILES_DIR=$BUILD_PATH/am/config-profiles
+RULES_VOLUME=
 if [ -n "$COMPONENTS" ] ; then
-  CONFIG_DIR=${COMPONENTS[0]}
+  CONFIG_PROF=${COMPONENTS[0]}
+  if [[ "$CONFIG_PROF" =~ ^/ ]] ; then
+    CONFIG_DIR=$CONFIG_PROF
+  else
+    CONFIG_DIR="${PROFILES_DIR}/${CONFIG_PROF}"
+  fi
   # If the user supplies a rules volume use that instead of the builtin rules
   if [[ -n "${COMPONENTS[1]}" ]] ; then
-    RDIR=$(realpath ${COMPONENTS[1]})
+    RULES_PATH=${COMPONENTS[1]}
+    if [[ ! "$RULES_PATH" =~ ^/ ]] ; then
+      if [ -d "${FORGEOPS_DATA}/${RULES_PATH}" ] ; then
+        echo "Found rules in ${FORGEOPS_DATA}"
+        RULES_PATH="${FORGEOPS_DATA}/${RULES_PATH}"
+      elif [ -d "${ROOT_PATH}/${RULES_PATH}" ] ; then
+        echo "Found rules in ${ROOT_PATH}"
+        RULES_PATH="${ROOT_PATH}/${RULES_PATH}"
+      fi
+    fi
+    RDIR=$(realpath $RULES_PATH)
     RULES_VOLUME="--volume $RDIR:/rules"
   fi
 else
-# Where the PingAM exported files are by default
-  CONFIG_DIR=$BUILD_PATH/am
+  usage 1 "You must provide a config-profile to upgrade"
 fi
 
 # Never run against a minikube daemon
@@ -119,7 +145,26 @@ fi
 # TAG=foo  bin/am-config-upgrader
 TAG=${TAG:-latest}
 
-if [ -n "$RELEASE_NAME" ] ; then
+if [ -n "$ENV_NAME" ] ; then
+  HELM_ENV_PATH=$HELM_PATH/$ENV_NAME
+  if [ -d "$HELM_ENV_PATH" ] ; then
+    VALUES_PATH=$HELM_ENV_PATH/values.yaml
+    if [ -f "$VALUES_PATH" ] ; then
+      REPO=$(yq '.am_config_upgrader.image.repository' $VALUES_PATH)
+      TAG=$(yq '.am_config_upgrader.image.tag' $VALUES_PATH)
+    else
+      usage 1 "Invalid environment.  Missing $VALUES_PATH."
+    fi
+  elif [ -d "$OVERLAY_PATH" ] ; then
+    IMG_KUST_PATH=$OVERLAY_PATH/image-defaulter/kustomization.yaml
+    if [ -f $IMG_KUST_PATH ] ; then
+      REPO=$(yq '.images[] | select(.name == "am_config_upgrader") | .newName' $IMG_KUST_PATH)
+      TAG=$(yq '.images[] | select(.name == "am_config_upgrader") | .newTag' $IMG_KUST_PATH)
+    else
+      usage 1 "Invalid environment.  Missing $IMG_KUST_PATH."
+    fi
+  fi
+elif [ -n "$RELEASE_NAME" ] ; then
   # If we were given a release name, source the file if it exists to
   # override $REPO and $TAG from that file
   RELEASE_PATH=$BUILD_PATH/am-config-upgrader/releases/$RELEASE_NAME
