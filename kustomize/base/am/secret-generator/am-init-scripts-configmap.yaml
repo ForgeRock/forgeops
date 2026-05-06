@@ -47,7 +47,7 @@ data:
   
     echo "Setting up writeable volume."
     echo "Creating tmp"
-    mkdir /writeable/tmp
+    mkdir -p /writeable/tmp
     echo "Copying /home/forgerock"
-    mkdir /writeable/home
+    mkdir -p /writeable/home
     cp -av /home/forgerock/ /writeable/home/forgerock
