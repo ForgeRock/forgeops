@@ -116,9 +116,7 @@ def getRules() {
                             forNamedInstanceSettings("http://am:80/am",
                                     withinSet("serverconfig")
                                             .replaceValueOfKey("am.encryption.pwd")
-                                            .with("&{am.encryption.key}"),
-                                    replace("serverconfigxml")
-                                            .with(objectProvider(singletonMap("\$inline", "serverconfig.xml")))),
+                                            .with("&{am.encryption.key}")),
                             forNamedInstanceSettings("server-default",
                                     withinSet("serverconfig")
                                             .replaceValueOfKey("am.encryption.pwd")
