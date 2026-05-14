@@ -255,7 +255,7 @@ def process_overlay_dir(path, config, args):
 
         write_yaml_file(res, res_path)
 
-    if skey == 'keystore_create' and args.secret_generator:
+    if skey == 'keystore_create' and args.namespace:
         rn_patch_path = path / 'cluster-role-name.yaml'
         rb_patch_path = path / 'role-binding.yaml'
         role_name = f'identity-platform-keystore-create:{args.namespace}'
