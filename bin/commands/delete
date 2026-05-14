@@ -116,7 +116,7 @@ if containsElement 'platform' "${COMPONENTS[*]}" ; then
   DELETE_ALL=true
   COMPONENTS=${COMPONENTS_PLATFORM[@]}
   shiftComponent 'secrets' 'last'
-  COMPONENTS+=( 'base' 'ds-set-passwords')
+  COMPONENTS+=( 'base' 'ds-set-passwords' 'keystore-create' )
 fi
 
 if containsElement 'apps' "${COMPONENTS[*]}" ; then
@@ -133,7 +133,7 @@ fi
 
 if containsElementLike 'ds-' "${COMPONENTS[*]}" && ! containsElements "${COMPONENTS_ALL[*]}" "${COMPONENTS[*]}" ; then
   if ! kubeExists sts 'ds-cts' || ! kubeExists sts 'ds-idrepo' ; then
-    COMPONENTS+=( 'ldif-importer' )
+    COMPONENTS+=( 'ds-set-passwords' )
   fi
 fi
 
@@ -195,7 +195,9 @@ for c in ${COMPONENTS[@]} ; do
     message "\nSkipping missing component: $OVERLAY_PATH/$c\n"
   fi
 
-  if [[ "$c" =~ ^ds- ]] ; then
+  if [ "$c" == "ds-set-passwords" ] ; then
+    continue
+  elif [[ "$c" =~ ^ds- ]] ; then
     deletePvcs $c
     deleteSnaps $c
   fi
