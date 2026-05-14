@@ -3,6 +3,11 @@ ARG TAG=latest
 
 FROM ${REPO}:${TAG}
 
+USER root
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install -y --no-install-recommends jq
+USER 11111
+
 ARG CONFIG_PROFILE=default
 RUN echo "\033[0;36m*** Building '${CONFIG_PROFILE}' profile ***\033[0m"
 COPY  --chown=forgerock:root config-profiles/${CONFIG_PROFILE}/ /home/forgerock/openam/
