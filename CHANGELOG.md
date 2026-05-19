@@ -36,6 +36,13 @@ New options added to the `forgeops env` command to allow the user to set the len
 of the ttlSecondsAfterFinished value in the amster and ds-set-passwords jobs.
 Default is set to 7200 seconds.
 
+
+### PodDisruptionBudget support for all product Helm chart components
+
+PodDisruptionBudgets can now be enabled for all product components in the `identity-platform` and `ping-gateway` Helm charts. The feature is disabled by default; enable it per component by setting `<component>.pdb.enabled: true` in your values file. The default policy keeps at least one pod available (`minAvailable: 1`); this can be changed via `<component>.pdb.minAvailable` or `<component>.pdb.maxUnavailable`.
+
+Affected components: `am`, `idm`, `admin-ui`, `end-user-ui`, `login-ui`, `ds-idrepo`, `ds-cts` (identity-platform) and `ig` (ping-gateway).
+
 ## Bugfixes
 
 ## How-tos

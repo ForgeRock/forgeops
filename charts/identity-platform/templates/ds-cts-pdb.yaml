@@ -1,0 +1,22 @@
+{{- if and .Values.ds_cts.enabled .Values.ds_cts.pdb.enabled }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: ds-cts
+  labels:
+    {{- include "identity-platform.labels" . | nindent 4 }}
+    {{- with .Values.ds_cts.podLabels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  {{- if .Values.ds_cts.pdb.minAvailable }}
+  minAvailable: {{ .Values.ds_cts.pdb.minAvailable }}
+  {{- else if .Values.ds_cts.pdb.maxUnavailable }}
+  maxUnavailable: {{ .Values.ds_cts.pdb.maxUnavailable }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- with .Values.ds_cts.podLabels }}
+        {{- toYaml . | nindent 6 }}
+      {{- end }}
+{{- end }}
