@@ -61,6 +61,9 @@ spec:
             sources:
               - secret:
                   name: ds-ssl-keypair
+              - secret:
+                  name: platform-truststore-certificates
+                  optional: true
         - name: new-truststore
           emptyDir: {}
         - name: am-logback
@@ -125,6 +128,8 @@ spec:
               value: /usr/lib/ssl/cert.pem
             - name: AM_PEM_TRUSTSTORE_DS
               value: /var/run/secrets/truststore/ca.crt
+            - name: AM_PEM_TRUSTSTORE_EXTRA
+              value: /var/run/secrets/truststore/certificates
       containers:
         - name: openam
           securityContext: {}
