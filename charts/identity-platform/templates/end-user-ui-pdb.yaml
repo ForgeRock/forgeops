@@ -1,0 +1,22 @@
+{{- if and .Values.end_user_ui.enabled .Values.end_user_ui.pdb.enabled }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: end-user-ui
+  labels:
+    {{- include "identity-platform.labels" . | nindent 4 }}
+    {{- with .Values.end_user_ui.podLabels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  {{- if .Values.end_user_ui.pdb.minAvailable }}
+  minAvailable: {{ .Values.end_user_ui.pdb.minAvailable }}
+  {{- else if .Values.end_user_ui.pdb.maxUnavailable }}
+  maxUnavailable: {{ .Values.end_user_ui.pdb.maxUnavailable }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- with .Values.end_user_ui.podLabels }}
+        {{- toYaml . | nindent 6 }}
+      {{- end }}
+{{- end }}

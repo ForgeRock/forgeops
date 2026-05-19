@@ -1,0 +1,22 @@
+{{- if and .Values.am.enabled .Values.am.pdb.enabled }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: am
+  labels:
+    {{- include "identity-platform.labels" . | nindent 4 }}
+    {{- with .Values.am.podLabels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  {{- if .Values.am.pdb.minAvailable }}
+  minAvailable: {{ .Values.am.pdb.minAvailable }}
+  {{- else if .Values.am.pdb.maxUnavailable }}
+  maxUnavailable: {{ .Values.am.pdb.maxUnavailable }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- with .Values.am.podLabels }}
+        {{- toYaml . | nindent 6 }}
+      {{- end }}
+{{- end }}

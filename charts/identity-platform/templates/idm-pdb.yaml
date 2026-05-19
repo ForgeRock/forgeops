@@ -1,0 +1,22 @@
+{{- if and .Values.idm.enabled .Values.idm.pdb.enabled }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: idm
+  labels:
+    {{- include "identity-platform.labels" . | nindent 4 }}
+    {{- with .Values.idm.podLabels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  {{- if .Values.idm.pdb.minAvailable }}
+  minAvailable: {{ .Values.idm.pdb.minAvailable }}
+  {{- else if .Values.idm.pdb.maxUnavailable }}
+  maxUnavailable: {{ .Values.idm.pdb.maxUnavailable }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- with .Values.idm.podLabels }}
+        {{- toYaml . | nindent 6 }}
+      {{- end }}
+{{- end }}

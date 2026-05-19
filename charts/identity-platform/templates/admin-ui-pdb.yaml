@@ -1,0 +1,22 @@
+{{- if and .Values.admin_ui.enabled .Values.admin_ui.pdb.enabled }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: admin-ui
+  labels:
+    {{- include "identity-platform.labels" . | nindent 4 }}
+    {{- with .Values.admin_ui.podLabels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  {{- if .Values.admin_ui.pdb.minAvailable }}
+  minAvailable: {{ .Values.admin_ui.pdb.minAvailable }}
+  {{- else if .Values.admin_ui.pdb.maxUnavailable }}
+  maxUnavailable: {{ .Values.admin_ui.pdb.maxUnavailable }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- with .Values.admin_ui.podLabels }}
+        {{- toYaml . | nindent 6 }}
+      {{- end }}
+{{- end }}

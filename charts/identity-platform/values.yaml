@@ -248,6 +248,11 @@ am:
     targetCPUUtilizationPercentage: 80
     # targetMemoryUtilizationPercentage: 80
 
+  pdb:
+    enabled: false
+    minAvailable: 1
+    # maxUnavailable: 1
+
   nodeSelector: {}
 
   tolerations: []
@@ -439,6 +444,11 @@ idm:
     maxReplicas: 100
     targetCPUUtilizationPercentage: 80
     # targetMemoryUtilizationPercentage: 80
+
+  pdb:
+    enabled: false
+    minAvailable: 1
+    # maxUnavailable: 1
 
   nodeSelector: {}
 
@@ -634,6 +644,11 @@ admin_ui:
     targetCPUUtilizationPercentage: 80
     # targetMemoryUtilizationPercentage: 80
 
+  pdb:
+    enabled: false
+    minAvailable: 1
+    # maxUnavailable: 1
+
   nodeSelector: {}
 
   tolerations: []
@@ -702,6 +717,11 @@ end_user_ui:
     targetCPUUtilizationPercentage: 80
     # targetMemoryUtilizationPercentage: 80
 
+  pdb:
+    enabled: false
+    minAvailable: 1
+    # maxUnavailable: 1
+
   nodeSelector: {}
 
   tolerations: []
@@ -769,6 +789,11 @@ login_ui:
     maxReplicas: 100
     targetCPUUtilizationPercentage: 80
     # targetMemoryUtilizationPercentage: 80
+
+  pdb:
+    enabled: false
+    minAvailable: 1
+    # maxUnavailable: 1
 
   nodeSelector: {}
 
@@ -900,6 +925,11 @@ ds_idrepo:
               - key: ds
                 operator: Exists
 
+  pdb:
+    enabled: false
+    minAvailable: 1
+    # maxUnavailable: 1
+
   podAnnotations: {}
 
   podLabels:
@@ -1011,6 +1041,11 @@ ds_cts:
             matchExpressions:
               - key: ds
                 operator: Exists
+
+  pdb:
+    enabled: false
+    minAvailable: 1
+    # maxUnavailable: 1
 
   podAnnotations: {}
 

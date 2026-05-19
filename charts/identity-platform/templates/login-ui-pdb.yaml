@@ -1,0 +1,22 @@
+{{- if and .Values.login_ui.enabled .Values.login_ui.pdb.enabled }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: login-ui
+  labels:
+    {{- include "identity-platform.labels" . | nindent 4 }}
+    {{- with .Values.login_ui.podLabels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  {{- if .Values.login_ui.pdb.minAvailable }}
+  minAvailable: {{ .Values.login_ui.pdb.minAvailable }}
+  {{- else if .Values.login_ui.pdb.maxUnavailable }}
+  maxUnavailable: {{ .Values.login_ui.pdb.maxUnavailable }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- with .Values.login_ui.podLabels }}
+        {{- toYaml . | nindent 6 }}
+      {{- end }}
+{{- end }}

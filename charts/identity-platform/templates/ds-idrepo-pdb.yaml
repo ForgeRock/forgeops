@@ -1,0 +1,22 @@
+{{- if and .Values.ds_idrepo.enabled .Values.ds_idrepo.pdb.enabled }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: ds-idrepo
+  labels:
+    {{- include "identity-platform.labels" . | nindent 4 }}
+    {{- with .Values.ds_idrepo.podLabels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  {{- if .Values.ds_idrepo.pdb.minAvailable }}
+  minAvailable: {{ .Values.ds_idrepo.pdb.minAvailable }}
+  {{- else if .Values.ds_idrepo.pdb.maxUnavailable }}
+  maxUnavailable: {{ .Values.ds_idrepo.pdb.maxUnavailable }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- with .Values.ds_idrepo.podLabels }}
+        {{- toYaml . | nindent 6 }}
+      {{- end }}
+{{- end }}

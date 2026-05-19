@@ -1,0 +1,22 @@
+{{- if and .Values.ig.enabled .Values.ig.pdb.enabled }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: ig
+  labels:
+    {{- include "ping-gateway.labels" . | nindent 4 }}
+    {{- with .Values.ig.podLabels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  {{- if .Values.ig.pdb.minAvailable }}
+  minAvailable: {{ .Values.ig.pdb.minAvailable }}
+  {{- else if .Values.ig.pdb.maxUnavailable }}
+  maxUnavailable: {{ .Values.ig.pdb.maxUnavailable }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- with .Values.ig.podLabels }}
+        {{- toYaml . | nindent 6 }}
+      {{- end }}
+{{- end }}
