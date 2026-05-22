@@ -2,14 +2,14 @@ apiVersion: v1
 entries:
   ping-gateway:
   - apiVersion: v2
-    appVersion: 1.0.0
+    appVersion: 2026.1.0
     description: A Helm chart for Kubernetes
     digest: 1e93f2a33416442cfefbafaeb1719b058ab18852c9d294554098bff744c811a3
     name: ping-gateway
     type: application
     urls:
     - https://github.com/ForgeRock/forgeops/releases/download/ping-gateway-1-0-0/ping-gateway-1.0.0.tgz
-    version: 1.0.0
+    version: 2026.1.0
   identity-platform:
   - apiVersion: v2
     appVersion: 2026.1.0
