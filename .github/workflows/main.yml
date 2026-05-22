@@ -82,7 +82,6 @@ jobs:
 
       - name: Helm deploy latest IG
         run: |
-          kubectl create namespace ping-gateway
           helm upgrade ping-gateway ping-gateway \
             --repo https://ForgeRock.github.io/forgeops/ \
             --version ${{ steps.get_latest_release.outputs.tag_name }} \
