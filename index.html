@@ -21,11 +21,11 @@ the desired options.  Example:
 $ kubectl create namespace identity-platform
 $ helm upgrade identity-platform identity-platform \
     --repo https://ForgeRock.github.io/forgeops/ \
-    --version 2026.1.0 --namespace identity-platform --install \
+    --version 2026.2.0 --namespace identity-platform --install \
     -f values-override.yaml
 </code></pre>
 <p>
-The above example installs version <code>2025.1.1</code> of the Helm chart
+The above example installs version <code>2026.2.0</code> of the Helm chart
 from the repository.
 </p>
 <p>
@@ -36,7 +36,7 @@ to set the host and TLS settings for the ingress:
 $ kubectl create namespace identity-platform
 $ helm upgrade identity-platform identity-platform \
     --repo https://ForgeRock.github.io/forgeops/ \
-    --version 2026.1.0 --namespace identity-platform --install \
+    --version 2026.2.0 --namespace identity-platform --install \
     --set platform.ingress.hosts={identity-platform.domain.local} \
     --set platform.ingress.tls.issuer.name=identity-platform-issuer \
     --set platform.ingress.tls.issuer.kind=Issuer \
@@ -49,6 +49,25 @@ $ helm upgrade identity-platform identity-platform \
 <pre><code>
 $ helm delete identity-platform -n identity-platform
 </code></pre>
+
+<h2>Ping Gateway install</h2>
+<p>
+In order to deploy the Ping Gateway, simply execute <code>helm</code> with
+the desired options.  Example:
+</p>
+<pre><code>
+$ helm upgrade ping-gateway ping-gateway \
+    --repo https://ForgeRock.github.io/forgeops/ \
+    --version 2026.2.0 --namespace identity-platform --install \
+    -f values-override.yaml
+</code></pre>
+
+<h2>Ping Gateway uninstall</h2>
+
+<pre><code>
+$ helm delete ping-gateway -n identity-platform
+</code></pre>
+
 </body>
 </html>
 
