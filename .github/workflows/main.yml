@@ -80,12 +80,23 @@ jobs:
             --version ${{ steps.get_latest_release.outputs.tag_name }} \
             --namespace identity-platform --install
 
-      - name: Update helm chart
-        id: update_helm_chart
+      - name: Helm deploy latest IG
+        run: |
+          kubectl create namespace ping-gateway
+          helm upgrade ping-gateway ping-gateway \
+            --repo https://ForgeRock.github.io/forgeops/ \
+            --version ${{ steps.get_latest_release.outputs.tag_name }} \
+            --namespace identity-platform --install
+
+      - name: Update helm chart versions
+        id: update_helm_chart_versions
         run: |
           sed -ie "s/^version:.*/version:\ ${{ env.RELEASE_TAG }}/" charts/identity-platform/Chart.yaml
           sed -ie "s/^appVersion:.*/appVersion:\ ${{ env.RELEASE_TAG }}/" charts/identity-platform/Chart.yaml
           sed -ie "s/tag:\ latest/tag:\ \"${{ env.BUILD_TAG }}\"/g" charts/identity-platform/values.yaml
+          sed -ie "s/^version:.*/version:\ ${{ env.RELEASE_TAG }}/" charts/ping-gateway/Chart.yaml
+          sed -ie "s/^appVersion:.*/appVersion:\ ${{ env.RELEASE_TAG }}/" charts/ping-gateway/Chart.yaml
+          sed -ie "s/tag:\ latest/tag:\ \"${{ env.BUILD_TAG }}\"/g" charts/ping-gateway/values.yaml
 
       - name: Run chart-releaser
         uses: helm/chart-releaser-action@v1.6.0
@@ -95,9 +106,20 @@ jobs:
           charts_dir: charts
           pages_branch: gh-pages
 
+      - name: Pause to ensure all is ready for update
+        run: |
+          sleep 5
+
       - name: Helm deploy upgrade
         run: |
           helm upgrade identity-platform identity-platform \
+            --repo https://ForgeRock.github.io/forgeops/ \
+            --version ${{ env.RELEASE_TAG }} \
+            --namespace identity-platform --install
+
+      - name: Helm deploy upgrade IG
+        run: |
+          helm upgrade ping-gateway ping-gateway \
             --repo https://ForgeRock.github.io/forgeops/ \
             --version ${{ env.RELEASE_TAG }} \
             --namespace identity-platform --install
