@@ -4,12 +4,6 @@ import sys
 import os
 import site
 from pathlib import Path
-try:
-    import pkg_resources
-except:
-    print('[error] You must install setuptool pyhon module. '
-          'You may want to try something like : pip3 install setuptools')
-    sys.exit(1)
 
 file_name = Path(__file__)
 current_file_path = file_name.parent.resolve()
@@ -24,15 +18,23 @@ sys.path.insert(2, str(dependencies_dir) + site.USER_SITE.replace(site.USER_BASE
 from lib.python.utils import REQ_VERSIONS, error, message, run, warning, certmanager, secretagent
 
 
+def __parse_version(version_to_parse):
+    """
+    Remove 'v' from full version `vX.Y.Z` and then return a tuple corresponding to the version
+    """
+    version_to_parse = version_to_parse.replace('v', '') # remove 'v' from full version `vX.Y.Z`
+    return tuple(map(int, version_to_parse.split(".")[0:3]))
+
+
 def check_component_version(component, version):
     """
     Check if the given component is within the accepted version range.
     component: name of the component to verify. e.a. kustomize, etc.
     version: version string to verify. If the version is out of range, an error is raised program terminates.
     """
-    version = pkg_resources.parse_version(version)
-    version_max = pkg_resources.parse_version(REQ_VERSIONS[component]['MAX'])
-    version_min = pkg_resources.parse_version(REQ_VERSIONS[component]['MIN'])
+    version = __parse_version(version)
+    version_max = __parse_version(REQ_VERSIONS[component]['MAX'])
+    version_min = __parse_version(REQ_VERSIONS[component]['MIN'])
     if not version_min <= version <= version_max:
         error(f'Unsupported {component} version found: "{version}".')
         message(f'Need {component} versions between {version_min} and {version_max}.')
