@@ -43,6 +43,12 @@ PodDisruptionBudgets can now be enabled for all product components in the `ident
 
 Affected components: `am`, `idm`, `admin-ui`, `end-user-ui`, `login-ui`, `ds-idrepo`, `ds-cts` (identity-platform) and `ig` (ping-gateway).
 
+### Ability to define apiVersion, kind, and spec for a secret
+
+You now have the ability to define `apiVersion`, `kind`, and `spec` for secrets
+defined in `platform.secrets`. This allows folks to define secrets using
+external-secrets.
+
 ## Bugfixes
 
 ## How-tos
