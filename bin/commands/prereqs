@@ -84,11 +84,16 @@ applyChart() {
   local version=$5
   local opts=$6
   local installed=$7
+  local crd_cmd=$8
   local chart_repo="$chart_name $chart_name --repo $repo"
   local msg="$pretty not found.  Installing..."
 
   if [[ "$repo" =~ ^oci:// ]] ; then
     chart_repo="$chart_name $repo"
+  fi
+
+  if [ -n "$crd_cmd" ] ; then
+    runOrPrint $crd_cmd
   fi
 
   if [ -n "$installed" ] && [ "$UPGRADE" = false ] ; then
@@ -151,6 +156,7 @@ CM_OPTS="--set crds.enabled=true \
 --set webhook.tolerations[0].'effect'='NoSchedule' \
 --set webhook.tolerations[0].'operator'='Exists'"
 
+ING_CRD_CMD=""
 if [ "$INGRESS" = "traefik" ]; then
     ING_PRETTY="Traefik Proxy (Ingress/Gateway API)"
     ING_REPO=https://traefik.github.io/charts
@@ -158,6 +164,8 @@ if [ "$INGRESS" = "traefik" ]; then
     ING_NAMESPACE=${TRAEFIK_NAMESPACE:-traefik}
     ING_VERSION=${TRAEFIK_VERSION:-}
     ING_INSTALLED=$(kubectl get clusterroles -l app.kubernetes.io/name=traefik 2>/dev/null)
+    ING_CRD_CMD="helm show crds traefik --repo $ING_REPO | kubectl apply --server-side --force-conflicts -f - && \
+      kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.5.1/standard-install.yaml" 
     NGINX_COMPAT_VALUES="\
 --set providers.kubernetesIngressNGINX.enabled=true \
 --set providers.kubernetesIngressNGINX.ingressClassByName=true \
@@ -264,10 +272,10 @@ for c in ${COMPONENTS[@]} ; do
   message "c=${c}" "debug"
   case "$c" in
     cert-manager)
-      applyChart "$CM_PRETTY" "$CM_REPO" "$CM_CHART_NAME" "$CM_NAMESPACE" "$CM_VERSION" "$CM_OPTS" "$CM_INSTALLED"
+      applyChart "$CM_PRETTY" "$CM_REPO" "$CM_CHART_NAME" "$CM_NAMESPACE" "$CM_VERSION" "$CM_OPTS" "$CM_INSTALLED" ""
       ;;
     ingress)
-      applyChart "$ING_PRETTY" "$ING_REPO" "$ING_CHART_NAME" "$ING_NAMESPACE" "$ING_VERSION" "$ING_OPTS" "$ING_INSTALLED"
+      applyChart "$ING_PRETTY" "$ING_REPO" "$ING_CHART_NAME" "$ING_NAMESPACE" "$ING_VERSION" "$ING_OPTS" "$ING_INSTALLED" "$ING_CRD_CMD"
       if [ "$INGRESS" = "traefik" ]; then
         NGINX_CURRENT_CONTROLLER=$(kubectl get ingressclass nginx -o="jsonpath={.spec.controller}" 2>/dev/null || true)
         if [ -z "$NGINX_CURRENT_CONTROLLER" ]; then
@@ -278,7 +286,7 @@ for c in ${COMPONENTS[@]} ; do
       fi
       ;;
     secrets)
-      applyChart "$SEC_PRETTY" "$SEC_REPO" "$SEC_CHART_NAME" "$SEC_NAMESPACE" "$SEC_VERSION" "$SEC_OPTS" "$SEC_INSTALLED"
+      applyChart "$SEC_PRETTY" "$SEC_REPO" "$SEC_CHART_NAME" "$SEC_NAMESPACE" "$SEC_VERSION" "$SEC_OPTS" "$SEC_INSTALLED" ""
       ;;
   esac
 done
