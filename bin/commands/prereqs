@@ -158,12 +158,20 @@ if [ "$INGRESS" = "traefik" ]; then
     ING_NAMESPACE=${TRAEFIK_NAMESPACE:-traefik}
     ING_VERSION=${TRAEFIK_VERSION:-}
     ING_INSTALLED=$(kubectl get clusterroles -l app.kubernetes.io/name=traefik 2>/dev/null)
+    NGINX_COMPAT_VALUES="\
+--set providers.kubernetesIngressNGINX.enabled=true \
+--set providers.kubernetesIngressNGINX.ingressClassByName=true \
+--set providers.kubernetesIngressNGINX.publishService.enabled=true"
+    if [ -n "$ING_VERSION" ] && [ "${ING_VERSION%%.*.*}" -lt 40 ] ; then
+      NGINX_COMPAT_VALUES="\
+--set providers.kubernetesIngressNginx.enabled=true \
+--set providers.kubernetesIngressNginx.ingressClassByName=true \
+--set providers.kubernetesIngressNginx.publishService.enabled=true"
+    fi
     ING_OPTS="--set deployment.replicas=2 \
 --set ingressClass.enabled=true \
 --set ingressRoute.dashboard.enabled=false \
---set providers.kubernetesIngressNginx.enabled=true \
---set providers.kubernetesIngressNginx.ingressClassByName=true \
---set providers.kubernetesIngressNginx.publishService.enabled=true \
+$NGINX_COMPAT_VALUES \
 --set providers.kubernetesIngress.publishedService.enabled=true \
 --set providers.kubernetesGateway.enabled=true \
 --set gateway.enabled=false \
