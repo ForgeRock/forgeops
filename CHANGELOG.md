@@ -49,6 +49,12 @@ You now have the ability to define `apiVersion`, `kind`, and `spec` for secrets
 defined in `platform.secrets`. This allows folks to define secrets using
 external-secrets.
 
+## Deprecations
+
+### IDM /admin endpoint deprecated (8.1 only)
+
+The IDM `/admin` UI endpoint is deprecated in platform 8.1. The `forgeops info` command will display a deprecation warning. This endpoint will be removed in a future ForgeOps release.
+
 ## Bugfixes
 
 ## How-tos
