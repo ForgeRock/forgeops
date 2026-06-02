@@ -78,7 +78,7 @@ jobs:
           helm upgrade identity-platform identity-platform \
             --repo https://ForgeRock.github.io/forgeops/ \
             --version ${{ steps.get_latest_release.outputs.tag_name }} \
-            --namespace identity-platform --install
+            --namespace identity-platform --install --timeout 600s
 
       - name: Helm deploy latest IG
         run: |
@@ -114,7 +114,7 @@ jobs:
           helm upgrade identity-platform identity-platform \
             --repo https://ForgeRock.github.io/forgeops/ \
             --version ${{ env.RELEASE_TAG }} \
-            --namespace identity-platform --install
+            --namespace identity-platform --install --timeout 600s
 
       - name: Helm deploy upgrade IG
         run: |
