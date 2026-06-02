@@ -89,7 +89,7 @@ applyChart() {
     chart_repo="$chart_name $repo"
   fi
 
-  if [ -n $crd_cmd ] ; then
+  if [ -n "$crd_cmd" ] ; then
     runOrPrint $crd_cmd
   fi
 
