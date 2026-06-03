@@ -7,6 +7,7 @@ env:
   REGISTRY: "us-docker.pkg.dev"
 jobs:
   build:
+    if: github.repository == 'ForgeRock/forgeops'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
