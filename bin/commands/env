@@ -246,12 +246,12 @@ def process_overlay_dir(path, config, args):
                 res['spec']['replicas'] = config['size'][skey]['replicaCount']
 
         if config.get('pull_policy'):
-            res['spec']['template']['spec']['containers'][0]['imagePullPolicy'] = config['pull_policy']
+            if utils.key_exists(res, 'spec.template.spec.containers'):
+                for idx, _ in enumerate(res['spec']['template']['spec']['containers']):
+                    res['spec']['template']['spec']['containers'][idx]['imagePullPolicy'] = config['pull_policy']
             if utils.key_exists(res, 'spec.template.spec.initContainers'):
-                if isDS or skey in ('am', 'idm'):
-                    res['spec']['template']['spec']['initContainers'][0]['imagePullPolicy'] = config['pull_policy']
-                if skey in ('am', 'idm'):
-                    res['spec']['template']['spec']['initContainers'][1]['imagePullPolicy'] = config['pull_policy']
+                for idx, _ in enumerate(res['spec']['template']['spec']['initContainers']):
+                    res['spec']['template']['spec']['initContainers'][idx]['imagePullPolicy'] = config['pull_policy']
 
         write_yaml_file(res, res_path)
 
