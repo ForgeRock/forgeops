@@ -93,7 +93,7 @@ def process_overlay_dir(path, config, args):
             elif getattr(args, 'secret_agent', None):
                 kust['resources'] = list(set(utils.replace_or_append_str(kust['resources'], './secret-generator', './secret-agent')))
 
-        if path.name == args.env_name:
+        if str(path) == str(config['overlay_path']):
             keystore_str = './keystore-create'
             if getattr(args, 'secret_generator', None) and keystore_str not in kust['resources']:
                 kust['resources'].append(keystore_str)
