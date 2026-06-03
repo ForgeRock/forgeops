@@ -73,6 +73,8 @@ spec:
           env:
           - name: SUBFOLDER
             value: "am/XUI"
+          - name: ROUTES_FILE
+            value: routes.platform
           envFrom:
           - configMapRef:
               name: platform-config
