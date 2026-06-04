@@ -509,8 +509,8 @@ keystore_create:
     pullPolicy: IfNotPresent
 
   image:
-    repository: alpine/kubectl
-    tag: 1.34.1
+    repository: us-docker.pkg.dev/forgeops-public/images/kubectl
+    tag: 1.36.1
     pullPolicy: IfNotPresent
     imagePullSecrets: []
 
@@ -836,8 +836,8 @@ ds_snapshot:
   appendNSToRole: true
 
   image:
-    repository: alpine/kubectl
-    tag: 1.34.1
+    repository: us-docker.pkg.dev/forgeops-public/images/kubectl
+    tag: 1.36.1
     pullPolicy: IfNotPresent
     imagePullSecrets: []
 

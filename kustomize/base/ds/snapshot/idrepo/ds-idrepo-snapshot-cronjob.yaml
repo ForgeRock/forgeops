@@ -19,7 +19,7 @@ spec:
           securityContext: {}
           containers:
             - name: ds-idrepo-snapshot
-              image: alpine/kubectl:1.34.1
+              image: kubectl
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh

@@ -31,6 +31,9 @@ images:
 - name: login-ui
   newName: us-docker.pkg.dev/forgeops-public/images/login-ui
   newTag: latest
+- name: kubectl
+  newName: us-docker.pkg.dev/forgeops-public/images/kubectl
+  newTag: latest
 labels:
 - includeSelectors: true
   pairs:
