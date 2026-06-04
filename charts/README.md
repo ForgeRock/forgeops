@@ -57,4 +57,3 @@ $ helm upgrade identity-platform . \
 ```bash
 $ helm delete identity-platform -n identity-platform
 ```
-

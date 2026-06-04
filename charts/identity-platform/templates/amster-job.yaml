@@ -2,7 +2,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: amster
+  name: amster-{{ .Release.Revision }}
   annotations:
     "helm.sh/hook": post-install,post-upgrade
     {{- if .Values.amster.deleteOnSuccess }}

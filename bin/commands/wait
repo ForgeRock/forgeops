@@ -102,6 +102,31 @@ waitResourceExists() {
   timeoutExit
 }
 
+# Returns the name of the most recently created amster Job, polling until one exists.
+# Progress messages go to stderr so stdout carries only the job name for capture.
+getLatestAmsterJob() {
+  local start_time=$(date +%s)
+  local now=$(date +%s)
+  local job_name
+
+  echo -n "Waiting for amster Job to exist..." >&2
+  while [ $(($now - $start_time)) -le $TIMEOUT ] ; do
+    job_name=$($K_GET jobs -l app.kubernetes.io/component=amster \
+      --sort-by=.metadata.creationTimestamp \
+      -o jsonpath='{.items[-1].metadata.name}' 2>/dev/null)
+    if [ -n "$job_name" ] ; then
+      echo " $job_name" >&2
+      echo "$job_name"
+      return 0
+    fi
+    echo -n '.' >&2
+    sleep 1
+    now=$(date +%s)
+  done
+
+  timeoutExit
+}
+
 waitForDS() {
   local ds=$1
 
@@ -160,12 +185,14 @@ for c in ${COMPONENTS[@]} ; do
       ;;
 
     amster)
-      waitForResource 'complete' job/amster
+      amster_job=$(getLatestAmsterJob)
+      waitForResource 'complete' "job/${amster_job}"
       ;;
 
     apps)
       waitForResource ready "pod -l app=am"
-      waitForResource 'complete' job/amster
+      amster_job=$(getLatestAmsterJob)
+      waitForResource 'complete' "job/${amster_job}"
       waitForResource ready "pod -l app=idm"
       ;;
 

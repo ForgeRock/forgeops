@@ -43,7 +43,18 @@ You can now pass a values file to `forgeops prereqs` for cert-manager and
 ingress. This allows users to provide extra values as needed. See `forgeops
 prereqs -h` for more info.
 
+### Increased TTL for Kubernetes jobs (Helm only)
+
+The default `ttlSecondsAfterFinished` for all three jobs has been increased from 7200s
+(2 hours) to 43200s (12 hours), giving more time to inspect completed or failed jobs
+before they are automatically cleaned up.
+
 ## Bugfixes
 
-## How-tos
+### Dynamic Kubernetes job naming (Helm only)
 
+The `amster`, `ds-set-passwords`, and `keystore-create` Kubernetes job names in the
+`identity-platform` Helm chart now include the Helm release revision as a suffix
+(e.g. `amster-3`, `ds-set-passwords-3`, `keystore-create-3`). This ensures each
+`helm upgrade` produces a distinct job name, preventing failures caused by Kubernetes'
+immutability constraint on existing jobs.
