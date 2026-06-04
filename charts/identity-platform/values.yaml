@@ -964,12 +964,18 @@ ds_idrepo:
     enabled: false
     name: ds-idrepo-snapshot
     pvcName: data-ds-idrepo-0
+    failedJobsHistoryLimit: 3
 
     # Daily snaphot at midnight
     schedule: "0 0 * * *"
 
     # Purge snaps older than 3 days
     purgeDelay: "-3 day"
+
+    # Set Env Vars in snapshot pod
+    env: []
+    # env:
+    #   - DEBUG: 'true' # Turn on debugging in snapshot.sh
 
 ds_cts:
   enabled: true
@@ -1081,9 +1087,15 @@ ds_cts:
     enabled: false
     name: ds-cts-snapshot
     pvcName: data-ds-cts-0
+    failedJobsHistoryLimit: 3
 
     # Daily snaphot at midnight
     schedule: "0 0 * * *"
 
     # Purge snaps older than 3 days
     purgeDelay: "-3 day"
+
+    # Set Env Vars in snapshot pod
+    env: []
+    # env:
+    #   - DEBUG: 'true' # Turn on debugging in snapshot.sh

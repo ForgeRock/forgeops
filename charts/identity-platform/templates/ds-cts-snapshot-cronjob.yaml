@@ -11,6 +11,7 @@ metadata:
 spec:
   schedule: {{ .Values.ds_cts.snapshot.schedule | quote }}
   concurrencyPolicy: Forbid
+  failedJobsHistoryLimit: {{ .Values.ds_cts.snapshot.failedJobsHistoryLimit }}
   jobTemplate:
     spec:
       template:
@@ -52,6 +53,9 @@ spec:
                   fieldPath: metadata.name
             - name: PURGE_DELAY
               value: {{ .Values.ds_cts.snapshot.purgeDelay | quote }}
+            {{- with .Values.ds_cts.snapshot.env }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
             volumeMounts:
             - name: {{ include "ds-snapshot.configMapName" . }}
               mountPath: /scripts

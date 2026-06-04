@@ -5,7 +5,11 @@
 # completion the script will clean up the Job. This is required to get the job to release the cloned PVC so it can be
 # reclaimed.
 #
-# set -x
+
+DEBUG=${DEBUG:-false}
+if [ "$DEBUG" = true ] ; then
+  set -x
+fi
 
 if [ $# > 0 ]; then
   DS_SNAPSHOT_NAME=$1
@@ -24,15 +28,15 @@ JOB_NAME="${DS_SNAPSHOT_NAME}-job"
 
 # Delete snapshots older than this date. Set env PURGE_DELAY to a valid date
 # range. You can use 'last day', 'last hour', '-10 min', etc.
-purgeTime=$(date -d "$PURGE_DELAY" -Ins --utc)
+purgeTime=$(date -d "$PURGE_DELAY" --utc +%s)
 
 #
 for snapshot in $(kubectl --namespace $NAMESPACE get volumesnapshot -l app="${JOB_NAME}"  -o jsonpath="{.items[*].metadata.name}")
 do
-  dt=$(kubectl  --namespace $NAMESPACE get volumesnapshot $snapshot -o jsonpath="{.metadata.creationTimestamp"})
+  dt=$(date -d $(kubectl  --namespace $NAMESPACE get volumesnapshot $snapshot -o jsonpath="{.metadata.creationTimestamp"}) +%s)
 
   # This does a lexigraphical comparison which works because the string is in UTC format
-  if [[ $dt < $purgeTime ]]; then
+  if [ "$dt" -lt "$purgeTime" ]; then
     echo "Purging $snapshot with age $dt"
     kubectl --namespace $NAMESPACE delete volumesnapshot $snapshot
   else
@@ -62,8 +66,6 @@ if [ $? == 0 ] ; then
   echo "Job finished. Job logs"
   kubectl --namespace $NAMESPACE wait -l app="${DS_SNAPSHOT_NAME}-job" --for=condition=Ready pod
   kubectl --namespace $NAMESPACE  --all-containers=true logs -l app="${DS_SNAPSHOT_NAME}-job"
-  echo "Cleaning up job"
-  kubectl --namespace $NAMESPACE delete job -l app="${DS_SNAPSHOT_NAME}-job"
   exit 0
 fi
 
