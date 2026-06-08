@@ -2,6 +2,16 @@ apiVersion: v1
 entries:
   identity-platform:
   - apiVersion: v2
+    appVersion: 2026.2.1
+    created: "2026-06-08T03:10:40.055661957Z"
+    description: A Helm chart for Kubernetes
+    digest: 512d6f30c4be626282dfa647f866aa89d65d15a92b46e9f00531d60a9c73a56a
+    name: identity-platform
+    type: application
+    urls:
+    - https://github.com/ForgeRock/forgeops/releases/download/identity-platform-2026.2.1/identity-platform-2026.2.1.tgz
+    version: 2026.2.1
+  - apiVersion: v2
     appVersion: 2026.2.0
     created: "2026-06-02T16:56:34.216569501Z"
     description: A Helm chart for Kubernetes
@@ -73,6 +83,16 @@ entries:
     version: 2025.01.0
   ping-gateway:
   - apiVersion: v2
+    appVersion: 2026.2.1
+    created: "2026-06-08T03:10:40.193982842Z"
+    description: A Helm chart for Kubernetes
+    digest: 7c21bbd3815b83e53603139876f0a4f166b4b3e4a90c587b448cf40e6a7e858c
+    name: ping-gateway
+    type: application
+    urls:
+    - https://github.com/ForgeRock/forgeops/releases/download/ping-gateway-2026.2.1/ping-gateway-2026.2.1.tgz
+    version: 2026.2.1
+  - apiVersion: v2
     appVersion: 2026.2.0
     created: "2026-06-02T16:56:34.486007902Z"
     description: A Helm chart for Kubernetes
@@ -92,4 +112,4 @@ entries:
     urls:
     - https://github.com/ForgeRock/forgeops/releases/download/ping-gateway-1-0-0/ping-gateway-1.0.0.tgz
     version: 2026.1.0
-generated: "2026-06-02T16:56:34.486047575Z"
+generated: "2026-06-08T03:10:40.194045656Z"
