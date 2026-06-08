@@ -1,8 +1,7 @@
-name: Tag on merge
+name: Tag on manual trigger
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
+
 env:
   REGISTRY: "us-docker.pkg.dev"
 jobs:
