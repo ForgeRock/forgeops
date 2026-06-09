@@ -1,9 +1,0 @@
----
-- op: "remove"
-  path: "/spec/secrets/2"
-- op: "remove"
-  path: "/spec/secrets/4"
-- op: "remove"
-  path: "/spec/secrets/5"
-- op: "remove"
-  path: "/spec/secrets/6"

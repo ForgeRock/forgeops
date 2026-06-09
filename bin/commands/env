@@ -86,40 +86,6 @@ def process_overlay_dir(path, config, args):
                     kust['patches'] = []
                 kust['patches'] = utils.replace_or_append_str(kust['patches'], 'snapshot-schedule', { 'path': 'snapshot-schedule.yaml' })
 
-        # Begin secret-generator/secret-agent logic for kustomization.yaml
-        if skey == 'secrets':
-            if getattr(args, 'secret_generator', None):
-                kust['resources'] = list(set(utils.replace_or_append_str(kust['resources'], './secret-agent', './secret-generator')))
-            elif getattr(args, 'secret_agent', None):
-                kust['resources'] = list(set(utils.replace_or_append_str(kust['resources'], './secret-generator', './secret-agent')))
-
-        if str(path) == str(config['overlay_path']):
-            keystore_str = './keystore-create'
-            if getattr(args, 'secret_generator', None) and keystore_str not in kust['resources']:
-                kust['resources'].append(keystore_str)
-            if getattr(args, 'secret_agent', None) and keystore_str in kust['resources']:
-                kust['resources'].remove(keystore_str)
-
-        if skey in ['am', 'amster', 'idm'] and (args.secret_agent or args.secret_generator):
-            base_path = f"../../../base/{skey}"
-            sa_resource = f"{base_path}/secret-agent"
-            sg_resource = f"{base_path}/secret-generator"
-            old_resource = ''
-            new_resource = ''
-            if args.secret_agent:
-                old_resource = sg_resource
-                new_resource = sa_resource
-            if args.secret_generator:
-                old_resource = sa_resource
-                new_resource = sg_resource
-            if base_path in kust['resources']:
-                old_resource = base_path
-            if args.debug:
-                print(f"old_resource = {old_resource}")
-                print(f"new_resource = {new_resource}")
-            kust['resources'] = list(set(utils.replace_or_append_str(kust['resources'], old_resource, new_resource)))
-        # End secret-generator/secret-agent logic
-
         write_yaml_file(kust, kust_path)
 
     ingress_path = path / 'ingress-fqdn.yaml'
@@ -329,8 +295,6 @@ def setup_args():
     parser.add_argument('--no-namespace', dest='no_namespace', action='store_true', help='Remove namespace from overlay')
     parser.add_argument('--env-name', '-e', dest='env_name', required=True, help='Name of environment to manage')
     parser.add_argument('--single-instance', dest='single', action='store_true', help='Use a single-instance configuration')
-    parser.add_argument('--secret-generator', action='store_true', help='Use secret-generator instead of secret-agent')
-    parser.add_argument('--secret-agent', action='store_true', help='Use secret-agent instead of secret-generator')
     parser.add_argument('--source', '-s', dest='source', help='Name of source Kustomize overlay')
     parser.add_argument('--ingress-no-cert-manager', action='store_true', help="Disable use of cert-manager for ingresses")
     parser.add_argument('--ssl-secretname', dest='ssl_secretname', help="Name of the secret containing private ssl data")
@@ -618,16 +582,6 @@ def manage_env(args, config):
     if getattr(args, 'snap_role_name', None):
         values_snap['ds_snapshot']['clusterRoleName'] = args.snap_role_name
 
-    values_secrets = {}
-    if getattr(args, 'secret_generator', None):
-        values_path = root_path / 'charts' / 'identity-platform' / 'values-secret-generator.yaml'
-        with open(values_path, 'r', encoding='utf-8') as f:
-            values_secrets = yaml.safe_load(f)
-    elif getattr(args, 'secret_agent', None):
-        values_path = root_path / 'charts' / 'identity-platform' / 'values-secret-agent.yaml'
-        with open(values_path, 'r', encoding='utf-8') as f:
-            values_secrets = yaml.safe_load(f)
-
     # Check if we are Creating or Updating
     config['kustomize_action'] = None
     if config['do_kustomize']:
@@ -876,15 +830,12 @@ If you have not yet deployed the environment, then you can ignore this message.
         if values_file.is_file():
             with open(values_file, 'r', encoding='utf-8') as f:
                 values = yaml.safe_load(f)
-            if getattr(args, 'secret_agent', None):
-                values['platform']['secrets'] = {}
         merge(values,
             config['size'],
             values_ingress,
             values_images,
             values_snap,
             values_amster,
-            values_secrets,
             values_ds_set_passwords,
             values_security)
 
@@ -922,9 +873,6 @@ def run():
 
     if not args.namespace and (args.cts_snap_enable or args.idrepo_snap_enable or args.snap_role_name):
         utils.exit_msg('You must specify a namespace (-n) with --cts-snap-enable and --idrepo-snap-enable')
-
-    if not args.namespace and args.secret_generator:
-        utils.exit_msg('You must specify a namespace (-n) with --secret-generator')
 
     settings = {}
 
