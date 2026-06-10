@@ -13,24 +13,6 @@ source $SCRIPT_DIR/common.sh
 # Go back to where we started
 cd $start_dir
 
-# Pre-flight Helm version check: Helm 4 or later is required (--rollback-on-failure is Helm 4 only).
-# Must run before processArgs so the check fires before any argument processing or Helm operations.
-if type -P helm > /dev/null 2>&1 ; then
-  _HELM_VERSION=$(helm version --template '{{.Version}}' 2>/dev/null || true)
-  _HELM_MAJOR=$(echo "$_HELM_VERSION" | sed 's/^v//' | cut -d. -f1)
-  if [[ -z "$_HELM_MAJOR" ]] || [[ "$_HELM_MAJOR" -lt 4 ]] ; then
-    echo "ERROR: Helm 4 or later is required to install ForgeOps prerequisites."
-    echo "The third-party Helm charts used by this command require Helm 4."
-    echo "Please upgrade Helm: https://helm.sh/docs/intro/install/"
-    exit 1
-  fi
-  unset _HELM_VERSION _HELM_MAJOR
-else
-  echo "ERROR: Helm 4 or later is required to install ForgeOps prerequisites."
-  echo "The third-party Helm charts used by this command require Helm 4."
-  echo "Please upgrade Helm: https://helm.sh/docs/intro/install/"
-  exit 1
-fi
 
 usage() {
   local usage_msg=$(cat<<EOM
@@ -123,7 +105,7 @@ applyChart() {
     fi
     echo $msg
     runOrPrint "helm upgrade $chart_repo \
-        ${version:+--version=$version} --rollback-on-failure \
+        ${version:+--version=$version} $ROLLBACK_FLAG \
         --namespace $namespace --install --reset-values \
         $opts --create-namespace"
   fi
@@ -150,6 +132,19 @@ message "SECRETS=$SECRETS" "debug"
 
 if containsElement 'all' "${COMPONENTS[*]}" || [ -z "$COMPONENTS" ] ; then
     expandComponent 'all' "${COMPONENTS_PREREQS[*]}"
+fi
+
+if type -P helm > /dev/null 2>&1 ; then
+  HELM_MAJOR=$(helm version --template '{{.Version}}' 2>/dev/null | sed 's/^v//' | cut -d. -f1)
+  if [[ "$HELM_MAJOR" -lt 4 ]] ; then
+    ROLLBACK_FLAG='--atomic'
+  else
+    ROLLBACK_FLAG='--rollback-on-failure'
+  fi
+else
+  echo "ERROR: Helm is required to install ForgeOps prerequisites."
+  echo "It is recommended to install the latest version of Helm."
+  exit 1
 fi
 
 message "COMPONENTS=${COMPONENTS[*]}" "debug"
