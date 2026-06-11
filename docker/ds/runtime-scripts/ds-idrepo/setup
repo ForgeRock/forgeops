@@ -7,6 +7,15 @@
 # changed it may use an older version. For example, PingAM 7.5 still uses the 6.5 schema for configuration
 set -e
 
+start_dir=$(pwd)
+# Figure out the dir we live in
+SCRIPT_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+# Go back to where we started
+cd "${start_dir}"
+
+ver=$(dsconfig -V | awk '{ print $1 }')
+IDM_REPO_VER=${ver%.*}
+
 CONFIG="am-config:6.5"
 AM_IDENTITY_STORE="am-identity-store"
 IDM_REPO="idm-repo"
@@ -156,6 +165,9 @@ create-backend-index \
         --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7 \
         --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.9
 EOF
+
+# Create plugins for unique attributes
+$SCRIPT_DIR/create-unique-attribute-plugins "$IDM_REPO_VER"
 
 # Example of creating additional indexes at setup time.
 # Insert the dsconfig sub command into the batch above, as per your needs:
