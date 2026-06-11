@@ -22,3 +22,4 @@ mkdir -p /writeable/tmp
 echo "Copying /home/forgerock"
 mkdir -p /writeable/home
 cp -av /home/forgerock/ /writeable/home/forgerock
+cp -av /usr/local/tomcat /writeable/tomcat

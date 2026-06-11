@@ -21,9 +21,9 @@ reliable seconds since epoch.
 
 ### Added volume for Tomcat temp dir
 
-When readOnlyRootFilesystem is enabled for AM, it can throw an error when a
-user tries to edit a script via the UI. The tomcat temp dir is now mounted
-separately as an emptyDir volume.
+When readOnlyRootFilesystem is enabled for AM, it can throw errors when it
+needs to create something in /usr/local/tomcat. The tomcat dir has been moved
+to the writable volume.
 
 ## How-tos
 

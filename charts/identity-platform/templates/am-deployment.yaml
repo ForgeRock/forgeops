@@ -50,8 +50,6 @@ spec:
           emptyDir: {}
         - name: writeable
           emptyDir: {}
-        - name: tomcat-temp
-          emptyDir: {}
         - name: am-secrets
           projected:
             sources:
@@ -245,8 +243,9 @@ spec:
             mountPath: /home/forgerock/logging
           - name: entrypoint-scripts
             mountPath: /home/forgerock/entrypoint-scripts
-          - name: tomcat-temp
-            mountPath: /usr/local/tomcat/temp
+          - name: writeable
+            mountPath: /usr/local/tomcat
+            subPath: tomcat
           - name: writeable
             mountPath: /tmp
             subPath: tmp
