@@ -89,6 +89,10 @@ def runPostcommitInNode(int stageNumber, Integer[] sleepTimeMinutes, Closure run
 def runPostcommitSet0(PipelineRunLegacyAdapter pipelineRun) {
     def parallelTestsMap = [:]
 
+    // Get the product info one time to be sure all the tests will use the same values
+    Map productInfoUpgradeFrom = upgrade.productInfoUpgradeFrom(commonModule.platformImagesRevision)
+    Map productInfoUpgradeTo = upgrade.productInfoUpgradeTo(commonModule.platformImagesRevision)
+
     // **************
     // DEV full tests
     // **************
@@ -103,7 +107,7 @@ def runPostcommitSet0(PipelineRunLegacyAdapter pipelineRun) {
     if (params.Postcommit_perf_postcommit) {
         parallelTestsMap.put('Perf Postcommit',
             {
-                commonLodestarModule.runLodestar(pipelineRun, 'Perf Postcommit') { c -> cloud_tests.runCdmPerfPostcommit(c) }
+                commonLodestarModule.runLodestar(pipelineRun, 'Perf Postcommit', [CONFIGFILE_NAME: 'conf-postcommit-no-env-vars-closed.yaml']) { c -> cloud_tests.runCdmPerfPostcommit(c) }
             }
         )
     }
@@ -111,7 +115,7 @@ def runPostcommitSet0(PipelineRunLegacyAdapter pipelineRun) {
     if (params.Postcommit_perf_restore) {
         parallelTestsMap.put('Perf Restore',
             {
-                commonLodestarModule.runLodestar(pipelineRun, 'Perf Restore') { c -> cloud_tests.runCdmPerfPostcommit(c) }
+                commonLodestarModule.runLodestar(pipelineRun, 'Perf Restore') { c -> cloud_tests.runCdmPerfRestore(c) }
             }
         )
     }
@@ -129,7 +133,8 @@ def runPostcommitSet0(PipelineRunLegacyAdapter pipelineRun) {
     if (params.Postcommit_am_k8s_upgrade) {
         parallelTestsMap.put('AM K8s Upgrade',
             {
-                commonLodestarModule.runLodestar(pipelineRun, 'AM K8s Upgrade') { c -> cloud_tests.runCdmFuncAmK8sUpgrade(c) }
+                commonLodestarModule.runLodestar(pipelineRun, 'AM K8s Upgrade',
+                    cloud_utils.getOnlyProductFromProductInfo('AM', productInfoUpgradeFrom) + cloud_utils.getOnlyProductFromProductInfo('AM', productInfoUpgradeTo)) { c -> cloud_tests.runCdmFuncAmK8sUpgrade(c) }
             }
         )
     }
@@ -145,7 +150,8 @@ def runPostcommitSet0(PipelineRunLegacyAdapter pipelineRun) {
         println('yyyyy')
         parallelTestsMap.put('DS K8s Upgrade',
             {
-                commonLodestarModule.runLodestar(pipelineRun, 'DS K8s Upgrade') { c -> cloud_tests.runCdmFuncDsK8sUpgrade(c) }
+                commonLodestarModule.runLodestar(pipelineRun, 'DS K8s Upgrade',
+                    cloud_utils.getOnlyProductFromProductInfo('DS', productInfoUpgradeFrom) + cloud_utils.getOnlyProductFromProductInfo('DS', productInfoUpgradeTo)) { c -> cloud_tests.runCdmFuncDsK8sUpgrade(c) }
             }
         )
     }

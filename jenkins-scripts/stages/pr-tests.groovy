@@ -22,7 +22,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
 
     parallelTestsMap.put('Perf postcommit',
         {
-            commonLodestarModule.runLodestar(pipelineRun, 'Perf Postcommit') { c -> cloud_tests.runCdmPerfPostcommit(c) }
+            commonLodestarModule.runLodestar(pipelineRun, 'Perf Postcommit', [CONFIGFILE_NAME: 'conf-postcommit-no-env-vars-closed.yaml']) { c -> cloud_tests.runCdmPerfPostcommit(c) }
         }
     )
 
