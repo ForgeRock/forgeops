@@ -39,25 +39,33 @@ Set the logging level:
 
 #### Create the rcs-key secret
 
-You need a shared secret that RCS and IDM both know. In this example, the pwgen
-tool is used to generate a password, but you can create one any way you like.
-The RCS software expects this shared secret to be encoded with sha1sum and
-base64.
+You need a shared password that RCS and IDM both know. The secret must hold it
+in the `RCS_KEY_PASSWORD` key as **plaintext** — the RCS container derives the
+key-hash form the connector server expects (base64 of the SHA-1 of the
+password's UTF-16BE encoding, the same encoding `Main -setKey` writes), and
+IDM's `remoteConnectorServers[].key` registration config must hold the same
+plaintext (IDM sends it as the Basic-auth password; the RCS compares the hash).
+The `secrets.rcs_key.generate` values block renders a random one:
 
 ```
-# Create a password, note this password to be entered into IDM
-export RCS_KEY_PW=$(pwgen 24)
-# sha1sum the password
-export RCS_KEY_SHA=$(echo $RCS_KEY_PW | sha1sum --quiet)
-# base64 encode the SHA
-export RCS_KEY_B64=$(echo $RCS_KEY_SHA | base64)
-kubectl create secret generic rcs-key --from-literal=RCS_KEY=$RCS_KEY_B64
-# Confirm secret contents
-export RCS_KEY_SHA_FROM_SECRET=$(kubectl get secret rcs-key -o json | jq '.data.RCS_KEY' | tr -d '"' | base64 -d | base64 -d)
-if [ "$RCS_KEY_SHA" == "$RCS_KEY_SHA_FROM_SECRET" ] ; then echo "They match" ; else echo "They don't match" ; fi
-# Note the password in $RCS_KEY_PW, then remove the vars
-unset RCS_KEY_PW RCS_KEY_SHA RCS_KEY_B64 RCS_KEY_SHA_FROM_SECRET
+secrets:
+  rcs_key:
+    generate:
+      RCS_KEY_PASSWORD:
+        length: 32
 ```
+
+If you prefer to bring your own password:
+
+```
+kubectl create secret generic rcs-key --from-literal=RCS_KEY_PASSWORD='<password>'
+```
+
+Alternatively, `RCS_KEY` may be set to the pre-computed key-hash form
+(`echo -n $PW | iconv -t utf-16be | xxd -p | tr -d '\n' | xxd -r -p | sha1sum |
+cut -d' ' -f1 | xxd -r -p | base64`); the entrypoint passes it through
+verbatim, but you then also need the plaintext for IDM's registration
+yourself.
 
 #### Create rcs-certs secret if needed
 

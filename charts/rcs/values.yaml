@@ -2,8 +2,9 @@
 mode: server
 replicaCount: 1
 image:
-  repository: us-docker.pkg.dev/forgeops-public/images/rcs
-  pullPolicy: IfNotPresent
+  repository: us-docker.pkg.dev/forgeops-public/images/pingrcs
+  tag: 8-alpine-example
+  pullPolicy: Always
 podAnnotations: {}
 podLabels: {}
 podSecurityContext: {}
@@ -26,6 +27,14 @@ nodeSelector: {}
 tolerations: []
 affinity: {}
 
+# Server mode needs the shared rcs-key secret: generate a random plaintext
+# password (the entrypoint derives the key-hash form; IDM's registration
+# config uses the same value), or create it yourself per the README.
+# secrets:
+#   rcs_key:
+#     generate:
+#       RCS_KEY_PASSWORD:
+#         length: 32
 secrets: {}
 
 custom_properties: []

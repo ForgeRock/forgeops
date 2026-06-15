@@ -107,11 +107,15 @@ spec:
                   name: rcs-client-auth
                   key: clientSecret
             {{- else }}
-            - name: RCS_KEY
+            # RCS_KEY_PASSWORD is the plaintext shared password; the
+            # entrypoint derives the key-hash form the connector server
+            # wants (base64(sha1(utf-16be(PW)))). IDM's registration config
+            # must hold the same plaintext (see charts/identity-platform).
+            - name: RCS_KEY_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: rcs-key
-                  key: RCS_KEY
+                  key: RCS_KEY_PASSWORD
             {{- end }}
           {{- with .Values.livenessProbe }}
           livenessProbe:
