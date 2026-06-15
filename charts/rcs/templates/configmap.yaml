@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rcs-config
+data:
+  LOG_CONFIG: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <configuration>
+        <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+                <pattern>%date{"MMM dd, yyyy h:mm:ss a"} %-5level %logger{35}: %msg %n</pattern>
+            </encoder>
+        </appender>
+    {{- range $class, $level := .Values.logLevels.classes }}
+        <logger name="{{ $class }}" level="{{ $level }}" additivity="false">
+            <appender-ref ref="STDOUT"/>
+        </logger>
+    {{- end }}
+        <root level="{{ .Values.logLevels.root }}">
+            <appender-ref ref="STDOUT" />
+        </root>
+      </configuration>
+  PROPERTIES_FILE: |
+    connectorserver.scope={{ .Values.scope | default "fr:idm:*" }} 
+    connectorserver.loggingConfigFile=/opt/openicf/conf/logback.xml
+    connectorserver.tokenEndpoint={{ .Values.idmEndpoints.token }}
+    connectorserver.url={{ .Values.idmEndpoints.wss }}
+    {{- with .Values.custom_properties }}
+      {{- toStrings . | indent 4 }}
+    {{- end }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rcs-init-scripts
+  labels:
+    {{- include "rcs.labels" . | nindent 4 }}
+    {{- with .Values.podLabels }}
+       {{- toYaml . | nindent 4 }}
+    {{- end }}
+data:
+  {{ (.Files.Glob "files/init-scripts/**.sh").AsConfig | nindent 2 }}

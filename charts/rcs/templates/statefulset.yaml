@@ -1,0 +1,125 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "rcs.fullname" . }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "rcs.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "rcs.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        - name: writeable
+          emptyDir: {}
+        - name: config
+          configMap:
+            name: rcs-config
+            items:
+              - key: PROPERTIES_FILE
+                path: ConnectorServer.properties
+              - key: LOG_CONFIG
+                path: logback.xml
+        - name: trusted-ca-vol
+          secret:
+            secretName: rcs-certs
+            defaultMode: 0640
+        - name: lib
+          configMap:
+            name: rcs-lib
+            optional: true
+        - name: init-scripts
+          configMap:
+            name: rcs-init-scripts
+            defaultMode: 0755
+        - name: scripts
+          configMap:
+            name: rcs-scripts
+            defaultMode: 0755
+            optional: true
+      initContainers:
+        - name: filesystem-init
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          volumeMounts:
+            - mountPath: /init-scripts
+              name: init-scripts
+            - mountPath: /custom_lib
+              name: lib
+            - mountPath: /writeable
+              name: writeable
+          command: [/init-scripts/filesystem-init.sh]
+      containers:
+        - name: rcs
+          {{- with .Values.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          volumeMounts:
+            - name: writeable
+              mountPath: /opt/openicf
+              subPath: openicf
+            - name: config
+              mountPath: /opt/openicf/conf
+            - name: trusted-ca-vol
+              mountPath: /opt/openicf/trusted-cas
+            - name: scripts
+              mountPath: /opt/openicf/scripts
+            - name: writeable
+              mountPath: /tmp
+              subPath: tmp
+          env: 
+            - name: RCS_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: rcs-client-auth
+                  key: clientId
+            - name: RCS_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: rcs-client-auth
+                  key: clientSecret
+          {{- with .Values.livenessProbe }}
+          livenessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.readinessProbe }}
+          readinessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

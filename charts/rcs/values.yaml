@@ -1,0 +1,51 @@
+---
+replicaCount: 1
+image:
+  repository: us-docker.pkg.dev/forgeops-public/images/rcs
+  tag: 1.5.20.35
+  pullPolicy: IfNotPresent
+podAnnotations: {}
+podLabels: {}
+podSecurityContext: {}
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - All
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+secure: true
+
+resources: {}
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+idmEndpoints:
+  wss: "wss://idp.example.com/openicf"
+  token: "https://idp.example.com/am/oauth2/realms/root/realms/alpha/access_token"
+tenantIp: "1.2.3.4"
+logLevels:
+  root: "INFO"
+  classes:
+    org.forgerock.openicf.misc: "INFO"
+    org.forgerock.openicf.connectors: "INFO"
+    org.identityconnectors: "INFO"
+    org.forgerock.openicf.framework: "INFO"
+    org.identityconnectors.framework.impl.api.LoggingProxy: "INFO"
+    org.identityconnectors.framework.api.operations: "INFO"
+    org.forgerock.openicf.common: "INFO"
+    org.forgerock.openicf.contract: "INFO"
+    org.forgerock.openicf.test: "INFO"
+    org.identityconnectors.common: "INFO"
+    org.forgerock.openicf.framework.client: "INFO"
+    org.forgerock.openicf.framework.async.impl.AbstractLocalOperationProcessor: "INFO"
+    org.identityconnectors.framework: "INFO"
+    org.identityconnectors.contract: "INFO"
+    org.identityconnectors.test: "INFO"
