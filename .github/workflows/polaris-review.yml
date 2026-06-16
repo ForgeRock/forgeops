@@ -1,0 +1,64 @@
+name: Polaris PR Review
+
+on:
+  pull_request_target:
+    # Note: To save costs, this will not fire on new pushes to the PR.
+    # To include new pushes, add "synchronize" to the types list.
+    types: [opened, reopened]
+    paths-ignore:
+      - "**/*.md"
+      - "docs/**"
+      - ".polaris/**"
+      - "**/node_modules/**"
+      - "**/jest/jest-transform-cache-*"
+      - "**/jest/-usr*"
+      - "**/jest/perf-cache*"
+      - "**/__fixtures__/**"
+      - "**/generated/**"
+      - "**/build/**"
+      - "**/target/**"
+      - "**/coverage/**"
+      - "**/.sonar/**"
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+
+# Required by plugin itself to perform PR actions:
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  review:
+    if: >
+      github.repository == 'ping-rocks/forgeops'
+      && (
+        github.event_name == 'pull_request_target'
+        || (
+          github.event_name == 'issue_comment'
+          && github.event.issue.pull_request
+          && contains(github.event.comment.body, '@polaris')
+        )
+        || (
+          github.event_name == 'pull_request_review_comment'
+          && contains(github.event.comment.body, '@polaris')
+        )
+      )
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    concurrency:
+      group: polaris-review-${{ github.event.pull_request.number || github.event.issue.number }}
+      cancel-in-progress: true
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: ping-rocks/eng-polaris-actions/polaris-review@release
+        with:
+          aws-bearer-token-bedrock: ${{ secrets.AWS_BEARER_TOKEN_BEDROCK }}
+          # Required by action to fetch plugin from marketplace:
+          marketplace-app-id: ${{ vars.POLARIS_CODE_REVIEW_APP_ID }}
+          marketplace-app-private-key: ${{ secrets.POLARIS_CODE_REVIEW_APP_PRIVATE_KEY }}
