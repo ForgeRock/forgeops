@@ -1,26 +1,25 @@
 # Deploying with ForgeOps
 
-_Kubernetes deployment for the Ping Identity Platform._
+_Kubernetes deployment for the Ping Advanced Identity Software._
 
 This repository provides Docker, Kustomize and Helm artifacts as well as custom tooling to help users deploy the 
-Ping Identity Platform on a Kubernetes cluster. 
+**Ping Advanced Identity Software** on a Kubernetes cluster. 
 
 ## Pre-release software 
 
-The [dev branch](https://github.com/ForgeRock/forgeops/tree/dev) is where ForgeOps engineers work on bugs and new features for the next release.  Please feel free to try the latest features by checking out the [dev branch](https://github.com/ForgeRock/forgeops/tree/dev).  
-Please find the *pre-release documentation* [here](https://staging-docs.pingidentity.com/forgeops/dev).  
+The [main branch](https://github.com/ForgeRock/forgeops/tree/main) is where ForgeOps engineers work on bugs and new features for the next release.  Please feel free to try the latest features by checking out the [main branch](https://github.com/ForgeRock/forgeops/tree/main).  
+Please find the *pre-release documentation* [here](https://staging-docs.pingidentity.com/forgeops/dev).
 The *pre-release Release Notes* can be found [here](https://staging-docs.pingidentity.com/forgeops/dev/rn/rn.html).
 
 >Note: The latest pre-release software in the dev branch is not supported by Ping Identity.
 
-## What's new?
+## What's new in the latest ForgeOps release?
 
 See the [ForgeOps Release Notes](https://docs.pingidentity.com/forgeops/latest/rn/rn.html) to read about new features and changes.
 
-## Ping Identity platform configuration
+## Ping Advanced Identity Software configuration
 
-The default product configuration bundled with the product images is a basic installation that can be further extended by developers 
-to meet their requirements. 
+The default product configuration bundled with the product images is a basic installation that can be further extended by developers to meet their requirements. 
 The main features of the default configuration are:
 
 * Deployments for PingAM, PingIDM, PingDS and PingGateway. PingGateway is not deployed by default, but is available optionally.
@@ -35,14 +34,14 @@ integration of PingIDM and PingAM.
 
 ## Getting Started
 
-If you just want to observe the Ping Identity Platform in action on a 
+If you just want to observe the Ping Advanced Identity Software in action on a 
 Kubernetes cluster, you can try out our ForgeOps deployment. You'll need to install 
 the required third-party software, set up a Kubernetes cluster, and install the 
-Ping Identity Platform. 
+Ping Advanced Identity software. 
 
 See the [Setup](https://docs.pingidentity.com/forgeops/latest/setup/overview.html) and [Deployment](https://docs.pingidentity.com/forgeops/latest/deploy/overview.html) sections in the documentation for detailed information about all these tasks.
 
-## Accessing Platform UIs and APIs
+## Accessing the UIs and APIs
 
 See [UI and API access](https://docs.pingidentity.com/forgeops/latest/deploy/access.html) in the ForgeOps documentation.
 
