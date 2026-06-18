@@ -109,7 +109,6 @@ void sendInformationMessageToPR() {
         )
 
         addTaskOnPR(['Run Guillotine tests manually?',
-                     'Helm and Kustomize updated? (includes running base-generate.sh)',
                      'Doc Jira created?/readme updated?'])
     }
 }
