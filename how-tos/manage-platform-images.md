@@ -1,16 +1,17 @@
-# Managing Ping Identity Platform images
+# Managing Ping Advanced Identity Software images
 
-ForgeOps has the ability to work with multiple versions of Ping Identity
-Platform (PIP) images. This allows for more flexibility when doing upgrades of
-the forgeops tool and PIP. This feature is supported for PIP 7.4 and newer. The
-`forgeops image` command is designed to help you keep up to date with the latest
-images available for your version of PIP.
+ForgeOps has the ability to work with multiple versions of Ping Advanced 
+Identity Software (PAIS) images. This allows for more flexibility when doing 
+upgrades of the forgeops tool and PAIS platform. This feature is supported for 
+the 7.4 and newer versions. The `forgeops image` command is designed to help you
+keep up to date with the latest images available for your version of PAIS platform.
 
 *Advantages*
-* Allows you to upgrade ForgeOps and PIP separately on your schedule.
+* Allows you to upgrade ForgeOps and PAIS platform separately on your schedule.
 * When upgrading, you create a new release and test it through your different environments.
 * Manage a single git release branch instead of one per platform version
-* Allows for supported container images that are regularly scanned for OS level security vulnerabilities
+* Allows for supported container images that are regularly scanned for OS level 
+security vulnerabilities
 
 ## Supported and Scanned images
 
@@ -79,7 +80,7 @@ Use a release name of your choosing. If the release exists, it will be overwritt
 ## Release Process
 
 As of the 2025.1.0 release of ForgeOps, the release process has changed to
-allow you to select the PIP version you want. This allows you much more
+allow you to select the PAIS platform version you want. This allows you much more
 flexibility when using ForgeOps in production scenarios.
 
 ## Managing a release

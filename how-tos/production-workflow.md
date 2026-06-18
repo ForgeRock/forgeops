@@ -4,7 +4,7 @@
 
 The previous forgeops tool was not designed for production use, but instead was
 intended to be used as an example of the resources necessary to get the Ping
-Identity Platform (PIP) running in Kubernetes (k8s). The new tool was designed
+Advanced Identity Software (PAIS) running in Kubernetes (k8s). The new tool was designed
 for production use, and these instructions describe the intended setup and
 workflow for production environments.
 
@@ -160,9 +160,9 @@ git add helm kustomize
 git commit -m 'Adding stage env'
 ```
 
-### Select a version of Ping Identity Platform (PIP)
+### Select a version of PAIS platform
 
-The Forgeops tool now works with multiple versions of PIP so you'll need to
+The Forgeops tool now works with multiple versions of PAIS platform so you'll need to
 select which one you want to work with. For an initial environment setup,
 you'll want to set the version for both builds and deployments. After
 developing your initial config, you'll only need to update the UI images in
@@ -170,7 +170,7 @@ your environments.
 
 See <a href="manage-platform-images.md">Manage Platform Images</a> for details.
 
-#### Select PIP version for builds
+#### Select PAIS version for builds
 
 In the build path (docker), there are folders for each component (am, idm, ds,
 etc). The `forgeops image` command will create a folder called releases in each
@@ -186,7 +186,7 @@ git add docker
 git commit -m 'Adding new 7.5.1 release for builds'
 ```
 
-#### Select PIP version for deployments
+#### Select PAIS version for deployments
 
 `forgeops image --release 7.5.1 --env-name stage-single platform`
 
@@ -205,7 +205,7 @@ To apply the example from above, you'd do:
 
 ### Configure your deployment
 
-Now that you have a vanilla single-instance PIP deployment up and running, you
+Now that you have a vanilla single-instance PAIS deployment up and running, you
 can start applying your AM and IDM configurations. These are your file-based
 configurations (FBC).
 

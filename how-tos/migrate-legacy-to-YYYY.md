@@ -1,10 +1,9 @@
 # Migrating from legacy ForgeOps to YYYY.x.y
 
 Legacy ForgeOps artifacts were released in individual release branches aligning
-with the version of Ping Identity Platform (PIP). These branches were locked to
-that specific version of PIP. This caused several problems.
+with the version of Ping Advanced Identity Software (PAIS). These branches were locked to that specific version of PAIS. This caused several problems.
 
-* PIP yearly releases
+* PAIS yearly releases
   * Long wait time for new features
 * Backporting headaches
 * Difficult to provide supported container images for the platform

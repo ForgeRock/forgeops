@@ -1,10 +1,11 @@
-# Using an externally deployed PingDS with the Ping Identity Platform
+# Using an externally deployed PingDS with the Ping Advanced Identity Software
 
 ## Objective
-Deploy the Ping Identity Platform in Kubernetes but connect to an externally deployed PingDS.  
-This document describes steps to use PingDS deployed in a VM external to the Kubernetes cluster  
-where the platform has been deployed.  The steps could also be easily adapted for a user  
-who wants to deploy PingDS in a different namespace in the same cluster or in a cluster different  
+Deploy the Ping Advanced Identity Software platform in Kubernetes but connect to 
+an externally deployed PingDS. This document describes steps to use PingDS 
+deployed in a VM external to the Kubernetes cluster where the platform has been 
+deployed.  The steps could also be easily adapted for a user who wants to deploy
+PingDS in a different namespace in the same cluster or in a cluster different  
 from the rest of the platform products.
 
 ## Assumptions

@@ -1,10 +1,10 @@
-# ForgeOps Overview
+# The `forgeops` tool - overview
 
 ## Introduction
 
-The new forgeops tool was created to simplify the ForgeRock platform
-deployment, make it more deterministic, and continue on our production first
-path. It no longer generates a Kustomize overlay on every run.  Instead, you
+The new forgeops tool was created to simplify the ForgeOps deployment, 
+make it more deterministic, and continue on our production first path. 
+It no longer generates a Kustomize overlay on every run.  Instead, you
 create and manage environments for each deployment you need, then you can apply
 them as you wish with either Kustomize or Helm.
 

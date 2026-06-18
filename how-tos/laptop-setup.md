@@ -2,10 +2,10 @@
 
 ## Introduction
 
-This document is designed to be given out by Ping Identity Platform (PIP)
-admins to folks new to PIP/ForgeOps in their organization. It will help you get
+This document is designed to be given out by Ping Advanced Identity Software (PAIS)
+admins to folks new to PAIS/ForgeOps in their organization. It will help you get
 your laptop setup to run ForgeOps so you can get further instruction on how to
-to use ForgeOps with your organization's implementation of PIP/ForgeOps.
+to use ForgeOps with your organization's implementation of PAIS/ForgeOps.
 
 ## Clone git repos
 
