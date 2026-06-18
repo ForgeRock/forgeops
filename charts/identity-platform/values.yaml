@@ -20,25 +20,31 @@ platform:
     enabled: true
   ingress:
     enabled: true
-    className: "nginx"
+    className: "traefik"
     annotations:
       # kubernetes.io/tls-acme: "true"
-      # Nginx specific ingress annotations
-      nginx.ingress.kubernetes.io/affinity: cookie
-      nginx.ingress.kubernetes.io/session-cookie-hash: sha1
-      nginx.ingress.kubernetes.io/session-cookie-name: route
-      nginx.ingress.kubernetes.io/ssl-redirect: "true"
-      # CORS is now set in the AM and IDM configurations
-      nginx.ingress.kubernetes.io/enable-cors: "false"
-      nginx.ingress.kubernetes.io/body-size: "64m"
-      nginx.ingress.kubernetes.io/send-timeout: "600"
-      nginx.ingress.kubernetes.io/proxy-body-size: "64m"
-      nginx.ingress.kubernetes.io/proxy-buffer-size: "16k"
-      nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
-      nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
-      # nginx.ingress.kubernetes.io/configuration-snippet: |
-      #   add_header X-ForgeRock-TransactionId $req_id;
-      #   proxy_set_header X-ForgeRock-TransactionId $req_id;
+      # Traefik specific ingress annotations
+      traefik.ingress.kubernetes.io/router.entrypoints: websecure
+      traefik.ingress.kubernetes.io/router.tls: "true"
+      # Sticky sessions via Traefik service annotation (set on the Service, or use a middleware)
+      # For cookie-based sticky sessions, configure a Sticky middleware and reference it:
+      # traefik.ingress.kubernetes.io/router.middlewares: <namespace>-sticky@kubernetescrd
+      # Nginx annotations (uncomment to use with nginx ingress)
+      # nginx.ingress.kubernetes.io/affinity: cookie
+      # nginx.ingress.kubernetes.io/session-cookie-hash: sha1
+      # nginx.ingress.kubernetes.io/session-cookie-name: route
+      # nginx.ingress.kubernetes.io/ssl-redirect: "true"
+      # # CORS is now set in the AM and IDM configurations
+      # nginx.ingress.kubernetes.io/enable-cors: "false"
+      # nginx.ingress.kubernetes.io/body-size: "64m"
+      # nginx.ingress.kubernetes.io/send-timeout: "600"
+      # nginx.ingress.kubernetes.io/proxy-body-size: "64m"
+      # nginx.ingress.kubernetes.io/proxy-buffer-size: "16k"
+      # nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+      # nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+      # # nginx.ingress.kubernetes.io/configuration-snippet: |
+      # #   add_header X-ForgeRock-TransactionId $req_id;
+      # #   proxy_set_header X-ForgeRock-TransactionId $req_id;
 
     hosts:
       - identity-platform.domain.local
@@ -159,7 +165,7 @@ am:
   ingress:
     enabled: true
     # Uncomment className and/or annotations to override global platform values
-    # className: "nginx"
+    # className: "traefik"
     # annotations: {}
 
   resources: {}
@@ -329,7 +335,7 @@ idm:
   ingress:
     enabled: true
     # Uncomment className and/or annotations to override global platform values
-    # className: "nginx"
+    # className: "traefik"
     # annotations: {}
 
   resources: {}
@@ -402,7 +408,7 @@ admin_ui:
   ingress:
     enabled: true
     # Uncomment className and/or annotations to override global platform values
-    # className: "nginx"
+    # className: "traefik"
     # annotations: {}
 
   resources: {}
@@ -471,7 +477,7 @@ end_user_ui:
   ingress:
     enabled: true
     # Uncomment className and/or annotations to override global platform values
-    # className: "nginx"
+    # className: "traefik"
     # annotations: {}
 
   resources: {}
@@ -540,7 +546,7 @@ login_ui:
   ingress:
     enabled: true
     # Uncomment className and/or annotations to override global platform values
-    # className: "nginx"
+    # className: "traefik"
     # annotations: {}
 
   resources: {}
@@ -609,10 +615,15 @@ ig:
   ingress:
     enabled: true
     # Uncomment className and/or annotations to override global platform values
-    # className: "nginx"
+    # className: "traefik"
     annotations:
+      # Traefik annotations
+      traefik.ingress.kubernetes.io/router.entrypoints: websecure
+      traefik.ingress.kubernetes.io/router.tls: "true"
+      # HAProxy annotations
       haproxy-ingress.github.io/ssl-redirect: "true"
       haproxy-ingress.github.io/rewrite-target: "/$2"
+      # Nginx annotations
       nginx.ingress.kubernetes.io/ssl-redirect: "true"
       nginx.ingress.kubernetes.io/rewrite-target: "/$2"
 
