@@ -1,11 +1,20 @@
 #!/bin/bash
 
-ingress=nginx
+applyYaml() {
+  local yaml=$1
+
+  echo "$yaml" | kubectl create -f -
+}
+
+ingress=traefik
+[ "$1" = "--nginx" ] && ingress=nginx
 [ "$1" = "--haproxy" ] && ingress=haproxy
+
+nginx_controller=${nginx_controller:-traefik.io/ingress-controller}
 
 sa_repo=oci://us-docker.pkg.dev/forgeops-public/charts/secret-agent
 sa_namespace=secret-agent
-sa_version="v1.2.0"
+sa_version="v1.2.12"
 sa_installed=$(kubectl get crd secretagentconfigurations.secret-agent.secrets.forgerock.io 2>/dev/null)
 if [ -n "$sa_installed" ]; then
     echo "Secret agent has already been installed."
@@ -50,7 +59,67 @@ else
         --set webhook.tolerations[0]."operator"="Exists"
 fi
 
-if [ "$ingress" = "nginx" ]; then
+if [ "$ingress" = "traefik" ]; then
+    traefik_pretty="Traefik Proxy (Ingress/Gateway API)"
+    traefik_repo=https://traefik.github.io/charts
+    traefik_chart_name=traefik
+    traefik_namespace=${TRAEFIK_NAMESPACE:-traefik}
+    traefik_version=
+    traefik_installed=$(kubectl get clusterroles -l app.kubernetes.io/name=traefik 2>/dev/null)
+    if [ -n "$ING_VERSION" ] && [ "${ING_VERSION%%.*.*}" -lt 40 ] ; then
+      nginx_compat_values="\
+--set providers.kubernetesIngressNginx.enabled=true \
+--set providers.kubernetesIngressNginx.ingressClassByName=true \
+--set providers.kubernetesIngressNginx.publishService.enabled=true"
+    fi
+    ing_crd_cmd="helm show crds traefik --repo $traefik_repo| kubectl apply --server-side --force-conflicts -f - && \
+      kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.5.1/standard-install.yaml"
+    if [ -n "$traefik_installed" ]; then
+        echo "$traefik_pretty has already been installed."
+    else
+        echo "$traefik_pretty not found.  Installing..."
+        if [ -n "$ing_crd_cmd" ] ; then
+          eval $ing_crd_cmd
+        fi
+        kubectl create namespace $traefik_namespace 2>/dev/null || true
+        helm upgrade $traefik_chart_name $traefik_chart_name --repo $traefik_repo \
+            --namespace $traefik_namespace --install --reset-values $nginx_compat_values \
+            ${traefik_version:+--version $traefik_version} \
+            --set providers.kubernetesIngressNGINX.enabled=true \
+            --set providers.kubernetesIngressNGINX.ingressClassByName=true \
+            --set providers.kubernetesIngressNGINX.publishService.enabled=true \
+            --set deployment.replicas=2 \
+            --set ingressClass.enabled=true \
+            --set ingressRoute.dashboard.enabled=false \
+            --set providers.kubernetesIngress.publishedService.enabled=true \
+            --set providers.kubernetesGateway.enabled=true \
+            --set gateway.enabled=false \
+            --set tolerations[0].'key'='kubernetes\.io/arch' \
+            --set tolerations[0].'effect'='NoSchedule' \
+            --set tolerations[0].'operator'='Exists'
+    fi
+
+    ing_class=$(cat <<EOF
+apiVersion: networking.k8s.io/v1
+kind: IngressClass
+metadata:
+  name: nginx
+  labels:
+    app.kubernetes.io/component: controller
+    app.kubernetes.io/managed-by: forgeops-prereqs
+    app.kubernetes.io/name: traefik
+    app.kubernetes.io/part-of: traefik
+spec:
+  controller: $nginx_controller
+EOF
+)
+    nginx_current_controller=$(kubectl get ingressclass nginx -o="jsonpath={.spec.controller}" 2>/dev/null || true)
+    if [ -z "$nginx_current_controller" ]; then
+      applyYaml "$ing_class"
+    elif [ "$nginx_current_controller" != "$nginx_controller" ]; then
+      kubectl delete ingressclass nginx && applyYaml "$ing_class"
+    fi
+elif [ "$ingress" = "nginx" ]; then
     nx_repo=https://kubernetes.github.io/ingress-nginx
     nx_namespace=ingress-nginx
     nx_version=

@@ -88,6 +88,7 @@ def forgeops_dependencies(legacy, operator):
     check_component_version('cert-manager', img.decode('ascii').split(':')[1])
 
     print('Checking secret-agent operator and related CRDs:', end=' ')
+    sa_namespace = 'secret-agent'
     try:
         run('kubectl', 'get crd secretagentconfigurations.secret-agent.secrets.forgerock.io',
             cstderr=True, cstdout=True)
@@ -97,16 +98,30 @@ def forgeops_dependencies(legacy, operator):
     else:
         message('secret-agent CRD found in cluster.')
         message('\nChecking secret-agent operator is running...')
+        sa_deployment = 'secret-agent'
+        found = False
+        for ns in ['secret-agent', 'secret-agent-system']:
+            for deploy in ['secret-agent', 'secret-agent-controller-manager']:
+                try:
+                    run('kubectl', f'-n {ns} get deployment {deploy}', cstderr=True, cstdout=True)
+                    sa_namespace = ns
+                    sa_deployment = deploy
+                    found = True
+                    break
+                except Exception:
+                    pass
+            if found:
+                break
         run('kubectl', 'wait --for=condition=Established crd secretagentconfigurations.secret-agent.secrets.forgerock.io --timeout=30s')
-        run('kubectl', '-n secret-agent-system wait --for=condition=available deployment  --all --timeout=120s')
+        run('kubectl', f'-n {sa_namespace} wait --for=condition=available deployment  --all --timeout=120s')
         try:
-            run('kubectl', '-n secret-agent-system get pod -l app.kubernetes.io/name=secret-agent-manager --field-selector=status.phase==Running')
+            run('kubectl', f'-n {sa_namespace} get pod -l app.kubernetes.io/name=secret-agent --field-selector=status.phase==Running')
         except Exception as e:
             error(f'Could not find a running secret-agent pod. See the following error: {e}')
             sys.exit(1)
         message('secret-agent operator is running')
 
-    _, img, _ = run('kubectl', f'-n secret-agent-system get deployment secret-agent-controller-manager -o jsonpath={{.spec.template.spec.containers[0].image}}',
+    _, img, _ = run('kubectl', f'-n {sa_namespace} get deployment {sa_deployment} -o jsonpath={{.spec.template.spec.containers[0].image}}',
                     cstderr=True, cstdout=True)
     check_component_version('secret-agent', img.decode('ascii').split(':')[1])
 
