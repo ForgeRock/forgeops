@@ -38,8 +38,8 @@ Retrieve the exact image tag using one of:
 **From the ForgeOps CLI:**
 
 ```sh
-bin/forgeops info --list-releases --json | jq -r '.ds["8.1"]["8.1.0"]'
-# Output: 8.1.0-202605280539
+bin/forgeops info --list-releases --json | jq -r '.idm["8.1"]["8.1.0"]'
+# Output: 8.1.0-202606240536
 ```
 
 **From the releases page:** Browse [releases.forgeops.com](http://releases.forgeops.com/).
@@ -51,20 +51,19 @@ bin/forgeops info --list-releases --json | jq -r '.ds["8.1"]["8.1.0"]'
 SBOMs are available at the following URL structure:
 
 ```
-http://releases.forgeops.com/sbom/PRODUCT_NAME/VERSION/TAG.ARCH.FORMAT.json
+http://releases.forgeops.com/sbom/<PRODUCT_NAME>/<VERSION>/<PRODUCT_NAME>_<TAG>_<ARCH>_<FORMAT>.json
 ```
 
 | Variable       | Values |
 |----------------|--------|
 | `PRODUCT_NAME` | `admin-ui`, `am`, `amster`, `am-config-upgrader`, `ds`, `end-user-ui`, `idm`, `ig`, `login-ui` |
 | `VERSION`      | `MAJOR.MINOR.PATCH` (e.g. `8.1.0`) |
-| `TAG`          | Full image tag (e.g. `8.1.0-202605280539`) |
+| `TAG`          | Full image tag (e.g. `8.1.0-202606240536`) |
 | `ARCH`         | `amd64` or `arm64` |
 | `FORMAT`       | `cyclonedx` or `spdx` |
 
 **Example:**
-
-[http://releases.forgeops.com/sbom/ds/8.1.0/8.1.0-202605280539.amd64.cyclonedx.json](http://releases.forgeops.com/sbom/ds/8.1.0/8.1.0-202605280539.amd64.cyclonedx.json)
+http://releases.forgeops.com/sbom/idm/8.1.0/idm_8.1.0-202606240536_arm64_cyclonedx.json
 
 
 ### Browse available SBOMs
@@ -75,18 +74,18 @@ Visit [releases.forgeops.com/sbom](http://releases.forgeops.com/sbom) to browse 
 
 ```sh
 # Define what needed
-PRODUCT_NAME="ds"
+PRODUCT_NAME="idm"
 VERSION="8.1.0"
-TAG="8.1.0-202605280539"
+TAG="8.1.0-202606240536"
 ARCH="amd64"  # or arm64
 FORMAT="cyclonedx"  # or spdx
 
 # Download the SBOMs file
-curl -O "http://releases.forgeops.com/sbom/${PRODUCT_NAME}/${VERSION}/${TAG}.${ARCH}.${FORMAT}.json"
+curl -O "http://releases.forgeops.com/sbom/${PRODUCT_NAME}/${VERSION}/${PRODUCT_NAME}_${TAG}_${ARCH}_${FORMAT}.json"
 
 # File downloaded
 $ ls
-8.1.0-202605280539.amd64.cyclonedx.json
+idm_8.1.0-202606240536_amd64_cyclonedx.json
 ```
 
 ---
@@ -108,11 +107,11 @@ CycloneDX is an OWASP standard focused on security use cases. It is designed for
 
 ```sh
 # Validate
-cyclonedx validate --input-file 8.1.0-202605280539.amd64.cyclonedx.json --input-format json
+cyclonedx validate --input-file idm_8.1.0-202606240536_amd64_cyclonedx.json --input-format json
 
 # List components
 cyclonedx convert \
-  --input-file 8.1.0-202605280539.amd64.cyclonedx.json \
+  --input-file idm_8.1.0-202606240536_amd64_cyclonedx.json \
   --input-format json \
   --output-format csv \
   | column -t -s,
@@ -140,13 +139,13 @@ pip install spdx-tools
 
 ```sh
 # Download the SPDX file first
-curl -O "http://releases.forgeops.com/sbom/${PRODUCT_NAME}/${VERSION}/${TAG}.${ARCH}.spdx.json"
+curl -O "http://releases.forgeops.com/sbom/${PRODUCT_NAME}/${VERSION}/${PRODUCT_NAME}_${TAG}_${ARCH}_spdx.json"
 
 # Validate
-pyspdxtools -i 8.1.0-202605280539.amd64.spdx.json
+pyspdxtools -i idm_8.1.0-202606240536_amd64.spdx.json
 
 # List packages and their licenses
-jq '.packages[] | {name: .name, version: .versionInfo, license: .licenseConcluded}' 8.1.0-202605280539.amd64.spdx.json
+jq '.packages[] | {name: .name, version: .versionInfo, license: .licenseConcluded}' 8.1.0-202606240536.amd64.spdx.json
 ```
 
 ---
