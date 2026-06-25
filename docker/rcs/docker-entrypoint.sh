@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 CONNECTOR_SERVER_HOME="${CONNECTOR_SERVER_HOME:-/opt/openicf}"
 

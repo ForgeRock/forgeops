@@ -2,7 +2,6 @@
 replicaCount: 1
 image:
   repository: us-docker.pkg.dev/forgeops-public/images/rcs
-  tag: 1.5.20.35
   pullPolicy: IfNotPresent
 podAnnotations: {}
 podLabels: {}

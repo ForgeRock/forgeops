@@ -66,7 +66,9 @@ spec:
               name: lib
             - mountPath: /writeable
               name: writeable
-          command: [/init-scripts/filesystem-init.sh]
+          command:
+            - "/bin/sh"
+            - "/init-scripts/filesystem-init.sh"
       containers:
         - name: rcs
           {{- with .Values.securityContext }}
@@ -75,6 +77,9 @@ spec:
           {{- end }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command:
+            - "/bin/sh"
+            - "/opt/openicf/bin/docker-entrypoint.sh"
           volumeMounts:
             - name: writeable
               mountPath: /opt/openicf
