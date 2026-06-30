@@ -46,4 +46,3 @@ pyenv.cfg
 *.swo
 *~
 lib/dependencies
-.polaris/
