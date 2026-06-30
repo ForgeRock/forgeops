@@ -36,14 +36,17 @@ usage() {
   local usage_msg=$(cat<<EOM
 usage: $PROG [OPTIONS] AM_CONF_PATH [RULES_PATH]
 
-Build container images for one or more Ping Identity Platform components.
+Upgrade AM file-based config (FBC) to selected version. It is also used to
+apply placeholders to FBC.
 
 Notes:
   * Building amster images is not supported, use bin/amster
   * Only ${COMPONENTS_FBC[*]} respect --config-profile
   * Set PUSH_TO in forgeops.conf to configure for the team
   * Default rules: /path/to/forgeops/etc/am-upgrader-rules/
-  * Paths to profile and rules can be relative or absolute
+  * Can provide profile name in docker/<component>/config-profiles
+    or full path to profile
+  * Can provide rules as a full path or relative to FORGEOPS_DATA/
 
 OPTIONS:
   -h|--help                        : display usage and exit
@@ -57,8 +60,11 @@ OPTIONS:
   -e|--env-name <env-name>         : forgeops env to use
 
 Examples (prod env, prod profile):
-  Normal operation:
+  Normal operation (Profile name):
   $PROG -e prod prod
+
+  Provide profile at a specific path:
+  $PROG -e stage /path/to/my/profiles/stage
 
   Specify alternate rules file in FORGEOPS_DATA/my-rules/:
   $PROG -e prod prod my-rules
