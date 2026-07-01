@@ -100,10 +100,21 @@ Create a ClusterRole name for creating a keystore
 {{- end }}
 
 {{/*
+Create a ClusterRole name for creating an ssh key
+*/}}
+{{- define "ssh_keygen.clusterRoleName" }}
+{{- if .Values.ssh_keygen.appendNSToRole }}
+{{- printf "%s:%s" .Values.ssh_keygen.clusterRoleName .Release.Namespace }}
+{{- else }}
+{{- .Values.ssh_keygen.clusterRoleName }}
+{{- end }}
+{{- end }}
+
+{{/*
 Define the key in the amster secret for the private SSH key
 */}}
 {{- define "amster.ssh.private_key_name" }}
-{{- if and .Values.platform.secrets_enabled (or .Values.platform.secrets.amster .Values.platform.base_generate) }}
+{{- if and .Values.platform.secrets_enabled .Values.platform.secrets.amster (hasKey .Values.platform.secrets.amster "annotations") (hasKey .Values.platform.secrets.amster.annotations "secret-generator.v1.mittwald.de/type") }}
 {{- printf "ssh-privatekey" }}
 {{- else }}
 {{- printf "id_rsa" }}
@@ -114,7 +125,7 @@ Define the key in the amster secret for the private SSH key
 Define the key in the amster secret for the public SSH key
 */}}
 {{- define "amster.ssh.public_key_name" }}
-{{- if and .Values.platform.secrets_enabled (or .Values.platform.secrets.amster .Values.platform.base_generate) }}
+{{- if and .Values.platform.secrets_enabled .Values.platform.secrets.amster (hasKey .Values.platform.secrets.amster.annotations "secret-generator.v1.mittwald.de/type") }}
 {{- printf "ssh-publickey" }}
 {{- else }}
 {{- printf "id_rsa.pub" }}
@@ -139,6 +150,17 @@ The Values.platform.base_generate allows base-generate.sh to create just the rel
 */}}
 {{- define "keystore_create.resources.enabled" }}
 {{- if and .Values.keystore_create.enabled .Values.platform.secrets_enabled (or .Values.platform.base_generate .Values.platform.secrets.keystore_create) (or .Values.am.enabled .Values.idm.enabled) }}
+{{- printf "true" }}
+{{- else }}
+{{- printf "false" }}
+{{- end }}
+{{- end }}
+
+{{/*
+Define a variable that determines if we should enable the ssh_keygen job.
+*/}}
+{{- define "ssh_keygen.enabled" }}
+{{- if and .Values.ssh_keygen.enabled (or .Values.am.enabled .Values.amster.enabled) }}
 {{- printf "true" }}
 {{- else }}
 {{- printf "false" }}

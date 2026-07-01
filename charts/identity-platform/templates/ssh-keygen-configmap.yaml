@@ -1,0 +1,10 @@
+{{- if eq (include "ssh_keygen.enabled" .) "true" }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ssh-keygen
+  labels:
+    {{- include "identity-platform.labels" . | nindent 4 }}
+data:
+  {{ (.Files.Glob "files/ssh-keygen/create-key.sh").AsConfig | nindent 2 }}
+{{- end }}

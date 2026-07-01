@@ -1099,3 +1099,63 @@ ds_cts:
     env: []
     # env:
     #   - DEBUG: 'true' # Turn on debugging in snapshot.sh
+    #
+ssh_keygen:
+  enabled: false
+  bits: 4096
+  backoffLimit: 6
+  restartPolicy: OnFailure
+  deleteOnSuccess: false
+  ttlSecondsAfterFinished: 7200
+  clusterRoleName: identity-platform-ssh-keygen
+  appendNSToRole: true
+
+  initImage:
+    repository: dockette/ssh
+    tag: latest
+    pullPolicy: IfNotPresent
+    imagePullSecrets: []
+  image:
+    repository: us-docker.pkg.dev/forgeops-public/images/kubectl
+    tag: 1.36.1
+    pullPolicy: IfNotPresent
+    imagePullSecrets: []
+
+  resources: {}
+    # limits:
+    #   cpu: 100m
+    #   memory: 512Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 512Mi
+
+  readinessProbe:
+    initialDelaySeconds: 1
+
+  nodeSelector: {}
+
+  tolerations: []
+
+  affinity: {}
+
+  podAnnotations: {}
+
+  podLabels:
+    app.kubernetes.io/component: platform-ssh-key
+    app: platform-ssh-key
+
+  podSecurityContext: {}
+    # fsGroup: 2000
+
+  securityContext: {}
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+    # runAsNonRoot: true
+    # runAsUser: 1000
+
+  config:
+    secret:
+      name: amster
+      replace: false  # Delete and recreate the keystore if it already exists?

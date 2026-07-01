@@ -1,0 +1,127 @@
+{{- if eq (include "ssh_keygen.enabled" .) "true" }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: ssh-keygen
+  labels:
+    {{- include "identity-platform.labels" . | nindent 4 }}
+    {{- with .Values.ssh_keygen.podLabels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  backoffLimit: {{ .Values.ssh_keygen.backoffLimit }}
+  ttlSecondsAfterFinished: {{ .Values.ssh_keygen.ttlSecondsAfterFinished | default 7200 | int }}
+  template:
+    metadata:
+      annotations:
+        {{- if .Values.platform.annotations.deploymentDate.enabled }}
+        deployment-date: {{ now | quote }}
+        {{- end }}
+        {{- with .Values.ssh_keygen.podAnnotations }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "identity-platform.selectorLabels" . | nindent 8 }}
+        {{- with .Values.ssh_keygen.podLabels }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      restartPolicy: {{ .Values.ssh_keygen.restartPolicy }}
+      {{- if .Values.ssh_keygen.image.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml .Values.ssh_keygen.image.imagePullSecrets | nindent 8 }}
+      {{- else if .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml .Values.imagePullSecrets | nindent 8 }}
+      {{- end }}
+      serviceAccountName: ssh-keygen
+      {{- if .Values.ssh_keygen.podSecurityContext }}
+      securityContext:
+        {{- toYaml .Values.ssh_keygen.podSecurityContext | nindent 8 }}
+      {{- end }}
+      volumes:
+        - name: scripts
+          configMap:
+            name: ssh-keygen
+            defaultMode: 0755
+        - name: ssh-key
+          emptyDir: {}
+      initContainers:
+        - name: ssh-keygen
+          {{- with .Values.ssh_keygen.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          image: "{{ .Values.ssh_keygen.initImage.repository }}:{{ .Values.ssh_keygen.initImage.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.ssh_keygen.initImage.pullPolicy }}
+          command: ["/tmp/create-key.sh"]
+          env:
+          - name: BITS
+            value: {{ .Values.ssh_keygen.bits | quote }}
+          {{- with .Values.ssh_keygen.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+          - name: scripts
+            mountPath: /tmp/create-key.sh
+            subPath: create-key.sh
+          - name: ssh-key
+            mountPath: /ssh_key
+      containers:
+        - name: ssh-key-secret-create
+          {{- with .Values.ssh_keygen.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          image: "{{ .Values.ssh_keygen.image.repository }}:{{ .Values.ssh_keygen.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.ssh_keygen.image.pullPolicy }}
+          command:
+            - sh
+            - -c
+            - |
+              {{- if .Values.ssh_keygen.config.secret.replace }}
+              kubectl delete secret $SECRET_NAME --namespace=$NAMESPACE
+              {{- end }}
+              kubectl get secret $SECRET_NAME \
+                --namespace=$NAMESPACE 2>&1 >/dev/null || \
+                  kubectl create secret generic $SECRET_NAME \
+                    --from-file=/ssh_key --namespace=$NAMESPACE
+          env:
+          - name: SECRET_NAME
+            value: {{ .Values.ssh_keygen.config.secret.name }}
+          - name: NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+          readinessProbe:
+            exec:
+              command:
+                - cat
+                - /etc/hosts
+            {{- with .Values.ssh_keygen.readinessProbe }}
+              {{- toYaml . | nindent 12 }}
+            {{- end }}
+          {{- with .Values.ssh_keygen.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+          - name: ssh-key
+            mountPath: /ssh_key
+      {{- with .Values.ssh_keygen.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.ssh_keygen.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if .Values.ssh_keygen.tolerations }}
+      tolerations:
+        {{- toYaml .Values.ssh_keygen.tolerations | nindent 8 }}
+      {{- else if .Values.platform.tolerations }}
+      tolerations:
+        {{- toYaml .Values.platform.tolerations | nindent 8 }}
+      {{- end }}
+{{- end }}
