@@ -40,9 +40,6 @@ Upgrade AM file-based config (FBC) to selected version. It is also used to
 apply placeholders to FBC.
 
 Notes:
-  * Building amster images is not supported, use bin/amster
-  * Only ${COMPONENTS_FBC[*]} respect --config-profile
-  * Set PUSH_TO in forgeops.conf to configure for the team
   * Default rules: /path/to/forgeops/etc/am-upgrader-rules/
   * Can provide profile name in docker/<component>/config-profiles
     or full path to profile
