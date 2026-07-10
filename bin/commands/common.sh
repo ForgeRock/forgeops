@@ -102,6 +102,8 @@ processArgs() {
   SIZE=
   SKIP_CONFIRM=false
   SKIP_IMAGE_APPEND=false
+  ING_VALUES=
+  CERT_MAN_VALUES=
 
   # Setup prog for usage()
   PROG_NAME=$(basename $0)
@@ -139,6 +141,8 @@ processArgs() {
       --nginx) INGRESS='nginx' ; shift ;;
       --haproxy) INGRESS='haproxy' ; shift ;;
       --secret-generator) SECRETS='secret-generator' ; shift ;;
+      --ingress-values) ING_VALUES=$2 ; shift 2 ;;
+      --cert-man-values) CERT_MAN_VALUES=$2 ; shift 2 ;;
       -f|--force|--fqdn)
         if [[ "$1" =~ "force" ]] || [[ "$2" =~ ^\- ]] || [[ "$2" == "" ]]; then
           FORCE=true

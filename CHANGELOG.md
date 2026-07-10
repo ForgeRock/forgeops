@@ -19,6 +19,12 @@ command has been updated to install this new version.
 8.1.1 patch versions for all Ping Advanced Identity Softward products.
 PingIDM 8.0.2
 
+### Extra values for prereqs
+
+You can now pass a values file to `forgeops prereqs` for cert-manager and
+ingress. This allows users to provide extra values as needed. See `forgeops
+prereqs -h` for more info.
+
 ## Bugfixes
 
 ## How-tos
