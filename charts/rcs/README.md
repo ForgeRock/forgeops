@@ -1,3 +1,5 @@
+CHART_VERSION=0.1.0
+
 # Helm chart for RCS
 
 ## Preparation
@@ -103,7 +105,7 @@ client in your deployment.
 
 Install the RCS Helm chart in the current namespace
 
-`helm install rcs rcs --repo https://ForgeRock.github.io/forgeops -f my-values.yaml`
+`helm install rcs rcs --repo https://ForgeRock.github.io/forgeops --version 0.1.0 -f my-values.yaml`
 
 There should now be running RCS pod(s) - e.g. with 2 replicas:
 

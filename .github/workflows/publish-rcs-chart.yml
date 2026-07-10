@@ -1,0 +1,36 @@
+name: Publish RCS Chart
+on:
+  pull_request: true
+  workflow_dispatch: true
+
+env:
+  REGISTRY: "us-docker.pkg.dev"
+jobs:
+  build:
+    #if: github.repository == 'ForgeRock/forgeops'
+    #if: github.repository == 'ping-rocks/forgeops'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set tag
+        id: set_tag
+        run: |
+          RELEASE_TAG=$(head -n 1 charts/rcs/README.md | awk -F= '{print $2}')
+          echo "RELEASE_TAG=$RELEASE_TAG" >> $GITHUB_ENV
+
+      - name: Update helm chart versions
+        id: update_helm_chart_versions
+        run: |
+          sed -ie "s/^version:.*/version:\ ${{ env.RELEASE_TAG }}/" charts/rcs/Chart.yaml
+
+      - name: Run chart-releaser
+        uses: helm/chart-releaser-action@v1.6.0
+        env:
+          CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+        with:
+          charts_dir: charts
+          pages_branch: gh-pages
