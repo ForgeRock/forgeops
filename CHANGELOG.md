@@ -4,6 +4,24 @@ RELEASE=2026.3.0
 
 ## New Features/Updated functionality
 
+### Secret Generator option removed
+
+The ability to select Secret Generator with the env command has been removed.
+Unfortunately, the project doesn't publish arm64 images, and community
+requests are not being responded to. As such, we cannot recommend it for
+customer use.
+
+### Helm generated secrets
+
+Secret generation using native Helm functions has been added to the Helm chart.
+This allows for random passwords to be generated without relying on an operator
+to do it.
+
+### ssh-keygen job
+
+Helm cannot generate ssh keys, so a job was created to generate an ssh key and
+store it in a secret. This is used by amster to connect to am.
+
 ### Helm chart for RCS
 
 A new Helm chart has been created for RCS Server. This allows users to sync
