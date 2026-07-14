@@ -92,6 +92,10 @@ waitResourceExists() {
   local start_time=$(date +%s)
   local now=$(date +%s)
 
+  if [ "$DRYRUN" = true ] ; then
+    return
+  fi
+
   while [ $(($now - $start_time)) -le $TIMEOUT ] ; do
     if kubeExists $resource ; then
       return 0
@@ -127,16 +131,12 @@ getLatestAmsterJob() {
   timeoutExit
 }
 
-waitForDS() {
-  local ds=$1
-
-  waitResourceExists "sts/${ds}"
-  local rep=$($K_CMD $NAMESPACE_OPT get sts $ds -o=jsonpath='{.spec.replicas}')
-  ((rep--))
-  message "rep=${rep}" "debug"
-  for i in $(seq 0 $rep) ; do
-    waitForResource ready "pod/${ds}-${i}"
-  done
+waitForRollout() {
+  local resource=$1
+  echo "Waiting for ${resource} rollout to complete."
+  if waitResourceExists "$resource" ; then
+    kube rollout status --watch "${resource}" --timeout="${TIMEOUT}s"
+  fi
 }
 
 # Setup valid components now so they get presented in the usage
@@ -177,11 +177,11 @@ for c in ${COMPONENTS[@]} ; do
   message "c=$c" "debug"
   case $c in
     admin-ui)
-      waitForResource ready "pod -l app=admin-ui"
+      waitForRollout "deployment/admin-ui"
       ;;
 
     am)
-      waitForResource ready "pod -l app=am"
+      waitForRollout "deployment/am"
       ;;
 
     amster)
@@ -190,34 +190,34 @@ for c in ${COMPONENTS[@]} ; do
       ;;
 
     apps)
-      waitForResource ready "pod -l app=am"
       amster_job=$(getLatestAmsterJob)
+      waitForRollout "deployment/am"
       waitForResource 'complete' "job/${amster_job}"
-      waitForResource ready "pod -l app=idm"
+      waitForRollout "deployment/idm"
       ;;
 
     ds-cts)
-      waitForDS ds-cts
+      waitForRollout "statefulset/ds-cts"
       ;;
 
     ds-idrepo)
-      waitForDS ds-idrepo
+      waitForRollout "statefulset/ds-idrepo"
       ;;
 
     end-user-ui)
-      waitForResource ready "pod -l app=end-user-ui"
+      waitForRollout "deployment/end-user-ui"
       ;;
 
     idm)
-      waitForResource ready "pod -l app=idm"
+      waitForRollout "deployment/idm"
       ;;
 
     ig)
-      waitForResource ready "pod -l app=ig"
+      waitForRollout "deployment/ig"
       ;;
 
     login-ui)
-      waitForResource ready "pod -l app=login-ui"
+      waitForRollout "deployment/login-ui"
       ;;
 
     secrets)

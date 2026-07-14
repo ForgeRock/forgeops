@@ -67,6 +67,14 @@ unmaintained Nginx ingress. However, some users are installing Traefik manually
 and running into issues with sticky sessions not working. The traefik specific
 annotations for sticky sessions has been added.
 
+### `forgops wait` reports success prematurely
+
+When using `forgeops wait` after doing a `kubectl rollout restart` on a DS
+statefulset, the wait command would show success prematurely. This was due to
+the logic looking at pods starting at 0 when rollout starts with the last pod
+in the set. The logic has been changed to use `kubectl rollout status` to check
+for readiness.
+
 ## How-tos
 
 The `custom-secrets.md` how-to has been modified to remove references to
