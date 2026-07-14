@@ -21,12 +21,15 @@ data:
         </root>
       </configuration>
   PROPERTIES_FILE: |
-    connectorserver.scope={{ .Values.scope | default "fr:idm:*" }} 
+    {{- if eq .Values.mode "client" }}
+    connectorserver.scope={{ .Values.scope | default "fr:idm:*" }}
+    {{- else }}
+    connectorserver.port=8759
+    connectorserver.useSSL=false
+    {{- end }}
     connectorserver.loggingConfigFile=/opt/openicf/conf/logback.xml
-    connectorserver.tokenEndpoint={{ .Values.idmEndpoints.token }}
-    connectorserver.url={{ .Values.idmEndpoints.wss }}
-    {{- with .Values.custom_properties }}
-      {{- toStrings . | indent 4 }}
+    {{- range $prop := .Values.custom_properties }}
+    {{ $prop }}
     {{- end }}
 ---
 apiVersion: v1

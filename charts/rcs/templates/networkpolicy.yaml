@@ -1,4 +1,4 @@
-{{- if .Values.secure }}
+{{- if .Values.remoteIps }}
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
@@ -22,13 +22,28 @@ spec:
         - protocol: UDP
           port: 53
     - to:
-        - ipBlock:
-            cidr: {{ .Values.tenantIp }}/32
-      ports:
-        - protocol: TCP
-          port: 443
-    - to:
       ports:
         - protocol: TCP
           port: 1636
+    {{- if eq .Values.mode "client" }}
+    - to:
+        {{- range $cidr := .Values.remoteIps }}
+        - ipBlock:
+            cidr: {{ $cidr }}
+        {{- end }}
+      ports:
+        - protocol: TCP
+          port: 443
+    {{- end }}
+  {{- if eq .Values.mode "server" }}
+  ingress:
+    - from:
+        {{- range $cidr := .Values.remoteIps }}
+        - ipBlock:
+            cidr: {{ $cidr }}
+        {{- end }}
+      ports:
+        - protocol: TCP
+          port: 8759
+  {{- end }}
 {{- end }}

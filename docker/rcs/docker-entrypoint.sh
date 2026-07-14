@@ -16,10 +16,17 @@ JAVA_OPTS="${JAVA_OPTS:- -server -XX:MaxRAMPercentage=80 -XshowSettings:vm}"
 MAIN_CLASS="org.forgerock.openicf.framework.server.Main"
 CLASSPATH="$CONNECTOR_SERVER_HOME/lib/framework/*:$CONNECTOR_SERVER_HOME/lib/framework/"
 
-OPENICF_OPTS="\
-    -Dconnectorserver.connectorServerName=`hostname` \
+OPENICF_OPTS="-Dconnectorserver.connectorServerName=$(hostname)"
+if [ -n "$RCS_CLIENT_ID" ] && [ -n "$RCS_CLIENT_SECRET" ] ; then
+  OPENICF_OPTS="$OPENICF_OPTS \
     -Dconnectorserver.clientId=${RCS_CLIENT_ID} \
     -Dconnectorserver.clientSecret=${RCS_CLIENT_SECRET}"
+elif [ -n "$RCS_KEY" ] ; then
+  OPENICF_OPTS="$OPENICF_OPTS -Dconnectorserver.key=${RCS_KEY}"
+else
+  echo "ERROR!! Missing credentials. Must provide RCS_KEY or RCS_CLIENT_SECRET and RCS_CLIENT_ID"
+  exit 1
+fi
 
 echo "Starting RCS"
 

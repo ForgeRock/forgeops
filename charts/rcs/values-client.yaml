@@ -1,0 +1,8 @@
+---
+mode: client
+secrets: null
+custom_properties: []
+  - "connectorserver.url=wss://idp.example.com/openicf"
+  - "connectorserver.tokenEndpoint=https://idp.example.com/am/oauth2/realms/root/realms/alpha/access_token"
+remoteIps:
+  - "1.2.3.4/32"

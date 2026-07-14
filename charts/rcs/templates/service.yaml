@@ -1,0 +1,17 @@
+{{- if eq .Values.mode "server" }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "rcs.fullname" . }}
+  labels:
+    {{- include "rcs.labels" . | nindent 4 }}
+spec:
+  clusterIP: None
+  selector:
+    {{- include "rcs.selectorLabels" . | nindent 4 }}
+  ports:
+    - name: openicf
+      port: 8759
+      targetPort: 8759
+      protocol: TCP
+{{- end }}

@@ -1,4 +1,5 @@
 ---
+mode: server
 replicaCount: 1
 image:
   repository: us-docker.pkg.dev/forgeops-public/images/rcs
@@ -13,7 +14,6 @@ securityContext:
       - All
   readOnlyRootFilesystem: true
   runAsNonRoot: true
-secure: true
 
 resources: {}
 autoscaling:
@@ -26,10 +26,19 @@ nodeSelector: {}
 tolerations: []
 affinity: {}
 
-idmEndpoints:
-  wss: "wss://idp.example.com/openicf"
-  token: "https://idp.example.com/am/oauth2/realms/root/realms/alpha/access_token"
-tenantIp: "1.2.3.4"
+secrets:
+  rcs_key:
+    generate:
+      RCS_KEY:
+        length: 24
+
+custom_properties: []
+# - "connectorserver.url=wss://idp.example.com/openicf"
+# - "connectorserver.tokenEndpoint=https://idp.example.com/am/oauth2/realms/root/realms/alpha/access_token"
+
+remoteIps: []
+#  - "1.2.3.4/32"
+
 logLevels:
   root: "INFO"
   classes:

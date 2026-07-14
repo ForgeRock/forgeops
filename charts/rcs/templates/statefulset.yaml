@@ -94,6 +94,7 @@ spec:
               mountPath: /tmp
               subPath: tmp
           env: 
+            {{- if eq .Values.mode "client" }}
             - name: RCS_CLIENT_ID
               valueFrom:
                 secretKeyRef:
@@ -104,6 +105,13 @@ spec:
                 secretKeyRef:
                   name: rcs-client-auth
                   key: clientSecret
+            {{- else }}
+            - name: RCS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: rcs-key
+                  key: RCS_KEY
+            {{- end }}
           {{- with .Values.livenessProbe }}
           livenessProbe:
             {{- toYaml . | nindent 12 }}
