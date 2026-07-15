@@ -1,0 +1,68 @@
+name: sync-forgeops-git
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: sync-forgeops-${{ github.ref_name }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  sync:
+    if: github.repository == 'ping-rocks/forgeops'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: checkout forgeops
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 0
+
+      - name: get ForgeRock token
+        id: forgerock-token
+        uses: actions/create-github-app-token@d72941d797fd3113feb6b93fd0dec494b13a2547 # v1
+        with:
+          app-id: ${{ secrets.FORGEROCK_APP_ID }}
+          private-key: ${{ secrets.FORGEROCK_PRIVATE_KEY }}
+          installation-id: ${{ secrets.FORGEROCK_APP_INSTALLATION_ID }}
+
+      - name: add ForgeRock public remote
+        env:
+          TOKEN: ${{ steps.forgerock-token.outputs.token }}
+        run: |
+          git remote add public "https://github.com/ForgeRock/forgeops.git"
+          BASIC="$(echo -n "x-access-token:${TOKEN}" | base64)"
+          echo "::add-mask::${BASIC}"
+          git config http.https://github.com/ForgeRock/forgeops.git.extraheader \
+            "AUTHORIZATION: basic ${BASIC}"
+
+      - name: fetch ForgeRock public remote
+        run: |
+          set -x
+          git fetch public
+
+      - name: log forgeops before push
+        run: |
+          set -x
+          git log origin/${{ github.ref_name }} -3
+
+      - name: log ForgeRock/forgeops before push
+        run: |
+          set -x
+          git log public/${{ github.ref_name }} -3 || true
+
+      - name: push to ForgeRock/forgeops
+        run: |
+          set -x
+          git push public HEAD:${{ github.ref_name }}
+
+      - name: log ForgeRock/forgeops after push
+        run: |
+          set -x
+          git log public/${{ github.ref_name }} -3
