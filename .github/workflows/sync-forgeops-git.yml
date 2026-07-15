@@ -30,14 +30,15 @@ jobs:
         with:
           app-id: ${{ secrets.FORGEROCK_APP_ID }}
           private-key: ${{ secrets.FORGEROCK_PRIVATE_KEY }}
-          installation-id: ${{ secrets.FORGEROCK_APP_INSTALLATION_ID }}
+          owner: ForgeRock
+          repositories: forgeops
 
       - name: add ForgeRock public remote
         env:
           TOKEN: ${{ steps.forgerock-token.outputs.token }}
         run: |
           git remote add public "https://github.com/ForgeRock/forgeops.git"
-          BASIC="$(echo -n "x-access-token:${TOKEN}" | base64)"
+          BASIC="$(echo -n "x-access-token:${TOKEN}" | base64 -w 0)"
           echo "::add-mask::${BASIC}"
           git config http.https://github.com/ForgeRock/forgeops.git.extraheader \
             "AUTHORIZATION: basic ${BASIC}"
