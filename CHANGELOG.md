@@ -34,7 +34,7 @@ Secret Agent has been updated to v1.2.12 to patch security issues. The prereqs
 command has been updated to install this new version.
 
 ### New product patch release versions
-8.1.1 patch versions for all Ping Advanced Identity Softward products.
+8.1.1 patch versions for all Ping Advanced Identity Software products.
 PingIDM 8.0.2
 
 ### Extra values for prereqs

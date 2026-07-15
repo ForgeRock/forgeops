@@ -11,7 +11,7 @@ mkdir -p $EXPORT_DIR
 if [[ "$1" == "full" ]]; then
     realmEntities=""
 else
-    realmEntities="--realmEntities 'OAuth2Clients IdentityGatewayAgents J2eeAgents WebAgents SoapStsAgents Policies CircleOfTrust Saml2Entity Applications TrustedJwtIssuer'"
+    realmEntities="--realmEntities 'OAuth2Clients IdentityGatewayAgents J2eeAgents WebAgents SoapStsAgents Policies CircleOfTrust Saml2Entity Applications TrustedJwtIssuer ResourceTypes'"
 fi
 
 # Create Amster export script.
