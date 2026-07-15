@@ -83,6 +83,11 @@ platform:
       #    crt: # base64 encoded string (Ex: base64 -w 0 <domain-file>.pem)
       #    key: # base64 encoded string (Ex: base64 -w 0 <domain-file>.key)
 
+  service:
+    annotations:
+      traefik.ingress.kubernetes.io/service.sticky.cookie: "true"
+      traefik.ingress.kubernetes.io/service.sticky.cookie.name: "route"
+
   notes:
     enabled: true
   storage:

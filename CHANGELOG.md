@@ -58,3 +58,18 @@ The `amster`, `ds-set-passwords`, and `keystore-create` Kubernetes job names in 
 (e.g. `amster-3`, `ds-set-passwords-3`, `keystore-create-3`). This ensures each
 `helm upgrade` produces a distinct job name, preventing failures caused by Kubernetes'
 immutability constraint on existing jobs.
+
+### Adding annotations for Traefik sticky sessions
+
+The `forgeops prereqs` command installs Traefik in Nginx compatibility mode.
+This was done to make it a more seamless transition from the old and
+unmaintained Nginx ingress. However, some users are installing Traefik manually
+and running into issues with sticky sessions not working. The traefik specific
+annotations for sticky sessions has been added.
+
+## How-tos
+
+The `custom-secrets.md` how-to has been modified to remove references to
+migrating to secret-generator. The references regarding migrating from
+secret-generator have been left in for any users that made the switch already.
+
