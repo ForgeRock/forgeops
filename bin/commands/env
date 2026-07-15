@@ -295,8 +295,6 @@ def setup_args():
     parser.add_argument('--no-namespace', dest='no_namespace', action='store_true', help='Remove namespace from overlay')
     parser.add_argument('--env-name', '-e', dest='env_name', required=True, help='Name of environment to manage')
     parser.add_argument('--single-instance', dest='single', action='store_true', help='Use a single-instance configuration')
-    parser.add_argument('--helm-secrets', action='store_true', help='Use Helm generated secrets')
-    parser.add_argument('--secret-agent', action='store_true', help='Use secret-agent')
     parser.add_argument('--source', '-s', dest='source', help='Name of source Kustomize overlay')
     parser.add_argument('--ingress-no-cert-manager', action='store_true', help="Disable use of cert-manager for ingresses")
     parser.add_argument('--ssl-secretname', dest='ssl_secretname', help="Name of the secret containing private ssl data")
@@ -342,6 +340,10 @@ def setup_args():
     secure = parser.add_mutually_exclusive_group()
     secure.add_argument('--secure', action='store_true', help='Enable pod security features (Helm only)')
     secure.add_argument('--insecure', action='store_true', help='Disable pod security features (Helm only)')
+
+    secrets = parser.add_mutually_exclusive_group()
+    secrets.add_argument('--helm-secrets', action='store_true', help='Use Helm generated secrets')
+    secrets.add_argument('--secret-agent', action='store_true', help='Use secret-agent')
 
     # Flag to skip interactivity for testing
     parser.add_argument('--testing', dest='testing', action='store_true', help=argparse.SUPPRESS)
@@ -584,16 +586,6 @@ def manage_env(args, config):
     if getattr(args, 'snap_role_name', None):
         values_snap['ds_snapshot']['clusterRoleName'] = args.snap_role_name
 
-    values_secrets = {}
-    if getattr(args, 'helm_secrets', None):
-        values_path = root_path / 'charts' / 'identity-platform' / 'values-helm-generate-secrets.yaml'
-        with open(values_path, 'r', encoding='utf-8') as f:
-            values_secrets = yaml.safe_load(f)
-    elif getattr(args, 'secret_agent', None):
-        values_path = root_path / 'charts' / 'identity-platform' / 'values-secret-agent.yaml'
-        with open(values_path, 'r', encoding='utf-8') as f:
-            values_secrets = yaml.safe_load(f)
-
     # Check if we are Creating or Updating
     config['kustomize_action'] = None
     if config['do_kustomize']:
@@ -656,6 +648,16 @@ To: {config['overlay_path']}
     if config['helm_action'] == 'Create' or config['kustomize_action'] == 'Create':
         do_create = True
     # Finish Create or Update check
+    #
+    values_secrets = {}
+    if getattr(args, 'secret_agent', None):
+        values_path = root_path / 'charts' / 'identity-platform' / 'values-secret-agent.yaml'
+        with open(values_path, 'r', encoding='utf-8') as f:
+            values_secrets = yaml.safe_load(f)
+    elif do_create or getattr(args, 'helm_secrets', None):
+        values_path = root_path / 'charts' / 'identity-platform' / 'values-helm-generate-secrets.yaml'
+        with open(values_path, 'r', encoding='utf-8') as f:
+            values_secrets = yaml.safe_load(f)
 
     # Start secure/insecure settings
     values_security = {}
