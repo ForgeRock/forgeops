@@ -290,7 +290,7 @@ am:
     servicemonitor:
       enabled: false
       path: /am/json/metrics/prometheus
-      port: https
+      port: http
       secretUser: prometheus
       secretPassword: prometheus
 

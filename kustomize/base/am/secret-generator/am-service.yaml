@@ -22,7 +22,7 @@ spec:
     - port: 80
       targetPort: https
       protocol: TCP
-      name: https
+      name: http
   selector:
     app.kubernetes.io/name: identity-platform
     app.kubernetes.io/part-of: identity-platform

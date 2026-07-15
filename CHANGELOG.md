@@ -82,6 +82,13 @@ the logic looking at pods starting at 0 when rollout starts with the last pod
 in the set. The logic has been changed to use `kubectl rollout status` to check
 for readiness.
 
+### Changing AM service port to http
+
+The AM service port was set to https which was fine when the controller was
+Nginx or Traefik in Nginx compatibility mode. When Traefik is run normally, it
+breaks here because the port on the AM pod is not a true SSL port. Changing the
+name to match reality.
+
 ## How-tos
 
 The `custom-secrets.md` how-to has been modified to remove references to
