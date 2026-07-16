@@ -40,6 +40,7 @@ jobs:
           git remote add public "https://github.com/ForgeRock/forgeops.git"
           BASIC="$(echo -n "x-access-token:${TOKEN}" | base64 -w 0)"
           echo "::add-mask::${BASIC}"
+          git config --unset-all http.https://github.com/.extraheader || true
           git config http.https://github.com/ForgeRock/forgeops.git.extraheader \
             "AUTHORIZATION: basic ${BASIC}"
 
