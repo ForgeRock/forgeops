@@ -338,8 +338,12 @@ def setup_args():
     issuer.add_argument('--skip-issuer', dest='skip_issuer', action='store_true', help='Skip TLS cert issuer setup')
 
     secure = parser.add_mutually_exclusive_group()
-    secure.add_argument('--secure', action='store_true', help='Enable pod security features (Helm only)')
-    secure.add_argument('--insecure', action='store_true', help='Disable pod security features (Helm only)')
+    secure.add_argument('--secure', action='store_true', help='Enable pod security features [Helm only]')
+    secure.add_argument('--insecure', action='store_true', help='Disable pod security features [Helm only]')
+
+    ai = parser.add_mutually_exclusive_group()
+    ai.add_argument('--ai-enable', action='store_true', help='Enable AI Agent [Helm only]')
+    ai.add_argument('--ai-disable', action='store_true', help='Disable AI Agent [Helm only]')
 
     secrets = parser.add_mutually_exclusive_group()
     secrets.add_argument('--helm-secrets', action='store_true', help='Use Helm generated secrets')
@@ -659,6 +663,32 @@ To: {config['overlay_path']}
         with open(values_path, 'r', encoding='utf-8') as f:
             values_secrets = yaml.safe_load(f)
 
+    values_ai = {}
+    if getattr(args, 'ai_disable', None):
+        values_ai = {
+            "platform": {
+                "configMap": {
+                    "enabled": True,
+                    "data": {
+                        "AM_OAUTH2_AIAGENTS_ENABLED": 'false',
+                        "ENABLE_AI_AGENTS": 'false'
+                    }
+                }
+            }
+        }
+    elif do_create or getattr(args, 'ai_enable', None):
+        values_ai = {
+            "platform": {
+                "configMap": {
+                    "enabled": True,
+                    "data": {
+                        "AM_OAUTH2_AIAGENTS_ENABLED": 'true',
+                        "ENABLE_AI_AGENTS": 'true'
+                    }
+                }
+            }
+        }
+
     # Start secure/insecure settings
     values_security = {}
     # Defaults to insecure
@@ -856,7 +886,8 @@ If you have not yet deployed the environment, then you can ignore this message.
             values_amster,
             values_secrets,
             values_ds_set_passwords,
-            values_security)
+            values_security,
+            values_ai)
 
         # Set insecure settings that don't get set by the merge
         if args.insecure:
