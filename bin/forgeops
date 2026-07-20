@@ -80,6 +80,7 @@ COMMANDS=(
   'env'
   'info'
   'image'
+  'migrate'
   'prereqs'
   'rotate'
   'version'

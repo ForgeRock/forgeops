@@ -43,10 +43,13 @@ class NoAliasDumper(yaml.SafeDumper):
     def ignore_aliases(self, data):
         return True
 
-def write_yaml_file(data, file):
+def write_yaml_file(data, file, dryrun=False):
     """Write an object to a yaml file"""
-    with open(file, 'w+', encoding='utf-8') as f:
-        yaml.dump(data, f, sort_keys=False, Dumper=NoAliasDumper)
+    if dryrun:
+        print(f"DRYRUN: Save YAML to {file}")
+    else:
+        with open(file, 'w+', encoding='utf-8') as f:
+            yaml.dump(data, f, sort_keys=False, Dumper=NoAliasDumper)
 
 
 def log(msg, path, verbose=True, log_file='upgrade.log', end="\n"):
@@ -76,7 +79,13 @@ def setup_args():
         '--debug',
         '-d',
         action='store_true',
-        help='Target namespace (default: current ctx namespace)')
+        help='Turn on debugging')
+    common_dr = argparse.ArgumentParser(add_help=False)
+    common_dr.add_argument(
+        '--dryrun',
+        '-r',
+        action='store_true',
+        help='Do a dryrun')
     common_pf = argparse.ArgumentParser(add_help=False)
     common_pf.add_argument(
         '--config-profile',
@@ -103,6 +112,18 @@ def setup_args():
         '--kustomize-path',
         '-k',
         help='Kustomize dir to use (absolute or relative to forgeops data dir)')
+    common_nh = argparse.ArgumentParser(add_help=False)
+    common_nh.add_argument(
+        '--no-helm',
+        dest='no_helm',
+        action='store_true',
+        help="Skip Helm")
+    common_nk = argparse.ArgumentParser(add_help=False)
+    common_nk.add_argument(
+        '--no-kustomize',
+        dest='no_kustomize',
+        action='store_true',
+        help="Skip Kustomize")
     common_src = argparse.ArgumentParser(add_help=False)
     common_src.add_argument(
         '--source',
@@ -111,11 +132,14 @@ def setup_args():
 
     return {
         'debug': common_dg,
+        'dryrun': common_dr,
         'namespace': common_ns,
-        'config_profile': common_ns,
+        'config_profile': common_pf,
         'env_name': common_env,
         'env_name_req': common_env_r,
         'helm_path': common_hp,
         'kustomize_path': common_kp,
+        'no_helm': common_nh,
+        'no_kustomize': common_nk,
         'source': common_src,
     }

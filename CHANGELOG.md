@@ -22,6 +22,13 @@ to do it.
 Helm cannot generate ssh keys, so a job was created to generate an ssh key and
 store it in a secret. This is used by amster to connect to am.
 
+### New migration command
+
+A new subcommand has been added called `forgeops migrate`. This subcommand
+currently can be used to migrate secrets from secret-agent to Helm-generated
+secrets.  Run `forgeops migrate -h` and `forgeops migrate sa2hs -h` for more
+information.
+
 ### Helm chart for RCS
 
 A new Helm chart has been created for RCS Server. This allows users to sync

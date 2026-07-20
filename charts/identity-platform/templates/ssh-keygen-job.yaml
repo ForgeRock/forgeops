@@ -2,7 +2,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: ssh-keygen
+  name: ssh-keygen-{{ .Release.Revision }}
   labels:
     {{- include "identity-platform.labels" . | nindent 4 }}
     {{- with .Values.ssh_keygen.podLabels }}

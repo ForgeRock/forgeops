@@ -168,7 +168,7 @@ def sub_title(title):
     print('')
     print(msg)
 
-def run(cmd, *cmdArgs, stdin=None, cstdout=False, cstderr=False, cwd=None, env=None, ignoreFail=False, dryrun=False):
+def run(cmd, *cmdArgs, stdin=None, cstdout=False, cstderr=False, cwd=None, env=None, ignoreFail=False, dryrun=False, debug=False):
     """
     Execute the given command. Raises error if command returns non-zero code.
     cmd: command to run.
@@ -189,6 +189,8 @@ def run(cmd, *cmdArgs, stdin=None, cstdout=False, cstderr=False, cwd=None, env=N
     if dryrun:
         print(runcmd)
     else:
+        if debug:
+            print(runcmd)
         try:
             _r = subprocess.run(shlex.split(runcmd), stdout=stdo_pipe, stderr=stde_pipe,
                                 check=True, input=stdin, cwd=cwd, env=env)

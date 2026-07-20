@@ -1110,7 +1110,6 @@ ssh_keygen:
   bits: 4096
   backoffLimit: 6
   restartPolicy: OnFailure
-  deleteOnSuccess: false
   ttlSecondsAfterFinished: 7200
   clusterRoleName: identity-platform-ssh-keygen
   appendNSToRole: true
