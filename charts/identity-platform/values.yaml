@@ -201,6 +201,9 @@ platform:
       operator: Exists
       effect: NoSchedule
 
+pingone: {}
+  #secretName: pingone-secrets
+
 am:
   enabled: true
   replicaCount: 1

@@ -41,8 +41,10 @@ Secret Agent has been updated to v1.2.12 to patch security issues. The prereqs
 command has been updated to install this new version.
 
 ### New product patch release versions
+
 8.1.1 patch versions for all Ping Advanced Identity Software products.
 PingIDM 8.0.2
+PingGateway 2026.6.0
 
 ### Extra values for prereqs
 
@@ -55,6 +57,16 @@ prereqs -h` for more info.
 The default `ttlSecondsAfterFinished` for all three jobs has been increased from 7200s
 (2 hours) to 43200s (12 hours), giving more time to inspect completed or failed jobs
 before they are automatically cleaned up.
+
+### Adding PingOne secret
+
+It is now possible to create and use a secret with ForgeOps to connect to the
+PingOne Worker Service. This secret gets mounted on the AM filesystem so that
+it can be used by AM. This is only part of the configuration necessary to make
+this solution work. A new flag has been added to `forgeops env` to set the
+secret name.
+
+`forgeops env -e my-env --pingone-secret pingone-secrets`
 
 ## Bugfixes
 

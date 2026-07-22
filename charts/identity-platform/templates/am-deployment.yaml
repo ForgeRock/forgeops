@@ -102,6 +102,11 @@ spec:
           configMap:
             name: am-init-scripts
             defaultMode: 0755
+        {{- if .Values.pingone.secretName }}
+        - name: pingone-secrets
+          secret:
+            secretName: {{ .Values.pingone.secretName }}
+        {{- end }}
       initContainers:
         - name: custom-vol-init
           image: "{{ .Values.am_custom.image.repository }}:{{ .Values.am_custom.image.tag | default .Chart.AppVersion }}"
@@ -235,6 +240,11 @@ spec:
             subPath: amtruststore
           - name: am-secrets
             mountPath: /var/run/secrets/am
+          {{- if .Values.pingone.secretName }}
+          - name: pingone-secrets
+            mountPath: /var/run/secrets/pingone
+            readOnly: true
+          {{- end }}
           - name: amster-key
             mountPath: /var/run/secrets/amster
           - name: fbc
