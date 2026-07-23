@@ -249,6 +249,9 @@ spec:
           volumeMounts:
           - mountPath: /var/run/secrets/idm
             name: idm-secrets
+          - name: writeable
+            mountPath: /opt/openidm
+            subPath: opt/openidm
           - name: new-truststore
             mountPath: /opt/openidm/idmtruststore
             readOnly: true
@@ -261,9 +264,6 @@ spec:
             name: idm-logback-xml
           - mountPath: /var/run/openidm/logging
             name: idm-logging-properties
-          - name: writeable
-            mountPath: /opt/openidm
-            subPath: opt/openidm
           - name: fbc
             mountPath: /opt/openidm/conf
             subPath: conf
