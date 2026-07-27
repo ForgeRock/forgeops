@@ -122,7 +122,7 @@ def edit_sac(ns_opt, params):
 
 
 def run_helm_cmd(msg, values_file, chart_name, chart_version, chart_repo,
-                 namespace_opt, params, force_ds_passwords=False):
+                 namespace_opt, params, force_ds_passwords=False, force_amster=False):
     """ Run Helm command """
     print(msg)
     cmd = 'helm'
@@ -132,6 +132,8 @@ def run_helm_cmd(msg, values_file, chart_name, chart_version, chart_repo,
     cmd_opts = f"upgrade -i {chart_name} {repo_opt} --values {values_file} {namespace_opt}"
     if force_ds_passwords:
         cmd_opts = f"{cmd_opts} --set ds_set_passwords.force=true"
+    if force_amster:
+        cmd_opts = f"{cmd_opts} --set amster.force=true"
     print(f"\n{cmd} {cmd_opts}")
     print("Do you want us to run this for you? (Y/N)")
     response = input()
@@ -224,7 +226,8 @@ def do_helm(params, settings):
     edit_sac(settings['namespace_opt'], params)
     run_helm_cmd("Run helm to apply new secrets",
                  values_file, params.chart_name, params.chart_version,
-                 params.chart_repo, settings['namespace_opt'], params, force_ds_passwords=True)
+                 params.chart_repo, settings['namespace_opt'], params,
+                 force_ds_passwords=True, force_amster=True)
 
     print("Once the ds-set-passwords job has finished and all pods are Ready, press <ENTER> to continue.")
     input()
