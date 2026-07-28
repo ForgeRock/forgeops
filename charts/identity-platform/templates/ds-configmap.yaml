@@ -13,3 +13,17 @@ metadata:
 data:
   {{ (.Files.Glob "files/ds/init-scripts/**.sh").AsConfig | nindent 2 }}
 {{- end }}
+{{- if or .Values.ds_cts.enabled .Values.ds_idrepo.enabled }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ds-entrypoint
+  labels:
+    {{- include "identity-platform.labels" . | nindent 4 }}
+    {{- with .Values.idm.podLabels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+data:
+  {{ (.Files.Glob "files/ds/docker-entrypoint.sh").AsConfig | nindent 2 }}
+{{- end }}

@@ -1,0 +1,15 @@
+ #!/usr/bin/env bash
+source /opt/opendj/env.sh
+
+
+echo "DS Status"
+status --hostname localhost --port 4444 \
+    --bindDN uid=admin --bindPassword:file $DS_UID_ADMIN_PASSWORD_FILE \
+    --trustAll
+
+echo "Replication Status"
+
+ dsrepl status --hostname localhost  --port 4444 \
+    --bindDN uid=admin --bindPassword:file $DS_UID_ADMIN_PASSWORD_FILE \
+    --trustAll \
+    --showReplicas --showGroups --showChangeLogs

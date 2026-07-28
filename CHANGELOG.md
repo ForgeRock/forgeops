@@ -68,6 +68,22 @@ secret name.
 
 `forgeops env -e my-env --pingone-secret pingone-secrets`
 
+### Applying schema updates to existing deployments
+
+When upgrading Ping Identity Advanced Software (PIAS), the DS schema needs to
+be updated. A new script called add schema has been added to the ds-idrepo
+startup process that will apply schema changes over time as they are needed.
+These changes are triggered both by the version of the DS software and if the
+schema is not already present.
+
+### Moving DS runtime-scripts into Helm chart
+
+Because the DS runtime-scripts now apply changes over time, they have been
+moved into the Helm chart. This allows the schema changes to happen without
+needing to rebuild DS images. For now, these have been hard linked into
+`docker/ds` so they still exist on the built images, but they will be removed
+once older versions of ForgeOps are no longer supported.
+
 ## Bugfixes
 
 ### Dynamic Kubernetes job naming (Helm only)

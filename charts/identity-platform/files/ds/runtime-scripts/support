@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# Create a support extract
+
+supportextract  --bindDN "uid=admin" --bindPassword $(cat $DS_UID_ADMIN_PASSWORD_FILE) --outputDirectory $DS_DATA_DIR/support-extract

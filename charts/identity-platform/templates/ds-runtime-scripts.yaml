@@ -1,0 +1,45 @@
+
+{{- if or .Values.ds_cts.enabled .Values.ds_idrepo.enabled }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ds-runtime-scripts
+  labels:
+    {{- include "identity-platform.labels" . | nindent 4 }}
+    {{- with .Values.idm.podLabels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+data:
+  {{ (.Files.Glob "files/ds/runtime-scripts/*.sh").AsConfig | nindent 2 }}
+  {{ (.Files.Glob "files/ds/runtime-scripts/rstatus").AsConfig | nindent 2 }}
+  {{ (.Files.Glob "files/ds/runtime-scripts/support").AsConfig | nindent 2 }}
+{{- end }}
+{{- if .Values.ds_cts.enabled }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ds-cts-runtime-scripts
+  labels:
+    {{- include "identity-platform.labels" . | nindent 4 }}
+    {{- with .Values.idm.podLabels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+data:
+  {{ (.Files.Glob "files/ds/runtime-scripts/ds-cts/**").AsConfig | nindent 2 }}
+{{- end }}
+{{- if .Values.ds_idrepo.enabled }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ds-idrepo-runtime-scripts
+  labels:
+    {{- include "identity-platform.labels" . | nindent 4 }}
+    {{- with .Values.idm.podLabels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+data:
+  {{ (.Files.Glob "files/ds/runtime-scripts/ds-idrepo/**").AsConfig | nindent 2 }}
+{{- end }}

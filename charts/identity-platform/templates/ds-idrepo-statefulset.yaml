@@ -68,6 +68,18 @@ spec:
           emptyDir: {}
         - name: cloud-credentials-cache
           emptyDir: {}
+        - name: ds-runtime-scripts
+          configMap:
+            name: ds-runtime-scripts
+            defaultMode: 0755
+        - name: ds-idrepo-runtime-scripts
+          configMap:
+            name: ds-idrepo-runtime-scripts
+            defaultMode: 0755
+        - name: ds-entrypoint
+          configMap:
+            name: ds-entrypoint
+            defaultMode: 0755
         {{- if .Values.ds_idrepo.securityContext.readOnlyRootFilesystem }}
         - name: writeable
           emptyDir: {}
@@ -125,6 +137,13 @@ spec:
             name: keys
           - mountPath: /var/run/secrets/cloud-credentials-cache/
             name: cloud-credentials-cache
+          - name: ds-entrypoint
+            mountPath: /opt/opendj/docker-entrypoint.sh
+            subPath: docker-entrypoint.sh
+          - name: ds-runtime-scripts
+            mountPath: /opt/opendj/runtime-scripts
+          - name: ds-idrepo-runtime-scripts
+            mountPath: /opt/opendj/runtime-scripts/ds-idrepo
           command:
           - sh
           - -c
@@ -241,6 +260,10 @@ spec:
           - name: writeable
             mountPath: /tmp
             subPath: tmp
+          - name: ds-runtime-scripts
+            mountPath: /opt/opendj/runtime-scripts
+          - name: ds-idrepo-runtime-scripts
+            mountPath: /opt/opendj/runtime-scripts/ds-idrepo
           {{- end }}
           {{- if .Values.ds_idrepo.volumeClaimSpec }}
           - mountPath: /opt/opendj/data
@@ -260,6 +283,9 @@ spec:
             name: keys
           - mountPath: /var/run/secrets/cloud-credentials-cache/
             name: cloud-credentials-cache
+          - name: ds-entrypoint
+            mountPath: /opt/opendj/docker-entrypoint.sh
+            subPath: docker-entrypoint.sh
       {{- with .Values.ds_idrepo.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

@@ -67,6 +67,18 @@ spec:
           emptyDir: {}
         - name: cloud-credentials-cache
           emptyDir: {}
+        - name: ds-runtime-scripts
+          configMap:
+            name: ds-runtime-scripts
+            defaultMode: 0755
+        - name: ds-cts-runtime-scripts
+          configMap:
+            name: ds-cts-runtime-scripts
+            defaultMode: 0755
+        - name: ds-entrypoint
+          configMap:
+            name: ds-entrypoint
+            defaultMode: 0755
         {{- if .Values.ds_cts.securityContext.readOnlyRootFilesystem }}
         - name: ds-init-scripts
           configMap:
@@ -124,6 +136,10 @@ spec:
             name: keys
           - mountPath: /var/run/secrets/cloud-credentials-cache/
             name: cloud-credentials-cache
+          - name: ds-runtime-scripts
+            mountPath: /opt/opendj/runtime-scripts
+          - name: ds-cts-runtime-scripts
+            mountPath: /opt/opendj/runtime-scripts/ds-cts
           command:
           - sh
           - -c
@@ -259,6 +275,13 @@ spec:
             name: keys
           - mountPath: /var/run/secrets/cloud-credentials-cache/
             name: cloud-credentials-cache
+          - name: ds-runtime-scripts
+            mountPath: /opt/opendj/runtime-scripts
+          - name: ds-cts-runtime-scripts
+            mountPath: /opt/opendj/runtime-scripts/ds-cts
+          - name: ds-entrypoint
+            mountPath: /opt/opendj/docker-entrypoint.sh
+            subPath: docker-entrypoint.sh
       {{- with .Values.ds_cts.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
