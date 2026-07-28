@@ -122,9 +122,10 @@ def edit_sac(ns_opt, params):
 
 
 def run_helm_cmd(msg, values_file, chart_name, chart_version, chart_repo,
-                 namespace_opt, params, force_ds_passwords=False, force_amster=False):
+                 namespace_opt, params, force_ds_passwords=False, force_amster=False, print_only=False):
     """ Run Helm command """
-    print(msg)
+    if not print_only:
+        print(msg)
     cmd = 'helm'
     repo_opt = chart_repo
     if chart_repo.startswith('http'):
@@ -135,14 +136,15 @@ def run_helm_cmd(msg, values_file, chart_name, chart_version, chart_repo,
     if force_amster:
         cmd_opts = f"{cmd_opts} --set amster.force=true"
     print(f"\n{cmd} {cmd_opts}")
-    print("Do you want us to run this for you? (Y/N)")
-    response = input()
-    if response.lower().startswith('y'):
-        print("Running helm")
-        utils.run(cmd, cmd_opts, dryrun=params.dryrun, debug=params.debug)
-    else:
-        print("Run the above command in another terminal, then press <ENTER> to continue")
-        input()
+    if not print_only:
+        print("Do you want us to run this for you? (Y/N)")
+        response = input()
+        if response.lower().startswith('y'):
+            print("Running helm")
+            utils.run(cmd, cmd_opts, dryrun=params.dryrun, debug=params.debug)
+        else:
+            print("Run the above command in another terminal, then press <ENTER> to continue")
+            input()
 
 
 def restart_ds(namespace_opt, params, skip_input=False):
@@ -251,12 +253,19 @@ def do_helm(params, settings):
 
     delete_old_secrets(settings['namespace_opt'], params)
 
+    # Force amster run to avoid WSOD problem
     run_helm_cmd("Run helm to delete old DS secrets",
                  values_file, params.chart_name, params.chart_version,
-                 params.chart_repo, settings['namespace_opt'], params, force_ds_passwords=True)
+                 params.chart_repo, settings['namespace_opt'], params,
+                 force_ds_passwords=True, force_amster=True)
     restart_ds(settings['namespace_opt'], params, skip_input=True)
     print("Once all DSes are all up, the migration is complete.")
     print("If you are unable to get to the login screen, clear your browser data.")
+    print("If you get a blank page after logging in, try running amster again with the following command.")
+    run_helm_cmd("",
+                 values_file, params.chart_name, params.chart_version,
+                 params.chart_repo, settings['namespace_opt'], params,
+                 force_amster=True, print_only=True)
 
 
 class MigrateFormatter(argparse.ArgumentDefaultsHelpFormatter, argparse.RawDescriptionHelpFormatter):
