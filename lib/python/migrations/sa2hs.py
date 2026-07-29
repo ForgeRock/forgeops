@@ -147,20 +147,23 @@ def run_helm_cmd(msg, values_file, chart_name, chart_version, chart_repo,
             input()
 
 
-def restart_ds(namespace_opt, params, skip_input=False):
+def restart_ds(namespace_opt, params, skip_input=False, skip_wait=False):
     """ Restart the DS StatefulSets """
     cmd = 'kubectl'
     cmd_opts = f"rollout restart {namespace_opt} sts ds-cts ds-idrepo"
     print("Restarting DS with kubectl rollout restart")
     print(f"\n{cmd} {cmd_opts}")
-    print("Do you want us to run this for you? (Y/N)")
-    response = input()
+    if skip_input:
+        response = 'y'
+    else:
+        print("Do you want us to run this for you? (Y/N)")
+        response = input()
     if response.lower().startswith('y'):
         print("Restarting DS")
         utils.run(cmd, cmd_opts, dryrun=params.dryrun, debug=params.debug)
     else:
         print("Run the above command in another terminal, then come back here to continue")
-    if not skip_input:
+    if not skip_wait:
         print("Press <ENTER> to continue once DSes have all restarted and are Ready")
         response = input()
 
@@ -249,7 +252,7 @@ def do_helm(params, settings):
                  values_file, params.chart_name, params.chart_version,
                  params.chart_repo, settings['namespace_opt'], params)
 
-    restart_ds(settings['namespace_opt'], params)
+    restart_ds(settings['namespace_opt'], params, skip_input=True)
 
     delete_old_secrets(settings['namespace_opt'], params)
 
@@ -258,8 +261,9 @@ def do_helm(params, settings):
                  values_file, params.chart_name, params.chart_version,
                  params.chart_repo, settings['namespace_opt'], params,
                  force_ds_passwords=True, force_amster=True)
-    restart_ds(settings['namespace_opt'], params, skip_input=True)
-    print("Once all DSes are all up, the migration is complete.")
+    restart_ds(settings['namespace_opt'], params, skip_wait=True)
+    print("\nOnce all DSes are all up, the migration is complete.")
+    print("If AM or IDM doesn't come up, use 'kubectl rollout restart deployment <APP>' to force a restart.")
     print("If you are unable to get to the login screen, clear your browser data.")
     print("If you get a blank page after logging in, try running amster again with the following command.")
     run_helm_cmd("",
