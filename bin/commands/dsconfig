@@ -1,0 +1,123 @@
+#!/usr/bin/env python3
+""" Manage file based configuration for Ping Identity Platform"""
+import argparse
+import json
+import sys
+import os
+import shutil
+from pathlib import Path
+import site
+
+file_name = Path(__file__)
+current_file_path = file_name.parent.resolve()
+root_path = [parent_path for parent_path in current_file_path.parents if (parent_path / 'README.md').exists()][0]
+dependencies_dir = os.path.join(root_path, 'lib', 'dependencies')
+# Insert lib folders to python path
+sys.path.insert(0, str(root_path))
+sys.path.insert(1, str(dependencies_dir) + site.USER_SITE.replace(site.USER_BASE, ''))
+
+import lib.python.common as common
+from lib.python import utils
+
+
+KUBECTL = shutil.which("kubectl")
+
+
+class ArgFormatter(argparse.ArgumentDefaultsHelpFormatter, argparse.RawDescriptionHelpFormatter):
+    pass
+
+
+def check_prereqs(args):
+    """ Check to make sure we have required params """
+
+    if not getattr(args, 'pod', None):
+        utils.exit_msg("Must provide a DS pod to connect to")
+    if not getattr(args, 'command', None):
+        utils.exit_msg("Must provide at least one dsconfig argument")
+
+
+def craft_opt_str(opts):
+    """
+    Create a string out of array of dsconfig options
+      * loop over array
+      * if a string contains spaces, put it in quotes
+    """
+
+    opt_str = ''
+    for o in opts:
+        if o == '--':
+            continue
+        if ' ' in o:
+            opt_str = f"{opt_str} '{o}'"
+        else:
+            opt_str = f"{opt_str} {o}"
+    return opt_str
+
+
+def setup_args():
+    """ Setup argparser """
+    prog = "forgeops dsconfig"
+    desc = "Run dsconfig commands against a pod"
+    epilog = f"""
+Notes:
+  * Strings with spaces must be handled 1 of these ways
+    * Double quoted
+    * Quoted and spaces escaped
+
+Examples:
+  List plugins and specify the namespace:
+  {prog} -n my-ns ds-idrepo-0 -- list-plugins
+
+  Get plugin properties with double quoted string:
+  {prog} ds-idrepo-0 -- get-plugin-prop --plugin-name "'Entity Tag'"
+
+  Get plugin properties with escaped spaces and quotes:
+  {prog} ds-idrepo-0 -- get-plugin-prop --plugin-name "Entity\\ Tag"
+
+  Do a dryrun:
+  {prog} --dryrun ds-idrepo-0 -- list-plugins
+"""
+
+    common_args = common.setup_args()
+    parser = argparse.ArgumentParser(description=desc,
+                                     epilog=epilog,
+                                     prog=prog,
+                                     parents=[common_args['debug'],
+                                              common_args['dryrun'],
+                                              common_args['namespace']],
+                                     formatter_class=ArgFormatter)
+    parser.add_argument('pod',
+                        help="DS pod to connect to")
+    parser.add_argument('command',
+                        nargs=argparse.REMAINDER,
+                        help="dsconfig subcommand and options")
+    return parser.parse_args()
+
+
+def run(params):
+    """ Run command logic """
+    check_prereqs(params)
+    namespace = utils.get_namespace()
+    namespace_opt = ''
+    if getattr(params, 'namespace', None):
+        namespace = params.namespace
+        namespace_opt = f"-n {params.namespace}"
+    admin_pass = utils.get_secret_value(namespace, 'ds-passwords', 'dirmanager\\\\.pw')
+    conn_str = "-h localhost -p 1636 --trustAll"
+    user_str = "-D 'uid=admin'"
+    pass_str = f"-w '{admin_pass}'"
+    pass_str_red = f"-w '****'" # Redacted password string
+    if params.debug:
+        print(f"command = {params.command}")
+    dsconfig_opts = craft_opt_str(params.command)
+    extra_opts = "--no-prompt"
+    dsconfig = f"dsconfig {conn_str} {user_str} {dsconfig_opts} {extra_opts}"
+    cmd_opts = f"exec {namespace_opt} {params.pod} -- {dsconfig}"
+    if params.debug or params.dryrun:
+        print(f"{KUBECTL} {cmd_opts} {pass_str_red}")
+    if not args.dryrun:
+        utils.run(KUBECTL, f"{cmd_opts} {pass_str}")
+
+if __name__ == '__main__':
+    args = setup_args()
+    run(args)
