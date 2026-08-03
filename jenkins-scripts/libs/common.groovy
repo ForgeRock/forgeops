@@ -61,7 +61,6 @@ String calculatePlatformImagesBranch() {
 boolean branchSupportsPitTests() {
     def supportedBranchPrefixes = [
             'main',
-            'dev',
             'idcloud-',
             'release/',
             'sustaining/',
@@ -77,7 +76,7 @@ boolean branchSupportsPitTests() {
 // To be discussed with Bruno and Robin
 boolean branchSupportsIDCloudReleases() {
     def branchName = isPR() ? env.CHANGE_TARGET : env.BRANCH_NAME
-    return branchName.equals('dev') \
+    return branchName.equals('main') \
             || branchName.equals('feature/config') \
             || branchName.equals('release/') \
             || branchName.startsWith('idcloud-') \
