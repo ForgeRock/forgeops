@@ -52,26 +52,26 @@ DNS = re.compile(r'^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}(:\d{1,})?$')
 HELP_EXAMPLES = """
 examples:
 # Checkout latest version of platform-images and update Dockerfiles to match it
-$ ./bin/set-images
+$ ./bin/set-images -e my-env
 
 # Remove old config.
 $ ./bin/set-images --clean
 
 # Use a specific branch in platform-images
-$ ./bin/set-images --ref pit2-upgrade
+$ ./bin/set-images -e my-env --ref pit2-upgrade
 
 # Use a specific branch in platform-images and checkout exact commit
-$ ./bin/set-images --ref fdsf123
+$ ./bin/set-images -e my-env --ref fdsf123
 
 # Use the given path to find the config and only change the PingAM product.
-$ ./bin/set-images --config-path /tmp/mychange --products am
+$ ./bin/set-images -e my-env --config-path /tmp/mychange --products am
 
 # Update the dockerfile for PingAM to use the same repo and image but the tag of "sometagname"
-$ ./bin/set-images --inplace --products am --update-tag sometagname
+$ ./bin/set-images -e my-env --inplace --products am --update-tag sometagname
 
 # Change all the repo names, leaves docker image name (leaves the last part as is) to match the value
 # Changes tags to match platform-images repository
-$ ./bin/set-images --update-repo us-docker.pkg.dev/forgeops-public/images
+$ ./bin/set-images -e my-env --update-repo us-docker.pkg.dev/forgeops-public/images
 """
 
 ### Tests ###
@@ -144,6 +144,9 @@ def func_args():
         formatter_class=argparse.RawDescriptionHelpFormatter)
     # Global
     utils.add_loglevel_arg(parser)
+
+    parser.add_argument('-e', '--env-name',
+                        help='ForgeOps environment to update')
 
     # Git repo  configuration
     parser.add_argument('--git-repo',
@@ -301,7 +304,7 @@ def load_product_configs(path, product_names):
     e.g. build/platform-images/am.json
     """
     docker_images = {}
-    kustomize_images = {}
+    env_images = {}
     for name in product_names:
         try:
             if name not in DOCKER_PRODUCTS:
@@ -329,7 +332,7 @@ def load_product_configs(path, product_names):
                 for product_name, keyname in zip(UI_PRODUCTS, UI_CONF_KEYNAME):
                     c = config.copy()
                     c['imageName'] = config[keyname]
-                    kustomize_images[product_name] = c
+                    env_images[product_name] = c
 
         # amster images are all tagged with the same version as am-cdk.
         # updating with forgeops-master doesn't use am base and am needs to be
@@ -345,7 +348,35 @@ def load_product_configs(path, product_names):
         log.error(f'{e}')
         sys.exit(1)
 
-    return docker_images, kustomize_images
+    return docker_images, env_images
+
+
+def update_env(products, env_name, update_repo=None, update_tag=None):
+    """
+    Updates ForgeOps environment to use image names and/or tags
+    update_repo and update_tag take precedence over product config.
+    """
+    for product_name, product_config in products.items():
+        new_image_name, new_tag = '', ''
+        if update_repo is not None:
+            new_image_name = f'{update_repo}/{product_name}'
+        else:
+            new_image_name = product_config['imageName']
+        if update_tag is not None:
+            new_tag = f'{update_tag}'
+        else:
+            new_tag = f'{product_config["imageTag"]}'
+        log.info(f'Updating {env_name} to use {new_image_name}:{new_tag}')
+
+        utils.run(f'{current_file_path}/forgeops',
+                  'image',
+                  '--env-name',
+                  env_name,
+                  '--image-repo',
+                  new_image_name,
+                  '--tag',
+                  new_tag,
+                  product_name)
 
 
 def update_kustomize(products, kustomize_path, update_repo=None, update_tag=None):
@@ -589,17 +620,24 @@ def run_from_args(args):
 
 
 def run_from_files(args):
-    docker_images, kustomize_images = load_product_configs(args.config_path,
+    docker_images, env_images = load_product_configs(args.config_path,
                                                            args.products)
     log.info('Updating products {}'.format(' '.join(args.products)))
     update_dockerfiles(docker_images,
                        PLATFORM_DOCKER_PATH,
                        args.update_repo,
                        args.update_tag)
-    update_kustomize(kustomize_images,
-                     PLATFORM_KUSTOMIZE_PATH,
-                     args.update_repo,
-                     args.update_tag)
+    if getattr(args, 'env_name', None):
+        update_env(env_images,
+                   args.env_name,
+                   args.update_repo,
+                   args.update_tag)
+    else:
+        log.warn('Missing env name, using old method. The env name will be required in the future so update your process.')
+        update_kustomize(env_images,
+                         PLATFORM_KUSTOMIZE_PATH,
+                         args.update_repo,
+                         args.update_tag)
 
 
 def main():
