@@ -15,5 +15,11 @@ information.
 
 ## Bugfixes
 
+### forgeops env --upgrade didn't honor --no-helm or --no-kustomize
+
+The `forgeops env --upgrade` command wasn't properly honoring `--no-helm` and
+`--no-kustomize` which caused errors for folks using them. It has been updated
+to properly honor those flags.
+
 ## How-tos
 

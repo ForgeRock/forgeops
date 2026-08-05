@@ -243,22 +243,32 @@ def run(args, config):
     header=f"""#
 # Running upgrade on {args.env_name} at {timestamp}
 #"""
-    log(header, config['overlay_path'])
+    if not getattr(args, 'no_kustomize', None):
+        log(header, config['overlay_path'])
+    if not getattr(args, 'no_helm', None):
+        log(header, config['helm_env_path'])
 
     # 2025.2.0 updates
-    log('Checking 2025.2.0 updates', config['overlay_path'])
-    update_secrets_2025_2_0(config['overlay_path'], config['source_path'])
-    update_apps_2025_2_0(config['overlay_path'], def_overlay_path)
+    if not getattr(args, 'no_kustomize', None):
+        log('Checking 2025.2.0 updates', config['overlay_path'])
+        update_secrets_2025_2_0(config['overlay_path'], config['source_path'])
+        update_apps_2025_2_0(config['overlay_path'], def_overlay_path)
 
     # 2025.2.1 updates
-    log('Checking 2025.2.1 updates', config['helm_env_path'])
-    update_secrets_2025_2_1(config['helm_env_path'])
+    if not getattr(args, 'no_helm', None):
+        log('Checking 2025.2.1 updates', config['helm_env_path'])
+        update_secrets_2025_2_1(config['helm_env_path'])
 
     # 2026.1.0 updates
-    log('Checking 2026.1.0 updates', config['overlay_path'])
-    update_secrets_2026_1_0(config['overlay_path'], config['source_path'])
+    if not getattr(args, 'no_kustomize', None):
+        log('Checking 2026.1.0 updates', config['overlay_path'])
+        update_secrets_2026_1_0(config['overlay_path'], config['source_path'])
 
+    timestamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%d-%H:%M:%S%z")
     footer=f"""#
 # End upgrade on {args.env_name} at {timestamp}
 #"""
-    log(footer, config['overlay_path'])
+    if not getattr(args, 'no_kustomize', None):
+        log(footer, config['overlay_path'])
+    if not getattr(args, 'no_helm', None):
+        log(footer, config['helm_env_path'])

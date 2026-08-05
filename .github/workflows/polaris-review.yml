@@ -47,7 +47,7 @@ jobs:
         )
       )
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 30
     concurrency:
       group: polaris-review-${{ github.event.pull_request.number || github.event.issue.number }}
       cancel-in-progress: true
