@@ -370,6 +370,7 @@ def update_env(products, env_name, update_repo=None, update_tag=None):
 
         utils.run(f'{current_file_path}/forgeops',
                   'image',
+                  '--skip-image-append',
                   '--env-name',
                   env_name,
                   '--image-repo',
