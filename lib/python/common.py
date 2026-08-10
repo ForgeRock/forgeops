@@ -86,6 +86,12 @@ def setup_args():
         '-r',
         action='store_true',
         help='Do a dryrun')
+    common_ver = argparse.ArgumentParser(add_help=False)
+    common_ver.add_argument(
+        '--verbose',
+        '-v',
+        action='store_true',
+        help='Be verbose')
     common_pf = argparse.ArgumentParser(add_help=False)
     common_pf.add_argument(
         '--config-profile',
@@ -112,6 +118,11 @@ def setup_args():
         '--kustomize-path',
         '-k',
         help='Kustomize dir to use (absolute or relative to forgeops data dir)')
+    common_bp = argparse.ArgumentParser(add_help=False)
+    common_bp.add_argument(
+        '--build-path',
+        '-b',
+        help='Path to build dir (absolute or relative to forgeops data dir) [default: docker]')
     common_nh = argparse.ArgumentParser(add_help=False)
     common_nh.add_argument(
         '--no-helm',
@@ -133,12 +144,14 @@ def setup_args():
     return {
         'debug': common_dg,
         'dryrun': common_dr,
+        'verbose': common_ver,
         'namespace': common_ns,
         'config_profile': common_pf,
         'env_name': common_env,
         'env_name_req': common_env_r,
         'helm_path': common_hp,
         'kustomize_path': common_kp,
+        'build_path': common_bp,
         'no_helm': common_nh,
         'no_kustomize': common_nk,
         'source': common_src,
