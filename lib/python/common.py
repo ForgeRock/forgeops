@@ -1,38 +1,7 @@
-#!/usr/bin/env python3
-"""Upgrade a ForgeOps environment to the latest updates"""
+""" Common ForgeOps functions """
 
 import argparse
-import site
-import os
-from pathlib import Path
-import sys
-file_name = Path(__file__)
-current_file_path = file_name.parent.resolve()
-root_path = [parent_path for parent_path in current_file_path.parents if (parent_path / 'README.md').exists()][0]
-dependencies_dir = os.path.join(root_path, 'lib', 'dependencies')
-# Insert lib folders to python path
-sys.path.insert(0, str(root_path))
-sys.path.insert(1, str(dependencies_dir) + site.USER_SITE.replace(site.USER_BASE, ''))
-
-from lib.python.ensure_configuration_is_valid_or_exit import ensure_configuration_is_valid_or_exit, \
-    print_how_to_install_dependencies
-from lib.python.defaults import SNAPSHOT_ROLE_NAME
-
-# First ensure configure has been executed
-try:
-    ensure_configuration_is_valid_or_exit()
-except Exception as e:
-    try:
-        print(f'[error] {str(e)}')
-    except Exception as exc:
-        raise e from exc
-    sys.exit(1)
-
-try:
-    import yaml
-except:
-    print_how_to_install_dependencies()
-import lib.python.utils as utils
+import yaml
 
 
 # Avoid using anchors/aliases in outputted YAML
@@ -66,93 +35,96 @@ Do a `git add {log_path}` to track.
     with open(log_path, 'a', encoding='utf-8') as log_f:
         log_f.write(f"{msg}{end}")
 
+
 def setup_args():
     """ Setup the common arguments """
 
-    common_ns = argparse.ArgumentParser(add_help=False)
-    common_ns.add_argument(
+    env_help_msg = 'Forgeops environment to target'
+
+    namespace_arg = argparse.ArgumentParser(add_help=False)
+    namespace_arg.add_argument(
         '--namespace',
         '-n',
         help='Target namespace (default: current ctx namespace)')
-    common_dg = argparse.ArgumentParser(add_help=False)
-    common_dg.add_argument(
+    debug_arg = argparse.ArgumentParser(add_help=False)
+    debug_arg.add_argument(
         '--debug',
         '-d',
         action='store_true',
         help='Turn on debugging')
-    common_dr = argparse.ArgumentParser(add_help=False)
-    common_dr.add_argument(
+    dryrun_arg = argparse.ArgumentParser(add_help=False)
+    dryrun_arg.add_argument(
         '--dryrun',
         '-r',
         action='store_true',
         help='Do a dryrun')
-    common_ver = argparse.ArgumentParser(add_help=False)
-    common_ver.add_argument(
+    verbose_arg = argparse.ArgumentParser(add_help=False)
+    verbose_arg.add_argument(
         '--verbose',
         '-v',
         action='store_true',
         help='Be verbose')
-    common_pf = argparse.ArgumentParser(add_help=False)
-    common_pf.add_argument(
+    config_profile_arg = argparse.ArgumentParser(add_help=False)
+    config_profile_arg.add_argument(
         '--config-profile',
         '-p',
         help='Name of config profile in docker/<component>/config-profiles')
-    common_env = argparse.ArgumentParser(add_help=False)
-    common_env.add_argument(
+    env_name_arg = argparse.ArgumentParser(add_help=False)
+    env_name_arg.add_argument(
         '--env-name',
         '-e',
-        help='Forgeops environment to target')
-    common_env_r = argparse.ArgumentParser(add_help=False)
-    common_env_r.add_argument(
+        help=env_help_msg)
+    env_name_arg_req = argparse.ArgumentParser(add_help=False)
+    env_name_arg_req.add_argument(
         '--env-name',
         '-e',
         required=True,
-        help='Forgeops environment to target')
-    common_hp = argparse.ArgumentParser(add_help=False)
-    common_hp.add_argument(
-        '--helm-path',
-        '-H',
-        help='Dir to store Helm values files (absolute or relative to forgeops data dir)')
-    common_kp = argparse.ArgumentParser(add_help=False)
-    common_kp.add_argument(
-        '--kustomize-path',
-        '-k',
-        help='Kustomize dir to use (absolute or relative to forgeops data dir)')
-    common_bp = argparse.ArgumentParser(add_help=False)
-    common_bp.add_argument(
+        help=env_help_msg)
+    build_path_arg = argparse.ArgumentParser(add_help=False)
+    build_path_arg.add_argument(
         '--build-path',
         '-b',
         help='Path to build dir (absolute or relative to forgeops data dir) [default: docker]')
-    common_nh = argparse.ArgumentParser(add_help=False)
-    common_nh.add_argument(
+    helm_path_arg = argparse.ArgumentParser(add_help=False)
+    helm_path_arg.add_argument(
+        '--helm-path',
+        '-H',
+        help='Dir to store Helm values files (absolute or relative to forgeops data dir)')
+    kustomize_path_arg = argparse.ArgumentParser(add_help=False)
+    kustomize_path_arg.add_argument(
+        '--kustomize-path',
+        '-k',
+        help='Kustomize dir to use (absolute or relative to forgeops data dir)')
+    no_helm_arg = argparse.ArgumentParser(add_help=False)
+    no_helm_arg.add_argument(
         '--no-helm',
         dest='no_helm',
         action='store_true',
         help="Skip Helm")
-    common_nk = argparse.ArgumentParser(add_help=False)
-    common_nk.add_argument(
+    no_kustomize_arg = argparse.ArgumentParser(add_help=False)
+    no_kustomize_arg.add_argument(
         '--no-kustomize',
         dest='no_kustomize',
         action='store_true',
         help="Skip Kustomize")
-    common_src = argparse.ArgumentParser(add_help=False)
-    common_src.add_argument(
+    source_arg = argparse.ArgumentParser(add_help=False)
+    source_arg.add_argument(
         '--source',
         '-s',
         help='Name of source Kustomize overlay')
 
     return {
-        'debug': common_dg,
-        'dryrun': common_dr,
-        'verbose': common_ver,
-        'namespace': common_ns,
-        'config_profile': common_pf,
-        'env_name': common_env,
-        'env_name_req': common_env_r,
-        'helm_path': common_hp,
-        'kustomize_path': common_kp,
-        'build_path': common_bp,
-        'no_helm': common_nh,
-        'no_kustomize': common_nk,
-        'source': common_src,
+        'debug': debug_arg,
+        'dryrun': dryrun_arg,
+        'verbose': verbose_arg,
+        'namespace': namespace_arg,
+        'config_profile': config_profile_arg,
+        'env_name': env_name_arg,
+        'env_name_req': env_name_arg_req,
+        'build_path': build_path_arg,
+        'helm_path': helm_path_arg,
+        'kustomize_path': kustomize_path_arg,
+        'no_helm': no_helm_arg,
+        'no_kustomize': no_kustomize_arg,
+        'source': source_arg,
     }
