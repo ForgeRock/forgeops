@@ -28,12 +28,13 @@ jobs:
       - name: Update helm chart versions
         id: update_helm_chart_versions
         run: |
-          sed -ie "s/^version:.*/version:\ ${{ env.RELEASE_TAG }}/" charts/rcs/Chart.yaml
+          sed -i -e "s/^version:.*/version:\ ${{ env.RELEASE_TAG }}/" charts/rcs/Chart.yaml
 
       - name: Run chart-releaser
-        uses: helm/chart-releaser-action@v1.6.0
+        uses: helm/chart-releaser-action@v1.7.0
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         with:
           charts_dir: charts
           pages_branch: gh-pages
+          skip_existing: true
