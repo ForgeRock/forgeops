@@ -134,7 +134,7 @@ entries:
     version: 2026.1.0
   rcs:
   - apiVersion: v2
-    appVersion: 1.
+    appVersion: 0.1.0
     description: A Helm chart for Ping Remote Connector Server
     digest: 5c12053974b6be2e69e10b6147d8dc3766bf458c4f40ebfb549d3a13356e7ff9
     name: rcs
