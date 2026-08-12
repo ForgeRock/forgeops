@@ -26,11 +26,7 @@ nodeSelector: {}
 tolerations: []
 affinity: {}
 
-secrets:
-  rcs_key:
-    generate:
-      RCS_KEY:
-        length: 24
+secrets: {}
 
 custom_properties: []
 # - "connectorserver.url=wss://idp.example.com/openicf"
