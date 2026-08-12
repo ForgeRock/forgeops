@@ -134,7 +134,18 @@ entries:
     version: 2026.1.0
   rcs:
   - apiVersion: v2
+    appVersion: 1.5.20.35
+    created: "2026-08-12T21:49:30.99676524Z"
+    description: A Helm chart for Ping Remote Connector Server
+    digest: 0fb04ec8d98e4fe07af9fb05084750c333e3e2699552117e1ff928601466926a
+    name: rcs
+    type: application
+    urls:
+    - https://github.com/ForgeRock/forgeops/releases/download/rcs-0.2.0/rcs-0.2.0.tgz
+    version: 0.2.0
+  - apiVersion: v2
     appVersion: 0.1.0
+    created: "0001-01-01T00:00:00Z"
     description: A Helm chart for Ping Remote Connector Server
     digest: 5c12053974b6be2e69e10b6147d8dc3766bf458c4f40ebfb549d3a13356e7ff9
     name: rcs
@@ -142,4 +153,4 @@ entries:
     urls:
     - https://github.com/ForgeRock/forgeops/releases/download/rcs-0.1.0/rcs-0.1.0.tgz
     version: 0.1.0
-generated: "2026-08-04T15:24:14.312007493Z"
+generated: "2026-08-12T21:49:30.99679201Z"
