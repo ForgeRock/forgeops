@@ -32,6 +32,20 @@ has the ability to specify a digest as a tag.
 
 We have now changed the AM port to http in forgerock-metrics Helm chart.
 
+### Referential integrity was not enforced in the amIdentityStore backend
+
+Deleting a managed object left dangling references to it on surviving entries
+under `ou=identities`. For example, deleting an organization left stale
+`fr-idm-managed-organization-member` values on its former members, which PingIDM
+then resolved as living members.
+
+A `referential-integrity` plugin scoped to `ou=identities` is now created by
+`runtime-scripts/ds-idrepo/add-schema`, along with the extensible indexes it
+requires. Because `add-schema` runs on every DS initialization, existing
+deployments pick this up on their next restart; no manual `dsconfig` run is
+needed. Existing data is not modified -- the plugin only fires on future
+deletes.
+
 ### forgeops env --upgrade didn't honor --no-helm or --no-kustomize
 
 The `forgeops env --upgrade` command wasn't properly honoring `--no-helm` and

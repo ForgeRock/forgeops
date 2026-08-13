@@ -16,6 +16,12 @@ plug_exists() {
     return $?
 }
 
+index_exists() {
+    dsconfig --offline --no-prompt get-backend-index-prop \
+        --backend-name "$1" --index-name "$2" > /dev/null 2>&1
+    return $?
+}
+
 PLUG_NAME="User Unique Attribute"
 if  plug_exists "$PLUG_NAME" ; then
     echo "Found $PLUG_NAME, skipping create"
@@ -47,4 +53,99 @@ create-plugin \
         --set "enabled:true"
 EOF
     fi
+fi
+
+# Referential integrity for the amIdentityStore backend (OPENIDM-19324).
+#
+# When a managed object is deleted, this plugin removes the dangling references
+# to it from the relationship attributes of surviving entries under
+# ou=identities. Without it, for example, deleting an organization leaves stale
+# fr-idm-managed-organization-member values on former member entries, which IDM
+# then resolves as living members.
+#
+# The attribute list covers the managed objects that CDK stores in
+# amIdentityStore. Roles, assignments, applications, accounts and internal
+# users/roles live in the idmRepo backend (dc=openidm) in CDK -- confirmed via
+# repo.ds.json -- so their attributes have no entries under ou=identities and
+# are deliberately absent. They are covered for IDC by ForgeCloud/saas#26505.
+#
+# Every attribute-type listed here MUST have a nameAndJsonEqualityMatchingRule
+# extensible index (OID .7) on the same backend. DS validates this at startup
+# and SILENTLY DISABLES the whole plugin if a single index is missing, so the
+# indexes are created first, below, and the plugin is created afterwards.
+REFINT_ATTRS="fr-idm-managed-user-roles
+fr-idm-managed-user-groups
+fr-idm-managed-user-manager
+fr-idm-managed-user-task-principals
+fr-idm-managed-user-meta
+fr-idm-managed-user-notifications
+fr-idm-managed-user-authzroles-internal-role
+fr-idm-managed-user-authzroles-managed-role
+fr-idm-managed-organization-admin
+fr-idm-managed-organization-owner
+fr-idm-managed-organization-member
+fr-idm-managed-assignment-member
+fr-idm-managed-application-member
+fr-idm-managed-application-owner
+fr-idm-reference-1
+fr-idm-reference-2
+fr-idm-reference-3
+fr-idm-reference-4
+fr-idm-reference-5"
+
+# fr-idm-reference-6 through -10 are only defined from the 8.0 idm-repo schema
+# onwards; 7.4 and 7.5 have no schema of their own and inherit 7.3's, which
+# defines fr-idm-reference-1 through -5 only. Listing an undefined one makes DS
+# reject the plugin config with an OID decode error on every tool invocation,
+# which broke the 7.4 baseline used by the Kustomize.UpgradePlatform74To75 test.
+if version_gt "$IDM_REPO_VER" "7.5"; then
+    REFINT_ATTRS="${REFINT_ATTRS}
+fr-idm-reference-6
+fr-idm-reference-7
+fr-idm-reference-8
+fr-idm-reference-9
+fr-idm-reference-10"
+fi
+
+# Existing deployments never run setup, so any index missing there is created
+# here. rebuild-index is required for an index added to a populated backend:
+# without it the index is left degraded and the plugin's searches miss entries.
+REFINT_NEW_INDEXES=""
+for attr in $REFINT_ATTRS; do
+    if index_exists amIdentityStore "$attr"; then
+        continue
+    fi
+    echo "Adding extensible index for '${attr}'"
+    dsconfig --offline --no-prompt --batch <<EOF
+create-backend-index \
+        --backend-name amIdentityStore \
+        --set index-type:extensible \
+        --index-name ${attr} \
+        --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7 \
+        --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.9
+EOF
+    REFINT_NEW_INDEXES="${REFINT_NEW_INDEXES} --index ${attr}"
+done
+
+if [ -n "$REFINT_NEW_INDEXES" ]; then
+    echo "Rebuilding new referential integrity indexes"
+    # shellcheck disable=SC2086
+    rebuild-index --offline --noPropertiesFile --baseDn ou=identities $REFINT_NEW_INDEXES > /dev/null
+fi
+
+PLUG_NAME="fr-am-referential-int-plugin"
+if plug_exists "$PLUG_NAME" ; then
+    echo "Found $PLUG_NAME, skipping create"
+else
+    echo "Adding '${PLUG_NAME}'"
+    {
+        printf 'create-plugin \\\n'
+        printf '        --plugin-name "%s" \\\n' "$PLUG_NAME"
+        printf '        --type "referential-integrity" \\\n'
+        printf '        --set "base-dn:ou=identities" \\\n'
+        for attr in $REFINT_ATTRS; do
+            printf '        --set "attribute-type:%s" \\\n' "$attr"
+        done
+        printf '        --set "enabled:true"\n'
+    } | dsconfig --offline --no-prompt --batch
 fi

@@ -161,9 +161,48 @@ create-backend-index \
         --index-name fr-idm-managed-application-owner \
         --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7 \
         --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.9
+create-backend-index \
+        --backend-name amIdentityStore \
+        --set index-type:extensible \
+        --index-name fr-idm-managed-user-task-principals \
+        --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7 \
+        --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.9
+create-backend-index \
+        --backend-name amIdentityStore \
+        --set index-type:extensible \
+        --index-name fr-idm-reference-1 \
+        --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7 \
+        --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.9
+create-backend-index \
+        --backend-name amIdentityStore \
+        --set index-type:extensible \
+        --index-name fr-idm-reference-2 \
+        --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7 \
+        --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.9
+create-backend-index \
+        --backend-name amIdentityStore \
+        --set index-type:extensible \
+        --index-name fr-idm-reference-3 \
+        --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7 \
+        --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.9
+create-backend-index \
+        --backend-name amIdentityStore \
+        --set index-type:extensible \
+        --index-name fr-idm-reference-4 \
+        --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7 \
+        --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.9
+create-backend-index \
+        --backend-name amIdentityStore \
+        --set index-type:extensible \
+        --index-name fr-idm-reference-5 \
+        --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7 \
+        --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.9
 EOF
 
-# Create extra application schema
+# Create extra application schema.
+# This also creates the amIdentityStore referential integrity plugin, and any of
+# its extensible indexes still missing above -- it runs on existing deployments
+# too, where this setup script never executes.
 $SCRIPT_DIR/add-schema
 
 # Example of creating additional indexes at setup time.
