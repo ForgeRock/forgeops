@@ -91,6 +91,16 @@ entries:
     urls:
     - https://github.com/ForgeRock/forgeops/releases/download/identity-platform-2025.1.0/identity-platform-2025.1.0.tgz
     version: 2025.01.0
+  - apiVersion: v2
+    appVersion: 1.0.0
+    created: "2026-08-13T16:11:17.954356004Z"
+    description: A Helm chart for Kubernetes
+    digest: 8948a6472313206694e9e292bdf4a33e88eb032660b8488021f50e65f4cc5cab
+    name: identity-platform
+    type: application
+    urls:
+    - https://github.com/ForgeRock/forgeops/releases/download/identity-platform-1.0.0/identity-platform-1.0.0.tgz
+    version: 1.0.0
   ping-gateway:
   - apiVersion: v2
     appVersion: 2026.3.0
@@ -135,6 +145,16 @@ entries:
   rcs:
   - apiVersion: v2
     appVersion: 1.5.20.35
+    created: "2026-08-13T16:11:18.13471984Z"
+    description: A Helm chart for Ping Remote Connector Server
+    digest: 8f26810a06b1493af5a9448d88bab420c804a98efcef0ba7873bf8d280c151dd
+    name: rcs
+    type: application
+    urls:
+    - https://github.com/ForgeRock/forgeops/releases/download/rcs-0.3.0/rcs-0.3.0.tgz
+    version: 0.3.0
+  - apiVersion: v2
+    appVersion: 1.5.20.35
     created: "2026-08-12T21:49:30.99676524Z"
     description: A Helm chart for Ping Remote Connector Server
     digest: 0fb04ec8d98e4fe07af9fb05084750c333e3e2699552117e1ff928601466926a
@@ -153,4 +173,4 @@ entries:
     urls:
     - https://github.com/ForgeRock/forgeops/releases/download/rcs-0.1.0/rcs-0.1.0.tgz
     version: 0.1.0
-generated: "2026-08-12T21:49:30.99679201Z"
+generated: "2026-08-13T16:11:18.134766969Z"
