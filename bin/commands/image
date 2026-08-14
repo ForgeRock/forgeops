@@ -41,6 +41,16 @@ from lib.python.releases import (
 )
 
 
+PROG = 'forgeops image'
+COMPONENTS_APPS = ['am', 'amster', 'am-config-upgrader', 'idm']
+COMPONENTS_UI = ['admin-ui', 'end-user-ui', 'login-ui']
+COMPONENTS_PLATFORM = sum([COMPONENTS_APPS, ['ds'], COMPONENTS_UI], [])
+COMPONENTS_META = ['platform', 'apps', 'ui']
+COMPONENTS_VALID = sum([COMPONENTS_META, COMPONENTS_PLATFORM, ['ig']], [])
+# argparse checks `choices` against the empty default of the nargs='*'
+# positional, so [] must be an allowed value for --copy with no components
+COMPONENTS_VALID.append([])
+
 # Avoid using anchors/aliases in outputted YAML
 # Notice we call this with yaml.dump, but we are still using safe_dump
 # From https://ttl255.com/yaml-anchors-and-aliases-and-how-to-disable-them/
@@ -95,15 +105,8 @@ def update_image_defaulter(images, overlay_path):
         utils.run('kustomize', cmd_args, cwd=f"{overlay_path}/image-defaulter")
 
 
-def main():
-    prog = 'forgeops image'
-    components_apps = ['am', 'amster', 'am-config-upgrader', 'idm']
-    components_ui = ['admin-ui', 'end-user-ui', 'login-ui']
-    components_platform = sum([components_apps, ['ds'], components_ui], [])
-    components_meta = ['platform', 'apps', 'ui']
-    components_valid = sum([components_meta, components_platform, ['ig']], [])
-    components_valid.append([])
-
+def setup_args():
+    """ Setup argparse args """
     help_epilog=f"""
 --image-repo shorthand repos and their defaults:
 base = {BASE_REPO_DEF}
@@ -112,36 +115,36 @@ dev = {BASE_REPO_DEV}
 
 examples:
 # Set a custom component image in the prod env for am (used by build command)
-{prog} --env-name prod --image-repo my-container-repo/idp --tag 7.5.0 am
+{PROG} --env-name prod --image-repo my-container-repo/idp --tag 7.5.0 am
 
 # Copy images from one env to another (prod-single to prod)
-{prog} --env-name prod --source prod-single --copy
+{PROG} --env-name prod --source prod-single --copy
 
 ### Manage release files for use with `forgeops build --release-name $RELEASE_NAME`
 # Manage release files for the entire platform (generated release name is 7.5.1-DATETIME)
-{prog} --release 7.5.1 platform
+{PROG} --release 7.5.1 platform
 
 # Manage release files with a custom release name for the entire platform
-{prog} --release 7.5.1 --release-name 7.5.1-2 platform
+{PROG} --release 7.5.1 --release-name 7.5.1-2 platform
 
 # Manage an official PingGateway release with a custom release name
-{prog} --release 2024.6.3 --release-name 2024.6.3-1 ig
+{PROG} --release 2024.6.3 --release-name 2024.6.3-1 ig
 
 ### Update Helm values.yaml and Kustomize overlay to use deployable images
 ### Needed for demos and initial setup
 # Select an official release for an env for platform components
-{prog} --release 7.5.1 --env-name ig-sfo1 platform
+{PROG} --release 7.5.1 --env-name ig-sfo1 platform
 
 # Select an official PingGateway release for an env
-{prog} --release 7.5.1 --env-name ig-dfw1 ig
+{PROG} --release 7.5.1 --env-name ig-dfw1 ig
 """
 
     parser = argparse.ArgumentParser(description='Manage images in a Ping Identity Platform (PIP) environment',
-                                     prog=prog,
+                                     prog=PROG,
                                      epilog=textwrap.dedent(help_epilog),
                                      formatter_class=Formatter)
     parser.add_argument('-d', '--debug', action='store_true', help='Turn on debugging')
-    parser.add_argument('components', nargs='*', choices=components_valid)
+    parser.add_argument('components', nargs='*', choices=COMPONENTS_VALID)
     parser.add_argument('-k', '--kustomize-path', default=argparse.SUPPRESS,
                         help='Kustomize dir to use [absolute or relative to forgeops root] (default: kustomize)')
     parser.add_argument('-b', '--build-path', default=argparse.SUPPRESS,
@@ -164,7 +167,11 @@ examples:
     parser.add_argument('--dryrun', action='store_true', help=argparse.SUPPRESS)
     parser.add_argument('--verbose', action='store_true', help=argparse.SUPPRESS)
 
-    args = parser.parse_args()
+    return parser.parse_args()
+
+
+def run(args, config):
+    """ Run logic for image """
     if args.debug:
         print(args)
 
@@ -190,31 +197,21 @@ examples:
         if 'platform' in args.components or len(args.components) > 1:
             utils.exit_msg('You can only set the image for one component when using --skip-image-append')
 
-    overrides = utils.process_overrides(root_path,
-                                        getattr(args, 'helm_path', None),
-                                        getattr(args, 'kustomize_path', None),
-                                        getattr(args, 'build_path', None),
-                                        getattr(args, 'no_helm', False),
-                                        getattr(args, 'no_kustomize', False),
-                                        getattr(args, 'releases_src', None),
-                                        getattr(args, 'pull_policy', None),
-                                        getattr(args, 'source', None),
-                                        getattr(args, 'ssl_secretname', None))
-    build_path = overrides['build_path']
-    helm_root = overrides['helm_path']
+    build_path = config['build_path']
+    helm_root = config['helm_path']
     helm_path = helm_root / args.env_name if args.env_name else None
-    kustomize_path = overrides['kustomize_path']
-    releases_src = overrides['releases_src']
+    kustomize_path = config['kustomize_path']
+    releases_src = config['releases_src']
 
     components = copy(args.components)
     if containsElement(['platform'], components):
-        components.extend(components_platform)
+        components.extend(COMPONENTS_PLATFORM)
         components.remove('platform')
     if containsElement(['apps'], components):
-        components.extend(components_apps)
+        components.extend(COMPONENTS_APPS)
         components.remove('apps')
     if containsElement(['ui'], components):
-        components.extend(components_ui)
+        components.extend(COMPONENTS_UI)
         components.remove('ui')
     # Use set() to remove duplicates from components
     components = list(set(components))
@@ -275,7 +272,7 @@ examples:
                 values_images[c.replace('-', '_')] = data
                 images_kustomize[c] = data
 
-    if overrides['do_kustomize']:
+    if config['do_kustomize']:
         utils.check_path(kustomize_path, 'Kustomize path', 'dir')
         overlay_root = kustomize_path / 'overlay'
         utils.check_path(overlay_root, 'Overlay root', 'dir')
@@ -310,7 +307,7 @@ examples:
             print(f"Updating image-defaulter in {args.env_name} overlay")
             update_image_defaulter(images_kustomize, overlay_path)
 
-    if overrides['do_helm'] and args.env_name:
+    if config['do_helm'] and args.env_name:
         utils.check_path(helm_path, 'Helm path', 'dir')
         values_fn = 'values.yaml'
         values_file = helm_path / values_fn
@@ -351,21 +348,33 @@ examples:
     ### Logs
     ###
     timestamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%d-%H:%M:%S%z")
-    cmd_ary = sys.argv
-    cmd_ary[0] = prog
+    cmd_ary = copy(sys.argv)
+    cmd_ary[0] = PROG
     cmd = ' '.join(cmd_ary)
     log_action = 'Update'
     log_file = 'env.log'
     log_line = f"{timestamp} {log_action} {cmd}"
-    if overrides['do_kustomize'] and args.copy:
+    if config['do_kustomize'] and args.copy:
         log_path_overlay = overlay_path / log_file
         with open(log_path_overlay, 'a', encoding='utf-8') as log_overlay_f:
             log_overlay_f.write(f"{log_line}\n")
-    if overrides['do_helm'] and args.env_name:
+    if config['do_helm'] and args.env_name:
         log_path_helm = helm_path / log_file
         with open(log_path_helm, 'a', encoding='utf-8') as log_helm_f:
             log_helm_f.write(f"{log_line}\n")
 
 
 if __name__ == '__main__':
-    main()
+    args = setup_args()
+    overrides = utils.process_overrides(root_path,
+                                        getattr(args, 'helm_path', None),
+                                        getattr(args, 'kustomize_path', None),
+                                        getattr(args, 'build_path', None),
+                                        getattr(args, 'no_helm', False),
+                                        getattr(args, 'no_kustomize', False),
+                                        getattr(args, 'releases_src', None),
+                                        getattr(args, 'pull_policy', None),
+                                        getattr(args, 'source', None),
+                                        getattr(args, 'ssl_secretname', None),
+                                        debug=args.debug)
+    run(args, overrides)
