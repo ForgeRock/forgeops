@@ -13,6 +13,11 @@ of your choosing. Strings with spaces need to be handled properly by double
 quoting or quoting and escaping spaces. See `forgeops dsconfig --help` for more
 information.
 
+### Removing dryrun short flag
+
+The dryrun short flag (`-r`) conflicts with `--push-to`, and is generally not
+necessary. Removing as part of a project to normalize flags across commands.
+
 ## Bugfixes
 
 ### forgeops env --upgrade didn't honor --no-helm or --no-kustomize

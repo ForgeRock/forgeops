@@ -20,7 +20,7 @@ dependencies_dir = os.path.join(root_path, 'lib', 'dependencies')
 sys.path.insert(0, str(root_path))
 sys.path.insert(1, str(dependencies_dir) + site.USER_SITE.replace(site.USER_BASE, ''))
 
-from lib.python import utils
+from lib.python import utils, common
 
 HELP_DESCRIPTION = "Manage Ping Identity Platform configuration."
 HELP_BUILD_CMD_DESCRIPTION = "Build a custom image. PingAM, PingIDM, and PingGateway only."
@@ -165,10 +165,13 @@ def profile_path(path):
         path.mkdir(parents=True)
 
 
-def clean_path(path):
+def clean_path(path, dryrun=False):
     """Clean profile directory"""
     log.info(f'Clean profile: {path}')
-    shutil.rmtree(path)
+    if dryrun:
+        print(f"rm -rf {path}")
+    else:
+        shutil.rmtree(path)
 
 
 def _get_profile_path(component, profile_name, build_path):
@@ -176,16 +179,19 @@ def _get_profile_path(component, profile_name, build_path):
         APP_CONF_PATH_FMT[component](profile=profile_name))).resolve()
 
 
-def export_amster(conf):
+def export_amster(conf, dryrun=False):
     profile_path(conf)
     try:
-        utils.run(AMSTER_BIN, f'export {conf}')
+        if dryrun:
+            print(f"{AMSTER_BIN} export {conf}")
+        else:
+            utils.run(AMSTER_BIN, f'export {conf}')
     except utils.RunError as e:
         log.error(f'{e.cmd} had the following error: \n {e.stderr}')
         raise Exception('Couldn\'t run amster export')
 
 
-def export_idm(idm_conf, idm_ui_conf, pod_name):
+def export_idm(idm_conf, idm_ui_conf, pod_name, dryrun=False):
     """Export PingIDM config"""
     profile_path(idm_conf)
     profile_path(idm_ui_conf)
@@ -201,13 +207,13 @@ def export_idm(idm_conf, idm_ui_conf, pod_name):
         {pod_name}:/opt/openidm/ui/admin/default/config/AppConfiguration.js {idm_ui_conf_file}
     """.strip()
     try:
-        utils.run(KUBECTL, cp_args)
-        utils.run(KUBECTL, cp_args_ui)
+        utils.run(KUBECTL, cp_args, dryrun=dryrun)
+        utils.run(KUBECTL, cp_args_ui, dryrun=dryrun)
     except utils.RunError as e:
         log.error(f'{e.cmd} had the following error: \n {e.stderr}')
 
 
-def export_am(am_conf, pod_name):
+def export_am(am_conf, pod_name, dryrun=False):
     profile_path(am_conf)
 
     # Copy from the am container to a local path
@@ -216,11 +222,11 @@ def export_am(am_conf, pod_name):
     """.strip()
     try:
         log.debug('Starting export')
-        _, out, _ = utils.run(KUBECTL, exec_args, cstdout=True, cstderr=True)
+        _, out, _ = utils.run(KUBECTL, exec_args, cstdout=True, cstderr=True, dryrun=dryrun)
         if out == b'':
             raise Exception('No configuration changes found.')
         else:
-            clean_path(am_conf)
+            clean_path(am_conf, dryrun=dryrun)
         f = io.BytesIO(out)
         with tarfile.open(fileobj=f) as tarball:
             log.debug('Starting to extract tarball')
@@ -236,7 +242,7 @@ def export_am(am_conf, pod_name):
         raise e
 
 
-def upgrade_am(am_conf, env_name=None, release_name=None, rules=RULES_PATH):
+def upgrade_am(am_conf, env_name=None, release_name=None, rules=RULES_PATH, dryrun=False):
     """
     Run PingAM configuration through the PingAM control
     Notes:
@@ -251,7 +257,7 @@ def upgrade_am(am_conf, env_name=None, release_name=None, rules=RULES_PATH):
             opts = f"--env-name {env_name} {opts}"
         elif release_name:
             opts = f"--release-name {release_name} {opts}"
-        utils.run(AM_UPGRADER, opts)
+        utils.run(AM_UPGRADER, opts, dryrun=dryrun)
     except utils.RunError as e:
         log.error(f'Error during upgrade {e.stderr}')
         sys.exit(1)
@@ -260,7 +266,7 @@ def upgrade_am(am_conf, env_name=None, release_name=None, rules=RULES_PATH):
 
     log.info('Running PingAM static config through the am-config-upgrader to replace any missing default placeholders.')
     try:
-        utils.run(AM_UPGRADER, opts, str(rules))
+        utils.run(AM_UPGRADER, opts, str(rules), dryrun=dryrun)
     except utils.RunError as e:
         log.error(f'Error during placeholder replacement {e.stderr}')
         sys.exit(1)
@@ -268,7 +274,7 @@ def upgrade_am(am_conf, env_name=None, release_name=None, rules=RULES_PATH):
     log.info('Completed replacing PingAM placeholders')
 
 
-def export_ig(ig_conf, pod_name):
+def export_ig(ig_conf, pod_name, dryrun=False):
     """Export PingGateway config"""
     profile_path(ig_conf)
 
@@ -286,7 +292,7 @@ def export_ig(ig_conf, pod_name):
     cp -c ig {pod_name}:{ig_instance_dir}/config {ig_conf}
     """.strip()
     try:
-        utils.run(KUBECTL, cp_args)
+        utils.run(KUBECTL, cp_args, dryrun=dryrun)
     except utils.RunError as e:
         log.error(f'{e.cmd} had the following error: \n {e.stderr}')
         raise e
@@ -303,12 +309,14 @@ def run_export(args, overrides):
               APP_CONF_PATH_FMT[args.component](profile=args.baseline_profile))).resolve()
             shutil.copytree(baseline_profile, conf_path)
         else:
-            log.debug(f'Doing a mkdir for {conf_path}')
-            conf_path.mkdir(0o755, True, True) # mode, parents, exist_ok
+            if args.dryrun:
+                print(f"mkdir -p {conf_path}")
+            else:
+                log.debug(f'Doing a mkdir for {conf_path}')
+                conf_path.mkdir(0o755, True, True) # mode, parents, exist_ok
     if args.component == 'amster':
-        amster_path = APP_CONF_PATH_FMT['amster'](profile=args.profile)
         log.info('Exporting amster config.')
-        export_amster(conf_path)
+        export_amster(conf_path, dryrun=args.dryrun)
     # Configs from running containers
     else:
         jsonpath_expr = """
@@ -332,25 +340,28 @@ def run_export(args, overrides):
             if component_name == 'idm':
                 conf_ui_path = pathlib.Path(overrides['build_path'].joinpath(
                     APP_CONF_PATH_FMT["idm-ui"](profile=args.profile))).resolve()
-                export_idm(conf_path, conf_ui_path, pod_name)
+                export_idm(conf_path, conf_ui_path, pod_name, dryrun=args.dryrun)
             elif component_name == 'ig':
-                export_ig(conf_path, pod_name)
+                export_ig(conf_path, pod_name, dryrun=args.dryrun)
             elif component_name == 'am':
-                export_am(conf_path, pod_name)
+                export_am(conf_path, pod_name, dryrun=args.dryrun)
                 if args.am_export_no_upgrade:
                     log.debug('Skip PingAM upgrader rules')
                 else:
                     if args.env_name:
                         upgrade_am(conf_path,
                                    env_name=args.env_name,
-                                   rules=args.am_upgrader_rules)
+                                   rules=args.am_upgrader_rules,
+                                   dryrun=args.dryrun)
                     elif args.release_name:
                         upgrade_am(conf_path,
                                    release_name=args.release_name,
-                                   rules=args.am_upgrader_rules)
+                                   rules=args.am_upgrader_rules,
+                                   dryrun=args.dryrun)
                     else:
                         upgrade_am(conf_path,
-                                   rules=args.am_upgrader_rules)
+                                   rules=args.am_upgrader_rules,
+                                   dryrun=args.dryrun)
             log.info('Completed export')
         except IndexError:
             log.error('Unable to find running components.')
@@ -424,46 +435,20 @@ def run_path(args, overrides):
         print(overrides['helm_path'].joinpath(args.env_name))
 
 
-def main():
+def setup_args(common_args):
+    """ Setup argparse """
     parser = argparse.ArgumentParser(description=HELP_DESCRIPTION)
     utils.add_loglevel_arg(parser)
-    common_bp = argparse.ArgumentParser(add_help=False,
-                                     formatter_class=argparse.RawDescriptionHelpFormatter)
-    common_bp.add_argument('--build-path',
-                           '-b',
-                           help=HELP_BUILD_PATH)
-    common_cp = argparse.ArgumentParser(add_help=False,
-                                     formatter_class=argparse.RawDescriptionHelpFormatter)
-    common_cp.add_argument('--config-profile',
-                           '-p',
-                           dest='profile',
-                           default='default',
-                           help=HELP_CONFIG_PROFILE)
-    common_dr = argparse.ArgumentParser(add_help=False,
-                                     formatter_class=argparse.RawDescriptionHelpFormatter)
-    common_dr.add_argument('--dryrun',
-                           action='store_true',
-                           help=HELP_DRYRUN)
-    common_hk = argparse.ArgumentParser(add_help=False,
-                                     formatter_class=argparse.RawDescriptionHelpFormatter)
-    common_hk.add_argument('--helm-path',
-                           '-H',
-                           help=HELP_HELM_PATH)
-    common_hk.add_argument('--kustomize-path',
-                           '-k',
-                           help=HELP_KUSTOMIZE_PATH)
-    common_ns = argparse.ArgumentParser(add_help=False,
-                                     formatter_class=argparse.RawDescriptionHelpFormatter)
-    common_ns.add_argument('--namespace',
-                           '-n',
-                           help=HELP_NAMESPACE)
     sub_cmd_parser = parser.add_subparsers(dest="cmd")
 
     # export sub command
+    export_cmd_parents = [common_args['debug'],
+                          common_args['dryrun'],
+                          common_args['build_path']]
     export_cmd_parser = sub_cmd_parser.add_parser('export',
                                                   epilog=textwrap.dedent(HELP_EXPORT_EXAMPLES),
                                                   formatter_class=argparse.RawDescriptionHelpFormatter,
-                                                  parents=[common_bp],
+                                                  parents=export_cmd_parents,
                                                   description=HELP_EXPORT_CMD_DESCRIPTION)
     export_cmd_parser.add_argument('--baseline-profile',
                                    default='default',
@@ -488,7 +473,12 @@ def main():
     export_cmd_parser.set_defaults(func=run_export)
 
     # build sub command
-    build_parents = [common_bp, common_cp, common_dr, common_hk]
+    build_parents = [common_args['debug'],
+                     common_args['dryrun'],
+                     common_args['build_path'],
+                     common_args['config_profile_def'],
+                     common_args['helm_path'],
+                     common_args['kustomize_path']]
     build_cmd_parser = sub_cmd_parser.add_parser('build',
                                                 epilog=textwrap.dedent(HELP_BUILD_EXAMPLES),
                                                 formatter_class=argparse.RawTextHelpFormatter,
@@ -509,10 +499,15 @@ def main():
     build_cmd_parser.set_defaults(func=run_build)
 
     # path sub command
+    path_cmd_parents = [common_args['debug'],
+                        common_args['dryrun'],
+                        common_args['build_path'],
+                        common_args['helm_path'],
+                        common_args['kustomize_path']]
     path_cmd_parser = sub_cmd_parser.add_parser('path',
                                                 epilog=textwrap.dedent(HELP_PATH_EXAMPLES),
                                                 formatter_class=argparse.RawTextHelpFormatter,
-                                                parents=[common_bp, common_hk],
+                                                parents=path_cmd_parents,
                                                 description=HELP_PATH_CMD_DESCRIPTION)
     path_sub_cmd_parser = path_cmd_parser.add_subparsers(dest='tool')
     path_cmd_parser.set_defaults(func=run_path)
@@ -557,24 +552,30 @@ def main():
                                        nargs='?',
                                        default='')
 
-    parsed = parser.parse_args()
+    return parser.parse_args()
+
+def run(args, config):
+    """ Run config logic """
     global log
-    log = utils.logger(level=parsed.log_level)
-    overrides = utils.process_overrides(root_path,
-                                        getattr(parsed, 'helm_path', None),
-                                        getattr(parsed, 'kustomize_path', None),
-                                        getattr(parsed, 'build_path', None),
-                                        getattr(parsed, 'no_helm', False),
-                                        getattr(parsed, 'no_kustomize', False),
-                                        getattr(parsed, 'releases_src', None),
-                                        getattr(parsed, 'pull_policy', None),
-                                        getattr(parsed, 'source', None),
-                                        getattr(parsed, 'ssl_secretname', None))
-    if parsed.cmd == 'export' and parsed.am_export_no_upgrade and not parsed.component == 'am':
+    log = utils.logger(level=args.log_level)
+    if args.cmd == 'export' and args.am_export_no_upgrade and not args.component == 'am':
         log.error(f'--no-upgrade is only available for PingAM')
         sys.exit(1)
-    parsed.func(parsed, overrides)
+    args.func(args, config)
 
 
 if __name__ == '__main__':
-    main()
+    common_args = common.setup_args()
+    args = setup_args(common_args)
+    overrides = utils.process_overrides(root_path,
+                                        getattr(args, 'helm_path', None),
+                                        getattr(args, 'kustomize_path', None),
+                                        getattr(args, 'build_path', None),
+                                        getattr(args, 'no_helm', False),
+                                        getattr(args, 'no_kustomize', False),
+                                        getattr(args, 'releases_src', None),
+                                        getattr(args, 'pull_policy', None),
+                                        getattr(args, 'source', None),
+                                        getattr(args, 'ssl_secretname', None),
+                                        debug=args.debug)
+    run(args, overrides)

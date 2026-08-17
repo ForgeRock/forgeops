@@ -39,6 +39,7 @@ Do a `git add {log_path}` to track.
 def setup_args():
     """ Setup the common arguments """
 
+    config_profile_help_msg = 'Name of config profile in docker/<component>/config-profiles'
     env_help_msg = 'Forgeops environment to target'
 
     namespace_arg = argparse.ArgumentParser(add_help=False)
@@ -55,7 +56,6 @@ def setup_args():
     dryrun_arg = argparse.ArgumentParser(add_help=False)
     dryrun_arg.add_argument(
         '--dryrun',
-        '-r',
         action='store_true',
         help='Do a dryrun')
     verbose_arg = argparse.ArgumentParser(add_help=False)
@@ -68,7 +68,13 @@ def setup_args():
     config_profile_arg.add_argument(
         '--config-profile',
         '-p',
-        help='Name of config profile in docker/<component>/config-profiles')
+        help=config_profile_help_msg)
+    config_profile_def_arg = argparse.ArgumentParser(add_help=False)
+    config_profile_def_arg.add_argument(
+        '--config-profile',
+        '-p',
+        default='default',
+        help=config_profile_help_msg)
     env_name_arg = argparse.ArgumentParser(add_help=False)
     env_name_arg.add_argument(
         '--env-name',
@@ -119,6 +125,7 @@ def setup_args():
         'verbose': verbose_arg,
         'namespace': namespace_arg,
         'config_profile': config_profile_arg,
+        'config_profile_def': config_profile_def_arg,
         'env_name': env_name_arg,
         'env_name_req': env_name_arg_req,
         'build_path': build_path_arg,
