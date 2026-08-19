@@ -42,15 +42,13 @@ class MigrateFormatter(argparse.ArgumentDefaultsHelpFormatter, argparse.RawDescr
     pass
 
 
-if __name__ == '__main__':
-    PROG = 'forgeops migrate'
-    DESC = "Run a migration on a running deployment."
+def setup_args(common_args):
+    """ Setup argparse parser """
+    prog = 'forgeops migrate'
+    desc = "Run a migration on a running deployment."
 
-    migrations = ['sa2hs']
-    common_args = common.setup_args()
-
-    parser = argparse.ArgumentParser(description=DESC,
-                                     prog=PROG,
+    parser = argparse.ArgumentParser(description=desc,
+                                     prog=prog,
                                      formatter_class=MigrateFormatter)
 
     subparsers = parser.add_subparsers(
@@ -59,7 +57,26 @@ if __name__ == '__main__':
         dest="migration")
     sa2hs.setup_args(subparsers, common_args)
 
-    args = parser.parse_args()
+    return parser.parse_args()
+
+
+def run(args, config):
+    """ Run migrate logic """
+
+    if getattr(args, 'namespace', None):
+        config['namespace_opt'] = f'-n {args.namespace}'
+    else:
+        ns = utils.get_namespace()
+        print(f"No namespace given, getting it from your context. ns = {ns}")
+        config['namespace_opt'] = f'-n {ns}'
+
+    if args.migration == 'sa2hs':
+        sa2hs.run(args, config)
+
+
+if __name__ == '__main__':
+    common_args = common.setup_args()
+    args = setup_args(common_args)
 
     # Setup defaults for values that can be set in forgeops.conf
     overrides = utils.process_overrides(root_path,
@@ -72,7 +89,7 @@ if __name__ == '__main__':
                                         getattr(args, 'pull_policy', None),
                                         getattr(args, 'source', None),
                                         getattr(args, 'ssl_secretname', None),
-                                        args.debug)
+                                        debug=args.debug)
 
     config = {}
     config['root_path'] = root_path
@@ -80,13 +97,4 @@ if __name__ == '__main__':
         print(f"root_path = {config['root_path']}")
 
     config = merge(config, overrides)
-
-    if getattr(args, 'namespace', None):
-        config['namespace_opt'] = f'-n {args.namespace}'
-    else:
-        ns = utils.get_namespace()
-        print(f"No namespace given, getting it from your context. ns = {ns}")
-        config['namespace_opt'] = f'-n {ns}'
-
-    if args.migration == 'sa2hs':
-        sa2hs.run(args, config)
+    run(args, config)
