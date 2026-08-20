@@ -20,6 +20,14 @@ necessary. Removing as part of a project to normalize flags across commands.
 
 ## Bugfixes
 
+### Incorrect image tag for ssh-keygen job's init container
+
+A new job was added as part of the Helm generated secrets feature in 2026.3.0.
+During the release process, any latest tag is replaced with a build tag created
+as part of that process. This clobbered the tag for ssh-keygen's init
+container. The image tag is now pinned to a digest. Currently, only ssh-keygen
+has the ability to specify a digest as a tag.
+
 ### forgeops env --upgrade didn't honor --no-helm or --no-kustomize
 
 The `forgeops env --upgrade` command wasn't properly honoring `--no-helm` and

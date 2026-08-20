@@ -71,6 +71,19 @@ Create the name of the service account to use
 {{- end }}
 
 {{/*
+Create a common image helper that can setup a good image string
+*/}}
+{{- define "common.image" }}
+{{- $repository := .image.repository | toString }}
+{{- $tag := (.image.tag | default .default_tag) | toString }}
+{{- if hasPrefix "sha256:" $tag }}
+{{- printf "%s@%s" $repository $tag }}
+{{- else }}
+{{- printf "%s:%s" $repository $tag }}
+{{- end }}
+{{- end }}
+
+{{/*
 Create the name of the snapshot script configmap use
 */}}
 {{- define "ds-snapshot.configMapName" }}

@@ -52,7 +52,7 @@ spec:
           securityContext:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          image: "{{ .Values.ssh_keygen.initImage.repository }}:{{ .Values.ssh_keygen.initImage.tag | default .Chart.AppVersion }}"
+          image: "{{ include "common.image" (dict "image" .Values.ssh_keygen.initImage "default_tag" "latest") }}"
           imagePullPolicy: {{ .Values.ssh_keygen.initImage.pullPolicy }}
           command: ["/tmp/create-key.sh"]
           env:
@@ -74,7 +74,7 @@ spec:
           securityContext:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          image: "{{ .Values.ssh_keygen.image.repository }}:{{ .Values.ssh_keygen.image.tag | default .Chart.AppVersion }}"
+          image: "{{ include "common.image" (dict "image" .Values.ssh_keygen.image "default_tag" "latest") }}"
           imagePullPolicy: {{ .Values.ssh_keygen.image.pullPolicy }}
           command:
             - sh

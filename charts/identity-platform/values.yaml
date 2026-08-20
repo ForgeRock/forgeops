@@ -1118,8 +1118,9 @@ ssh_keygen:
   appendNSToRole: true
 
   initImage:
+    # dockette/ssh:latest as of 2026-08-24
     repository: dockette/ssh
-    tag: latest
+    tag: sha256:d55024e964adefe2793426ab26626a637cd2a531b9cd6898d06b1190df6399e6
     pullPolicy: IfNotPresent
     imagePullSecrets: []
   image:
