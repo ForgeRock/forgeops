@@ -166,7 +166,7 @@ Change the values in the new section as described by the comments:
     <product name>:
         component: am   # product name to define the ServiceMonitor
         enabled: false      # overriden in custom.yaml
-        path: /json/metrics/prometheus       # metrics path
+        path: /am/json/metrics/prometheus       # metrics path
         labelSelectorComponent: am      # kubernetes service label name
         secretUser: cHJvbWV0aGV1cw==        # username in base64 encode if required
         secretPassword: cHJvbWV0aGV1cw==        # password in base64 encode if required

@@ -28,11 +28,12 @@ as part of that process. This clobbered the tag for ssh-keygen's init
 container. The image tag is now pinned to a digest. Currently, only ssh-keygen
 has the ability to specify a digest as a tag.
 
+### Incorrect port defined for AM in forgerock-metrics
+
+We have now changed the AM port to http in forgerock-metrics Helm chart.
+
 ### forgeops env --upgrade didn't honor --no-helm or --no-kustomize
 
 The `forgeops env --upgrade` command wasn't properly honoring `--no-helm` and
 `--no-kustomize` which caused errors for folks using them. It has been updated
 to properly honor those flags.
-
-## How-tos
-
