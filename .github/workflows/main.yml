@@ -56,8 +56,14 @@ jobs:
         uses: joutvhu/get-release@v1
         with:
           latest: true
+          pattern: '^\d{4}\.\d+\.\d+$'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Verify latest release resolved
+        run: |
+          test -n "${{ steps.get_latest_release.outputs.tag_name }}" || {
+            echo "::error::No platform release matched the tag pattern"; exit 1; }
 
       - name: Start minikube
         id: minikube
