@@ -38,3 +38,4 @@ jobs:
           charts_dir: charts
           pages_branch: gh-pages
           skip_existing: true
+          mark_as_latest: false

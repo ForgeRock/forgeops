@@ -104,17 +104,32 @@ jobs:
           sed -ie "s/tag:\ latest/tag:\ \"${{ env.BUILD_TAG }}\"/g" charts/ping-gateway/values.yaml
 
       - name: Run chart-releaser
-        uses: helm/chart-releaser-action@v1.6.0
+        uses: helm/chart-releaser-action@v1.7.0
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         with:
           charts_dir: charts
           pages_branch: gh-pages
+          skip_existing: true
 
-      - name: Pause to ensure all is ready for update
+      - name: Wait until chart published
         run: |
-          sleep 5
+          ATTEMPT_COUNT=0
+          MAX_ATTEMPTS=6
+          SLEEP=10
+          CHART=identity-platform-${{ env.RELEASE_TAG }}
+          URL="https://github.com/ForgeRock/forgeops/releases/download/$CHART/$CHART.tgz"
 
+          echo -n "Waiting for charts to be ready"
+          until $(curl --output /dev/null --silent --head --fail $URL) ; do
+            if [ "$ATTEMPT_COUNT" -eq "$MAX_ATTEMPTS" ] ; then
+              echo "Max attempts reached"
+              exit 1
+            fi
+            ATTEMPT_COUNT=$((ATTEMPT_COUNT+1))
+            echo -n '.'
+            sleep $SLEEP
+          done
       - name: Helm deploy upgrade
         run: |
           helm upgrade identity-platform identity-platform \
