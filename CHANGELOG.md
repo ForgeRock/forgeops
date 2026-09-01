@@ -4,8 +4,21 @@ RELEASE=2026.3.2
 
 ## New Features/Updated functionality
 
-### New README for customizing the PingDS deployment setup
-New README with some useful customization steps for PingDS including adding custom LDAP entries and schema files.
+### Adding idm-admin-ui for 8.1.0+
+
+In 8.1.0, the IDM legacy admin-ui was deprecated and removed. It is now
+possible to add it back as a separate nginx pod in a Helm deployment.  The
+image command will also set the image information if the version requested
+is >= 8.1.0.
+
+`forgeops env -e my-env --idm-admin-ui-enable`
+
+Note that the IDM API URL path is now `/api` instead of `/openidm/api`.
+
+### Updated README for customizing the PingDS deployment setup
+
+Updated [README](docker/ds/README.md) with some useful customization steps for
+PingDS including adding custom LDAP entries and schema files.
 
 ## Bugfixes
 
@@ -34,3 +47,13 @@ IfNotPresent.
 ### New Procedures
 
 [Migrate to Helm from Kustomize](how-tos/kustomize-to-helm.md)
+[PingDS Customization Guide](how-tos/pingds-customization-guide.md)
+
+### Updated Procedures
+[Adding Custom Certs to truststore](how-tos/adding-user-supplied-certs-to-truststore.md)
+[Retrieve SBOMs based on original image URL](retrieve-SBOMs-based-on-original-image-URL)
+
+### Renamed Procedures
+how-tos/enabling-pingam-rest-apis.md -> (how-tos/pingam-enabling-rest-apis.md)
+how-tos/recreating-ds-sts.md -> (how-tos/pingds-recreating-sts.md)
+how-tos/use-an-externally-deployed-ds-with-a-forgeops-deployment.md -> (how-tos/pingds-use-an-externally-deployed-ds-with-a-forgeops-deployment.md)

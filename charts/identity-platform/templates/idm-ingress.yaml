@@ -1,5 +1,6 @@
 {{- if and .Values.idm.enabled .Values.platform.ingress.enabled -}}
 {{- $svcPort := .Values.idm.service.port -}}
+{{- $adminUiSvcPort := .Values.idm_admin_ui.service.port -}}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -63,10 +64,26 @@ spec:
           - path: /admin
             pathType: Prefix
             backend:
+              {{- if $.Values.idm_admin_ui.enabled }}
+              service:
+                name: idm-admin-ui
+                port:
+                  number: {{ $adminUiSvcPort }}
+              {{- else }}
               service:
                 name: idm
                 port:
                   number: {{ $svcPort }}
+              {{- end }}
+          {{- if $.Values.idm_admin_ui.enabled }}
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: idm-admin-ui
+                port:
+                  number: {{ $adminUiSvcPort }}
+          {{- end }}
           - path: /openicf
             pathType: Prefix
             backend:

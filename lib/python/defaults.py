@@ -19,6 +19,7 @@ BASE_IMAGE_NAMES = {
     'amster': 'amster',
     'ds': 'ds',
     'idm': 'idm',
+    'idm-admin-ui': 'idm-admin-ui',
     'idm-custom': 'idm-custom',
     'ig': 'ig',
     'ig-custom': 'ig-custom',

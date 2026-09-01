@@ -1,0 +1,27 @@
+{{- if and .Values.idm_admin_ui.enabled .Values.idm.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: idm-admin-ui
+  annotations:
+    {{- with .Values.platform.service.annotations }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+  labels:
+    {{- include "identity-platform.labels" . | nindent 4 }}
+    {{- with .Values.idm_admin_ui.podLabels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  type: {{ .Values.idm_admin_ui.service.type }}
+  ports:
+    - port: {{ .Values.idm_admin_ui.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "identity-platform.selectorLabels" . | nindent 4 }}
+    {{- with .Values.idm_admin_ui.podLabels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+{{- end }}

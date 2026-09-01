@@ -472,7 +472,6 @@ idm:
     app: idm
 
   podSecurityContext:
-    fsGroup: 0
     runAsUser: 11111
 
   securityContext: {}
@@ -500,6 +499,91 @@ idm_custom:
     repository: busybox
     tag: musl
     pullPolicy: IfNotPresent
+
+idm_admin_ui:
+  enabled: false
+  replicaCount: 1
+
+  image:
+    repository: us-docker.pkg.dev/forgeops-public/images/idm-admin-ui
+    tag: latest
+    pullPolicy: IfNotPresent
+    imagePullSecrets: []
+
+  ingress:
+    enabled: true
+    # Uncomment className and/or annotations to override global platform values
+    # className: "nginx"
+    # annotations: {}
+
+  # Provide extra ENV vars to idm-admin-ui deployment
+  env: []
+    #- name: "IDM_ENV_1"
+    #  value: "idm_value"
+  envFrom: []
+    #- secretRef:
+    #    name: "my_idm_secret"
+
+  resources:
+    limits:
+      memory: 100Mi
+    requests:
+      cpu: 10m
+      memory: 100Mi
+
+  livenessProbe:
+    initialDelaySeconds: 10
+    periodSeconds: 5
+    timeoutSeconds: 5
+
+  readinessProbe:
+    initialDelaySeconds: 10
+    periodSeconds: 30
+    timeoutSeconds: 5
+
+  startupProbe:
+    failureThreshold: 10
+    periodSeconds: 10
+
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 100
+    targetCPUUtilizationPercentage: 80
+    # targetMemoryUtilizationPercentage: 80
+
+  pdb:
+    enabled: false
+    minAvailable: 1
+    # maxUnavailable: 1
+
+  nodeSelector: {}
+
+  tolerations: []
+
+  affinity: {}
+
+  podAnnotations: {}
+
+  podLabels:
+    app.kubernetes.io/component: idm-admin-ui
+    app: idm-admin-ui
+
+  podSecurityContext:
+    fsGroup: 0
+    runAsUser: 1000
+
+  securityContext:
+    capabilities:
+      drop:
+        - ALL
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    runAsUser: 1000
+
+  service:
+    type: ClusterIP
+    port: 8080
 
 # keystore-create job requries platform.secrets_enabled is true and
 # platform.secrets.keystore_create is uncommented.

@@ -350,6 +350,10 @@ def setup_args():
     secrets.add_argument('--helm-secrets', action='store_true', help='Use Helm generated secrets')
     secrets.add_argument('--secret-agent', action='store_true', help='Use secret-agent')
 
+    idm_admin_ui = parser.add_mutually_exclusive_group()
+    idm_admin_ui.add_argument('--idm-admin-ui-enable', action='store_true', help='Enable legacy IDM admin-ui')
+    idm_admin_ui.add_argument('--idm-admin-ui-disable', action='store_true', help='Disable legacy IDM admin-ui')
+
     # Flag to skip interactivity for testing
     parser.add_argument('--testing', dest='testing', action='store_true', help=argparse.SUPPRESS)
 
@@ -884,10 +888,16 @@ If you have not yet deployed the environment, then you can ignore this message.
         if values_file.is_file():
             with open(values_file, 'r', encoding='utf-8') as f:
                 values = yaml.safe_load(f)
-            if getattr(args, 'secret_agent', None):
-                if 'platform' not in values:
-                    values['platform'] = {}
-                values['platform']['secrets'] = {}
+        if getattr(args, 'secret_agent', None):
+            if 'platform' not in values:
+                values['platform'] = {}
+            values['platform']['secrets'] = {}
+        if args.idm_admin_ui_enable or args.idm_admin_ui_disable:
+            if 'idm_admin_ui' not in values:
+                values['idm_admin_ui'] = {}
+            values['idm_admin_ui']['enabled'] = False
+            if args.idm_admin_ui_enable:
+                values['idm_admin_ui']['enabled'] = True
         merge(values,
             config['size'],
             values_ingress,

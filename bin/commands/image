@@ -24,10 +24,12 @@ from lib.python.ensure_configuration_is_valid_or_exit import print_how_to_instal
 try:
     import yaml
     from mergedeep import merge
+    from packaging.version import Version
 except:
     print_how_to_install_dependencies()
 import lib.python.utils as utils
 from lib.python.releases import (
+    ALT_RELEASES,
     BASE_REPO_DEF,
     BASE_REPO_DEV,
     DEPLOY_REPO_DEF,
@@ -43,7 +45,7 @@ from lib.python.releases import (
 
 PROG = 'forgeops image'
 COMPONENTS_APPS = ['am', 'amster', 'am-config-upgrader', 'idm']
-COMPONENTS_UI = ['admin-ui', 'end-user-ui', 'login-ui']
+COMPONENTS_UI = ['admin-ui', 'end-user-ui', 'login-ui', 'idm-admin-ui']
 COMPONENTS_PLATFORM = sum([COMPONENTS_APPS, ['ds'], COMPONENTS_UI], [])
 COMPONENTS_META = ['platform', 'apps', 'ui']
 COMPONENTS_VALID = sum([COMPONENTS_META, COMPONENTS_PLATFORM, ['ig']], [])
@@ -218,6 +220,10 @@ def run(args, config):
 
     if args.debug:
         print(f"components = {components}")
+
+    if 'idm-admin-ui' in components and args.release and args.release not in ALT_RELEASES:
+        if Version(args.release) < Version('8.1.0'):
+            components.remove('idm-admin-ui')
 
     repo = select_image_repo(args.release, getattr(args, 'image_repo', None),
                                  getattr(args, 'env_name', None))
