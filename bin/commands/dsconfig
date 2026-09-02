@@ -2,11 +2,13 @@
 """ Manage file based configuration for Ping Identity Platform"""
 import argparse
 import json
+import shlex
 import sys
 import os
 import shutil
-from pathlib import Path
 import site
+import uuid
+from pathlib import Path
 
 file_name = Path(__file__)
 current_file_path = file_name.parent.resolve()
@@ -60,10 +62,7 @@ def craft_opt_str(opts):
     for o in opts:
         if o == '--':
             continue
-        if ' ' in o:
-            opt_str = f"{opt_str} '{o}'"
-        else:
-            opt_str = f"{opt_str} {o}"
+        opt_str = f"{opt_str} {shlex.quote(o)}"
     return opt_str
 
 
@@ -75,6 +74,7 @@ def setup_args():
 Notes:
   * Strings with spaces must be handled 1 of these ways
     * Double quoted
+    * Quotes escaped
     * Quoted and spaces escaped
 
 Examples:
@@ -82,10 +82,13 @@ Examples:
   {prog} -n my-ns ds-idrepo-0 -- list-plugins
 
   Get plugin properties with double quoted string:
-  {prog} ds-idrepo-0 -- get-plugin-prop --plugin-name "'Entity Tag'"
+  {prog} ds-idrepo-0 -- get-plugin-prop --plugin-name "'Plugin Name'"
+
+  Get plugin properties with escaped quotes:
+  {prog} ds-idrepo-0 -- get-plugin-prop --plugin-name \\"Plugin Name\\"
 
   Get plugin properties with escaped spaces and quotes:
-  {prog} ds-idrepo-0 -- get-plugin-prop --plugin-name "Entity\\ Tag"
+  {prog} ds-idrepo-0 -- get-plugin-prop --plugin-name "Plugin\\ Name"
 
   Do a dryrun:
   {prog} --dryrun ds-idrepo-0 -- list-plugins
@@ -111,25 +114,56 @@ def run(params):
     """ Run command logic """
     check_prereqs(params)
     namespace = utils.get_namespace()
-    namespace_opt = ''
     if getattr(params, 'namespace', None):
         namespace = params.namespace
-        namespace_opt = f"-n {params.namespace}"
+    namespace_opt = f"-n {namespace}"
+    pass_file = f"/tmp/{uuid.uuid4()}"
     admin_pass = utils.get_secret_value(namespace, 'ds-passwords', 'dirmanager\\\\.pw')
+    with open(pass_file, "w", encoding='utf-8') as f:
+        f.write(admin_pass)
     conn_str = "-h localhost -p 1636 --trustAll"
     user_str = "-D 'uid=admin'"
-    pass_str = f"-w '{admin_pass}'"
-    pass_str_red = f"-w '****'" # Redacted password string
+    pass_str = f"--bindPassword:file {pass_file}"
     if params.debug:
         print(f"command = {params.command}")
     dsconfig_opts = craft_opt_str(params.command)
     extra_opts = "--no-prompt"
-    dsconfig = f"dsconfig {conn_str} {user_str} {dsconfig_opts} {extra_opts}"
-    cmd_opts = f"exec {namespace_opt} {params.pod} -- {dsconfig}"
-    if params.debug or params.dryrun:
-        print(f"{KUBECTL} {cmd_opts} {pass_str_red}")
-    if not args.dryrun:
-        utils.run(KUBECTL, f"{cmd_opts} {pass_str}")
+    dsconfig = f"dsconfig {conn_str} {user_str} {pass_str} {extra_opts} {dsconfig_opts}"
+    cmd_opts = f"exec {namespace_opt} {params.pod} -- "
+
+    try:
+        print(f"Copying password file to /tmp on {params.pod}.")
+        utils.run(KUBECTL, f"cp {namespace_opt} {pass_file} {params.pod}:{pass_file} --no-preserve=true",
+                  dryrun=params.dryrun,
+                  debug=params.debug)
+    except:
+        print(f"ERROR!!! Unable to copy {pass_file} to {params.pod}. Exiting.", file=sys.stderr)
+        sys.exit(1)
+    try:
+        utils.run(KUBECTL, f"{cmd_opts} {dsconfig}",
+                  dryrun=params.dryrun,
+                  debug=params.debug)
+    except:
+        print(f"ERROR!!! The dsconfig command failed, cleaning up '{pass_file}'.", file=sys.stderr)
+    try:
+        print(f"Deleting password file from {params.pod}")
+        utils.run(KUBECTL, f"exec {namespace_opt} {params.pod} -- rm {pass_file}",
+                  dryrun=params.dryrun,
+                  debug=params.debug)
+    except:
+        print(f"ERROR!!! Unable to delete {pass_file} from {params.pod}. Remove it manually.",
+              file=sys.stderr)
+        sys.exit(1)
+    try:
+        print(f"Deleting {pass_file} from the local system.")
+        utils.run('rm', pass_file,
+                  dryrun=params.dryrun,
+                  debug=params.debug)
+    except:
+        print(f"ERROR!!! Unable to delete {pass_file} from the local system. Remove it manually.",
+              file=sys.stderr)
+        sys.exit(1)
+
 
 if __name__ == '__main__':
     args = setup_args()

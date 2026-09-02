@@ -168,7 +168,7 @@ def sub_title(title):
     print('')
     print(msg)
 
-def run(cmd, *cmdArgs, stdin=None, cstdout=False, cstderr=False, cwd=None, env=None, ignoreFail=False, dryrun=False, debug=False):
+def run(cmd, *cmdArgs, stdin=None, cstdout=False, cstderr=False, cwd=None, env=None, ignoreFail=False, dryrun=False, debug=False, text=False):
     """
     Execute the given command. Raises error if command returns non-zero code.
     cmd: command to run.
@@ -181,6 +181,8 @@ def run(cmd, *cmdArgs, stdin=None, cstdout=False, cstderr=False, cwd=None, env=N
     ignoreFail: if True, do not raise an exception if the cmd fails.
     return: success, stdout, stderr. stdout and stderr are only populated if cstdout and cstderr are True.
     dryrun: print the command without running it
+    debug: enable debugging output
+    text: enable when using a string as stdin
     """
     runcmd = f'{cmd} {" ".join(cmdArgs)}'
     stde_pipe = subprocess.PIPE if cstderr else None
@@ -193,7 +195,7 @@ def run(cmd, *cmdArgs, stdin=None, cstdout=False, cstderr=False, cwd=None, env=N
             print(runcmd)
         try:
             _r = subprocess.run(shlex.split(runcmd), stdout=stdo_pipe, stderr=stde_pipe,
-                                check=True, input=stdin, cwd=cwd, env=env)
+                                check=True, input=stdin, text=text, cwd=cwd, env=env)
             return _r.returncode == 0, _r.stdout, _r.stderr
         except Exception as e:
             if ignoreFail:
