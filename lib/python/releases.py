@@ -53,10 +53,10 @@ def get_releases(releases_src, components):
                 with urlopen(f"{url}") as url:
                     data = json.load(url)
             except HTTPError as e:
-                print(f"Skipping {url}. HTTP Error: {e.code}")
+                print(f"Skipping {url}. HTTP Error: {e.code}", file=sys.stderr)
                 continue
             except URLError as e:
-                print(f"Skipping {url}. URL Error: {e.reason}")
+                print(f"Skipping {url}. URL Error: {e.reason}", file=sys.stderr)
                 continue
         else:
             json_file_path = releases_src / json_file
@@ -64,7 +64,7 @@ def get_releases(releases_src, components):
                 with open(releases_src / f"{json_file}") as f:
                     data = json.load(f)
             else:
-                print(f"Skipping {json_file_path} (No such file)")
+                print(f"Skipping {json_file_path} (No such file)", file=sys.stderr)
                 continue
         releases[c] = data['releases']
     return releases
@@ -93,7 +93,7 @@ def parse_release_str(rel_str, debug=False):
     return release
 
 
-def get_available_release(requested_release, component, component_releases, search='backward', debug=False):
+def get_available_release(requested_release, component, component_releases, search='backward', debug=False, verbose=True):
     """
     Return a sorted list of available releases from a given release and dictionary of all releases.
     """
@@ -131,7 +131,8 @@ def get_available_release(requested_release, component, component_releases, sear
                 print(f"Requested release ({requested_release}) valid for {component}")
             selected_release = requested_release
         else:
-            print(f"Requested release ({str(requested_release)}) not available for {component}, searching for available release.")
+            print(f"Requested release ({str(requested_release)}) not available for {component}, searching for available release.",
+                 file=sys.stderr)
             if search == 'latest':
                 selected_release = Version(minor_releases[-1])
             elif search == 'backward':
@@ -149,7 +150,7 @@ def get_available_release(requested_release, component, component_releases, sear
     return selected_release
 
 
-def select_tag(component, releases, release, image_names, tag=None, all_tags=False, debug=False):
+def select_tag(component, releases, release, image_names, tag=None, all_tags=False, debug=False, verbose=True):
     """
     Select the best tag based on the component, release, and/or tag.
     component: string (eg: am)
@@ -168,7 +169,7 @@ def select_tag(component, releases, release, image_names, tag=None, all_tags=Fal
     if isinstance(release, Version):
         if release.minor == 0 and release.micro == 0:
             modifier = 'forward'
-    selected_release = get_available_release(release, component, releases[component], modifier, debug)
+    selected_release = get_available_release(release, component, releases[component], modifier, debug, verbose)
     selected_release_str = str(selected_release)
     maj_min = None
     if isinstance(selected_release, str):
