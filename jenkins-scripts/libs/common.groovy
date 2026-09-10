@@ -130,7 +130,8 @@ def runGuillotine(PipelineRunLegacyAdapter pipelineRun, String stageName, String
                         authenticateGke()
                         // Configure environment to make Guillotine works on GKE
                         withCredentials([file(credentialsId: 'jenkins-guillotine-storage-gke-sa-key', variable: 'G_STORAGE_GKE_KEY')]) {
-                            sh("./venv/bin/python3 ./configure.py env --gke-only --gke-storage-sa ${env.G_STORAGE_GKE_KEY}")
+                            sh('./venv/bin/python3 ./configure.py env --gke-only --gke-storage-sa "$G_STORAGE_GKE_KEY"')
+                            sh('./venv/bin/python3 ./configure.py env --gke-only')
                         }
 
                         if (platformImageRef != '') {
