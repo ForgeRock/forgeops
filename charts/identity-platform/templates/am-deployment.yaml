@@ -168,6 +168,7 @@ spec:
           - name: NAMESPACE
             valueFrom:
               fieldRef:
+                apiVersion: v1
                 fieldPath: metadata.namespace
           - name: AM_STORES_SSL_ENABLED
             value: "true"

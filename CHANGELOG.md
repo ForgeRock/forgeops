@@ -1,4 +1,4 @@
-RELEASE=2026.4.0
+RELEASE=2026.3.2
 
 # Release Notes
 
@@ -18,3 +18,9 @@ Kubernetes will log a call to sh instead of dsconfig.
 ### info --json included extra output
 
 `forgeops info --release x.y.z --json` now only outputs valid json to stdout.
+
+## How-tos
+
+### New Procedures
+
+[Migrate to Helm from Kustomize](how-tos/kustomize-to-helm.md)

@@ -146,6 +146,7 @@ spec:
           - name: NAMESPACE
             valueFrom:
               fieldRef:
+                apiVersion: v1
                 fieldPath: metadata.namespace
           - name: OPENIDM_REPO_PASSWORD
             valueFrom:

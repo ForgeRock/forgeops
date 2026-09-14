@@ -49,7 +49,7 @@ We start with some common steps, and provide alternatives based on what you
 want to end up with.
 
 These steps work with any YYYY.x.z release. For this document, we will use
-2025.2.1. It is recommended to use the latest version.
+2025.2.1. It is recommended to use the latest version of ForgeOps.
 
 ### Setup
 
