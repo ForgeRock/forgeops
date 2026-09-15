@@ -65,18 +65,18 @@ one up for your team.
 
 To enable custom secrets for a fresh deployment, you can use the `forgeops env` command.
 
-`forgeops env -e MY_ENV --helm-secrets -f iam.example.com --cluster-issuer MY_ISSUER`
+`forgeops env -e my-env --helm-secrets -f iam.example.com --cluster-issuer MY_ISSUER`
 
 If you have already created an environment, but not yet deployed it, then you can just enable it.
 
-`forgeops env -e MY_ENV --helm-secrets -n MY_NS`
+`forgeops env -e my-env --helm-secrets -n MY_NS`
 
 If you have deployed but haven't gone live with it, you can reinstall your deployment.
 
 ```
-forgeops env --env-name MY_ENV --helm-secrets -n MY_NS`
+forgeops env --env-name my-env --helm-secrets -n MY_NS`
 helm uninstall identity-platform -n MY_NS
-helm upgrade -i identity-platform identity-platform --repo https://ForgeRock.github.io/forgeops --version 2025.2.1 -f helm/MY_ENV/values.yaml
+helm upgrade -i identity-platform identity-platform --repo https://ForgeRock.github.io/forgeops --version 2025.2.1 -f helm/my-env/values.yaml
 ```
 
 Your DS data will be on PVCs that are not destroyed by `helm uninstall`, and
@@ -196,7 +196,7 @@ and rotate the `ds-env-secrets` secret.
 ```
 helm upgrade -i identity-platform identity-platform \
   --repo https://ForgeRock.github.io/forgeops --version 2025.2.1 \
-  -f helm/my_env/values.yaml -n my_ns
+  -f helm/my-env/values.yaml -n my_ns
 ```
 
 Make sure AM restarts so it starts using the newly created password. If `helm
@@ -234,7 +234,7 @@ The secret-generator secrets can just be deleted with kubectl.
 
 #### Disable ds-set-passwords
 
-Edit `helm/my_env/values.yaml` and disable the ds-set-passwords job.
+Edit `helm/my-env/values.yaml` and disable the ds-set-passwords job.
 
 ```
 ds_set_passwords:
@@ -247,13 +247,13 @@ Replace the config for the remaining secrets (`keystore_create`,
 `ds_passwords`, and `idm_env_secrets`). This is just like the "Add new secrets"
 section above.
 
-Update `helm/my_env/values.yaml` with the remaining secrets, and deploy the
+Update `helm/my-env/values.yaml` with the remaining secrets, and deploy the
 helm chart with `helm upgrade`.
 
 ```
 helm upgrade -i identity-platform identity-platform \
   --repo https://ForgeRock.github.io/forgeops --version 2025.2.1 \
-  -f helm/my_env/values.yaml -n my_ns
+  -f helm/my-env/values.yaml -n my_ns
 ```
 
 #### Restart DS

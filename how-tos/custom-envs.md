@@ -38,11 +38,11 @@ platform:
       value: "MY_GLOBAL_VALUE"
 am:
   env:
-    - name: MY_ENV
+    - name: my-env
       value: "MY_CUSTOM_VALUE"
 idm:
   env:
-    - name: MY_ENV
+    - name: my-env
       value: "MY_CUSTOM_VALUE"
 ```
 
@@ -51,6 +51,6 @@ idm:
 For Kustomize users, you can add your custom environment variables in the
 following places:
 
-* `kustomize/overlay/MY_ENV/base/platform-config.yaml`
-* `kustomize/overlay/MY_ENV/am/deployment.yaml`
-* `kustomize/overlay/MY_ENV/idm/deployment.yaml`
+* `kustomize/overlay/my-env/base/platform-config.yaml`
+* `kustomize/overlay/my-env/am/deployment.yaml`
+* `kustomize/overlay/my-env/idm/deployment.yaml`

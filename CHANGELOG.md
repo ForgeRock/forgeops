@@ -4,6 +4,9 @@ RELEASE=2026.4.0
 
 ## New Features/Updated functionality
 
+### New README for customizing the PingDS deployment setup
+New README with some useful customization steps for PingDS including adding custom LDAP entries and schema files.
+
 ## Bugfixes
 
 ### forgeops dsconfig leaked password

@@ -14,12 +14,12 @@ This How To provides instructions to configure your ForgeOps deployment with a a
 ## Update the ingress resource  
 First you need to update the ingress resource in your custom env to configure the ingress controller with the additional FQDN.
 
-### Kustomize steps
+### Kustomize: (Deprecated) steps
 The easiest way to configure your overlay is to copy the complete `am` ingress  
 definition into the `am` sub overlay in your custom overlay.
 
 1. Create a file called `ingress.yaml` in `kustomize/overlay/my-env/am`.  
-2. Copy the contents of the ingress definition from `kustomize/base/am/resources.yaml`(~L232) to the new `ingress.yaml`.
+2. Copy the contents of the ingress definition from `kustomize/base/am/secret-agent/am-ingress.yaml` (~L232) to the new `ingress.yaml`.
 3. In `ingress.yaml` update the current host entries with your default FQDN.  
 
    **WARNING**: Do not update the secretName field unless you have configured a custom secret name in your environment.  
@@ -112,7 +112,7 @@ Create a custom PingAM image which includes the additional FQDN as a DNS alias f
 `helm upgrade -i identity-platform charts/identity-platform --repo https://ForgeRock.github.io/forgeops/ \
  --version 2025.1.1 --values helm/my-env/values.yaml`
 
-### Redeploy Ping AM with Kustomize
+### Redeploy Ping AM with Kustomize: (Deprecated)
 
 `./bin/forgeops apply -e my-env am`
 

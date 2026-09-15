@@ -25,7 +25,7 @@ For the optional inspection commands in the [SBOM Formats](#sbom-formats) sectio
 
 | Tool | Purpose | 
 |---|---|
-| [`cyclonedx`](https://github.com/CycloneDX/cyclonedx) | Validate and inspect CycloneDX files |
+| [`cyclonedx`](https://github.com/CycloneDX/cyclonedx-cli) | Validate and inspect CycloneDX files |
 | [`pyspdxtools`](https://github.com/spdx/tools-python) | Validate SPDX files |
 | [`jq`](https://jqlang.org/) | Parse JSON |
 
@@ -84,7 +84,7 @@ FORMAT="cyclonedx"  # or spdx
 curl -O "http://releases.forgeops.com/sbom/${PRODUCT_NAME}/${VERSION}/${PRODUCT_NAME}_${TAG}_${ARCH}_${FORMAT}.json"
 
 # File downloaded
-$ ls
+ls
 idm_8.1.0-202606240536_amd64_cyclonedx.json
 ```
 

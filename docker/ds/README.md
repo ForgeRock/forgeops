@@ -19,7 +19,6 @@ familiarity for administrators.
 example, a directory pod could be dedicated to indexing an attribute that is required for batch processing.
 * Backing up the PVC captures both data and configuration. A restore operation will restore the state exactly as-is.
 
-
 Cons:
 
 * Changes applied at runtime (for example, schema) must be captured, ideally
@@ -28,15 +27,6 @@ disciplined approach to capturing these changes is needed as the schema
 is not maintained as part of the Dockerfile. This could be as simple
 as scripts maintained in git that update the schema. This is an adhoc
 implementation of the concepts behind [Flyway](https://flywaydb.org/).
-
-## Runtime Scripts.
-
-> NOTE: Runtime scripts via a configmap are no longer supported. The PingDS docker image now contains the option to configure runtime scripts for idrepo and cts separately.
-
-To configure runtime behaviour for ds-idrepo and ds-cts separately, use the runtime scripts provided for each server in the runtime-scripts directory.  The scripts are used as follows:
-
-- setup: Intial setup runs on first deployment when the PVC contains no data.
-- post-init: Additional setup runs on subsequent deployments when the PVC already contains data.  
 
 ## Certificates
 
@@ -51,19 +41,6 @@ a newly generated certificate, even if that certificate is from
 the same trusted CA.
 
 As currently implemented, the pem keys are read from k8s secrets and copied to the PVC when the pod starts. If you backup the PVC using something like velero.io, the keys will be included in the file system backup. You must protect the backup carefully.
-
-## Custom Schema updates
-To provide a custom schema file, add your custom file to the config/schema directory 
-prior to building your image.  There is a sample file in there for guidance.
-
-## Custom LDAP entries
-To provide an ldif file with custom ldap entries, add your custom file to:
-- ldif-ext/am-config/ for the am-config backend
-- ldif-ext/identities/ for the identities backend
-- ldif-ext/tokens/ for the tokens backend
-- ldif-ext/idm-repo/ for the openidm backend
-
-To update any other backends, please update ds-setup.sh to copy the files to the relevant setup-profile.
 
 ## Backup/restore considerations
 

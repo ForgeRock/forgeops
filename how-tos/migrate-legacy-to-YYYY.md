@@ -197,16 +197,16 @@ overlay.
 
 If you followed the instructions above, you should have used `--small`,
 `--medium`, or `--large` when creating your environment with `forgeops env`. If
-so, then that added the config lines to `helm/my_env/values.yaml`. You can
-compare the settings there to what's in `kustomize/overlay/my_env`, and make
+so, then that added the config lines to `helm/my-env/values.yaml`. You can
+compare the settings there to what's in `kustomize/overlay/my-env`, and make
 them the same. Things like replica count, cpu, mem, and disk.
 
 If you didn't use `--size` when creating your env, then we can do it now to get
 those config lines into your `values.yaml`.
 
-`forgeops env -e my_env --small --no-kustomize`
+`forgeops env -e my-env --small --no-kustomize`
 
-Now the config lines will be in `helm/my_env/values.yaml`, and you can make
+Now the config lines will be in `helm/my-env/values.yaml`, and you can make
 them consistent with your Kustomize overlay.
 
 We also need to make sure that the images defined in `image-defaulter` are
@@ -216,11 +216,11 @@ upstream images. In this case, our running deployment is on `7.5.0`, so we'll
 select that to start. This sets the all images to the correct release before
 setting your custom images.
 
-`forgeops image -e my_env --release 7.5.0 platform --no-kustomize`
+`forgeops image -e my-env --release 7.5.0 platform --no-kustomize`
 
 Now we need to set your custom images. For example, let's say my am image lines
 look like this in
-`kustomize/overlay/my_env/image-defaulter/kustomization.yaml`:
+`kustomize/overlay/my-env/image-defaulter/kustomization.yaml`:
 
 ```
 - name: am
@@ -230,7 +230,7 @@ look like this in
 
 We can set this in `values.yaml` like so:
 
-`forgeops image --no-kustomize -e my_env --image-repo us-docker.pkg.dev/MyProject/images -t 7.5.0 am`
+`forgeops image --no-kustomize -e my-env --image-repo us-docker.pkg.dev/MyProject/images -t 7.5.0 am`
 
 Do this for any custom image you have built. Now your Helm configuration is ready.
 
@@ -247,7 +247,7 @@ moment.
 kubectl delete ingress -n my-ns forgerock ig && \
 helm upgrade -i identity-platform identity-platform \
   --repo https://ForgeRock.github.io/forgeops \
-  --version 2025.2.1 -f helm/my_env/values.yaml
+  --version 2025.2.1 -f helm/my-env/values.yaml
 ```
 
 ##### Kustomize
@@ -255,7 +255,7 @@ helm upgrade -i identity-platform identity-platform \
 ```
 cd /path/to/forgeops
 kubectl delete ingress -n my-ns forgerock ig && \
-./bin/forgeops apply -e my_env -n my-ns
+./bin/forgeops apply -e my-env -n my-ns
 ```
 
 #### Bring up new DS pods
