@@ -149,6 +149,10 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: metadata.name
+          {{- if eq (.Values.platform.imageMode | default "base") "forgeops" }}
+          - name: IMAGE_MODE
+            value: forgeops
+          {{- end }}
           - name: DS_SET_UID_ADMIN_AND_MONITOR_PASSWORDS
             value: "true"
           - name: DS_UID_MONITOR_PASSWORD_FILE
@@ -195,6 +199,10 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: metadata.name
+          {{- if eq (.Values.platform.imageMode | default "base") "forgeops" }}
+          - name: IMAGE_MODE
+            value: forgeops
+          {{- end }}
           {{- with .Values.platform.env }}
           {{- toYaml . | nindent 10 }}
           {{- end }}

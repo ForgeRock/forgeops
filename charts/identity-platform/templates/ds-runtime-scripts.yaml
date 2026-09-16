@@ -11,9 +11,9 @@ metadata:
       {{- toYaml . | nindent 4 }}
     {{- end }}
 data:
-  {{ (.Files.Glob "files/ds/runtime-scripts/*.sh").AsConfig | nindent 2 }}
-  {{ (.Files.Glob "files/ds/runtime-scripts/rstatus").AsConfig | nindent 2 }}
-  {{ (.Files.Glob "files/ds/runtime-scripts/support").AsConfig | nindent 2 }}
+  {{ (.Files.Glob (printf "%s/ds/runtime-scripts/*.sh" (include "platform.filesDir" .))).AsConfig | nindent 2 }}
+  {{ (.Files.Glob (printf "%s/ds/runtime-scripts/rstatus" (include "platform.filesDir" .))).AsConfig | nindent 2 }}
+  {{ (.Files.Glob (printf "%s/ds/runtime-scripts/support" (include "platform.filesDir" .))).AsConfig | nindent 2 }}
 {{- end }}
 {{- if .Values.ds_cts.enabled }}
 ---
@@ -27,7 +27,7 @@ metadata:
       {{- toYaml . | nindent 4 }}
     {{- end }}
 data:
-  {{ (.Files.Glob "files/ds/runtime-scripts/ds-cts/**").AsConfig | nindent 2 }}
+  {{ (.Files.Glob (printf "%s/ds/runtime-scripts/ds-cts/**" (include "platform.filesDir" .))).AsConfig | nindent 2 }}
 {{- end }}
 {{- if .Values.ds_idrepo.enabled }}
 ---
@@ -41,5 +41,5 @@ metadata:
       {{- toYaml . | nindent 4 }}
     {{- end }}
 data:
-  {{ (.Files.Glob "files/ds/runtime-scripts/ds-idrepo/**").AsConfig | nindent 2 }}
+  {{ (.Files.Glob (printf "%s/ds/runtime-scripts/ds-idrepo/**" (include "platform.filesDir" .))).AsConfig | nindent 2 }}
 {{- end }}

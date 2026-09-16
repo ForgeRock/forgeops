@@ -14,6 +14,12 @@ serviceAccount:
   name: ""
 
 platform:
+  # Which runtime contract the DS images follow: "base" (default) keeps the
+  # upstream samples/docker behavior of the DS image, "forgeops" selects DS
+  # images built with IMAGE_MODE=forgeops (Alpine/busybox runtime, PEM certs,
+  # data.tar.gz priming) and switches the DS ConfigMaps to the busybox-safe
+  # scripts in files-alpine/.
+  imageMode: base
   annotations:
     deploymentDate:
       enabled: false

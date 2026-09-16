@@ -1,0 +1,219 @@
+#!/bin/sh
+#
+# The entrypoint script for the fully mutable directory deployment.
+# Read this carefully if your not deploying with the provided operator or Kubernetes manifests.
+#
+# POSIX sh (busybox ash) variant of charts/identity-platform/files/ds/docker-entrypoint.sh,
+# used when the DS image is built with IMAGE_MODE=forgeops on an Alpine base.
+# Differences from the bash version:
+#   - no mapfile/arrays: base DNs collected in a newline-joined variable and
+#     iterated with a while-read
+#   - no ";&" case fallthrough: initialize-only/init share doInit()
+#   - [[ ]] replaced with POSIX test
+#   - entrypoint args are preserved for the default case (bash's $@ shift works
+#     the same here, but CMD dispatch is via "$1" only)
+#
+# Copyright 2019-2024 Ping Identity Corporation. All Rights Reserved
+#
+# This code is to be used exclusively in connection with Ping Identity
+# Corporation software or services. Ping Identity Corporation only offers
+# such software or services to legal entities who have entered into a
+# binding license agreement with Ping Identity Corporation.
+
+# set -x
+
+
+. /opt/opendj/env.sh
+
+# set -eu
+
+
+# If the pod was terminated abnormally then lock file may not have been cleaned up.
+removeLocks() {
+    rm -f $DS_DATA_DIR/locks/server.lock
+}
+
+# Make it easier to run tools interactively by exec'ing into the running container.
+setOnlineToolProperties() {
+    mkdir -p ~/.opendj
+    [ -f config/tools.properties ] && cp config/tools.properties ~/.opendj
+}
+
+upgradeDataAndRebuildDegradedIndexes() {
+
+    # busybox ash has no mapfile/arrays: collect the pluggable backend base DNs
+    # as a newline-joined variable and iterate with a while-read. The "|| true"
+    # keeps a no-match grep from tripping "set -e" (if enabled).
+    BASE_DNS=$(./bin/ldifsearch -b cn=backends,cn=config -s one $DS_DATA_DIR/config/config.ldif "(&(objectclass=ds-cfg-pluggable-backend)(ds-cfg-enabled=true))" ds-cfg-base-dn | grep "^ds-cfg-base-dn" | cut -c17- || true)
+
+    # Upgrade is idempotent, so it should have no effect if there is nothing to do.
+    # Fail-fast if the config needs upgrading because it should have been done when the image was built.
+    echo "Upgrading configuration and data..."
+     ./upgrade --acceptLicense --force --ignoreErrors --no-prompt
+
+    # Rebuild any corrupt/missing indexes.
+    printf '%s\n' "$BASE_DNS" | while IFS= read -r baseDn; do
+        [ -z "$baseDn" ] && continue
+        echo "Rebuilding degraded indexes for base DN \"${baseDn}\"..."
+        rebuild-index --offline --noPropertiesFile --rebuildDegraded --baseDn "${baseDn}" > /dev/null
+    done
+}
+
+
+waitUntilSigTerm() {
+    trap 'echo "Caught SIGTERM"' SIGTERM
+    while :
+    do
+       sleep infinity &
+       wait $!
+    done
+}
+
+enableMultiplePasswordValues() {
+    dsconfig --offline --no-prompt --batch <<EOM
+set-password-policy-prop --policy-name "Default Password Policy" --set allow-multiple-password-values:true
+set-password-policy-prop --policy-name "Root Password Policy" --set allow-multiple-password-values:true
+EOM
+}
+
+setUserPasswordInLdifFile() {
+    file=$1
+    dn=$2
+    pwds="$3"
+    pwd_str=""
+
+    echo "Updating the \"${dn}\" password"
+
+    for pw in $pwds ; do
+        # Set the JVM args to avoid blowing up the container memory.
+        jvm_args="-Xmx256m -Djava.security.egd=file:/dev/./urandom"
+        enc_pwd=$(DS_JAVA_ARGS="$jvm_args" OPENDJ_JAVA_ARGS="$jvm_args" encode-password -s "PBKDF2-HMAC-SHA256" -c "${pw}")
+        if [ "$pwd_str" = "" ] ; then
+            pwd_str="userPassword: ${enc_pwd}"
+        else
+            pwd_str=$(cat <<EOM
+${pwd_str}
+userPassword: ${enc_pwd}
+EOM
+)
+        fi
+    done
+
+    ldifmodify "${file}" > "${file}.tmp" << EOF
+dn: ${dn}
+changetype: modify
+replace: userPassword
+${pwd_str}
+EOF
+    rm "${file}"
+    mv "${file}.tmp" "${file}"
+}
+
+
+setAdminAndMonitorPasswords() {
+    adminPassword="${DS_UID_ADMIN_PASSWORD:-$(cat "${DS_UID_ADMIN_PASSWORD_FILE}")}"
+    monitorPassword="${DS_UID_MONITOR_PASSWORD:-$(cat "${DS_UID_MONITOR_PASSWORD_FILE}")}"
+    if [ -n "${OLD_DIRMANAGER_PW:-}" ] ; then
+        adminPassword="$adminPassword $OLD_DIRMANAGER_PW"
+    fi
+    if [ -n "${OLD_MONITOR_PW:-}" ] ; then
+        monitorPassword="$monitorPassword $OLD_MONITOR_PW"
+    fi
+    enableMultiplePasswordValues
+    setUserPasswordInLdifFile $DS_DATA_DIR/db/rootUser/rootUser.ldif       "uid=admin"   "$adminPassword"
+    setUserPasswordInLdifFile $DS_DATA_DIR/db/monitorUser/monitorUser.ldif "uid=monitor" "$monitorPassword"
+}
+
+# Copy the K8S secrets to the writable volume. The secrets are expected to be of type k8s.io/tls.
+# These are PEM files -see ds-setup.sh to understand how PingDS is configured for PEM support.
+# These are likely cert-manager generated, but any tool that generates valid PEM and puts it a k8s tls secret can be used.
+# See https://bugster.forgerock.org/jira/browse/OPENDJ-8374
+copyKeys() {
+    mkdir -p $PEM_KEYS_DIRECTORY
+    mkdir -p $PEM_TRUSTSTORE_DIRECTORY
+
+    # Copy the SSL certs. We also copy the ssl ca.crt to be used as the trustore in the case that
+    # a seperate truststore is not provided.
+    [ -d $SSL_CERT_DIR ] && cat $SSL_CERT_DIR/tls.crt $SSL_CERT_DIR/tls.key  >$PEM_KEYS_DIRECTORY/ssl-key-pair && \
+        cp $SSL_CERT_DIR/ca.crt $PEM_TRUSTSTORE_DIRECTORY/trust.pem
+
+    [ -d $MASTER_CERT_DIR ] && cat $MASTER_CERT_DIR/tls.key $MASTER_CERT_DIR/tls.crt $MASTER_CERT_DIR/ca.crt > $PEM_KEYS_DIRECTORY/master-key
+
+    # If the user provides a truststore then use it.
+    [ -d $TRUSTSTORE_DIR ] && cp $TRUSTSTORE_DIR/ca.crt $PEM_TRUSTSTORE_DIRECTORY/trust.pem
+}
+
+# POD_STATEFULSET is the statefulset name part of the pod name
+# (ds-cts-0 -> ds-cts), which is where the per-pod runtime scripts live.
+POD_STATEFULSET=${POD_NAME%-*}
+
+# Run a runtime script if the deployer supplied one. The default scripts in
+# this ConfigMap always provide setup/post-init; add-schema is only shipped
+# for ds-idrepo, so absence is not an error there.
+runRuntimeScript() {
+    script="./runtime-scripts/${POD_STATEFULSET}/$1"
+    if [ -f "$script" ]; then
+        sh "$script"
+    fi
+}
+
+init() {
+    # Make sure master keys and truststore are in place and up to date.
+    copyKeys
+    upgradeDataAndRebuildDegradedIndexes
+    # Set the admin and monitor passwords from K8S secrets
+    setAdminAndMonitorPasswords
+    # Add app schema
+    if [ -f "./runtime-scripts/${POD_STATEFULSET}/add-schema" ]; then
+        sh ./runtime-scripts/${POD_STATEFULSET}/add-schema
+    fi
+
+}
+
+doInit() {
+    if [ -d "$DS_DATA_DIR/db" ];  then
+        echo "data/ directory contains data. setup is not required";
+        # Init still needs to check and rebuild indexes.
+        init
+
+        # If the user supplies a post-init script, run it
+        # The default-script is a no-op.
+        runRuntimeScript post-init
+        exit 0;
+    fi
+    # Else - no data is present, we need to run setup.
+    # busybox tar has no --no-overwrite-dir; extraction happens into an empty
+    # PVC, so plain tar is safe.
+    echo "Untaring protoype setup to $DS_DATA_DIR"
+    tar -C $DS_DATA_DIR -xzf data.tar.gz
+    copyKeys
+    runRuntimeScript setup
+    init
+    runRuntimeScript post-init
+}
+
+CMD="${1:-help}"
+case "$CMD" in
+
+# init is run in an init container and prepares the directory for running.
+# initialize-only and init share the same path (busybox ash has no ";&"
+# fallthrough).
+initialize-only|init)
+    doInit
+    ;;
+
+# Start the server.
+start-ds|start)
+    removeLocks
+    setOnlineToolProperties
+    exec start-ds --nodetach
+    ;;
+
+*)
+    removeLocks
+    echo "Undefined entrypoint. Will exec $@"
+    shift
+    exec "$@"
+    ;;
+
+esac

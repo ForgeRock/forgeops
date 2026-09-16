@@ -11,7 +11,7 @@ metadata:
       {{- toYaml . | nindent 4 }}
     {{- end }}
 data:
-  {{ (.Files.Glob "files/ds/init-scripts/**.sh").AsConfig | nindent 2 }}
+  {{ (.Files.Glob (printf "%s/ds/init-scripts/**.sh" (include "platform.filesDir" .))).AsConfig | nindent 2 }}
 {{- end }}
 {{- if or .Values.ds_cts.enabled .Values.ds_idrepo.enabled }}
 ---
@@ -25,5 +25,5 @@ metadata:
       {{- toYaml . | nindent 4 }}
     {{- end }}
 data:
-  {{ (.Files.Glob "files/ds/docker-entrypoint.sh").AsConfig | nindent 2 }}
+  {{ (.Files.Glob (printf "%s/ds/docker-entrypoint.sh" (include "platform.filesDir" .))).AsConfig | nindent 2 }}
 {{- end }}
