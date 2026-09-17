@@ -61,7 +61,7 @@ spec:
             preStop:
               exec:
                 command:
-                  - /usr/bin/nginx
+                  - /usr/sbin/nginx
                   - -s
                   - quit
           env:
