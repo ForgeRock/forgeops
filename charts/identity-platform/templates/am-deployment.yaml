@@ -42,7 +42,9 @@ spec:
       {{- end }}
       serviceAccountName: {{ include "identity-platform.serviceAccountName" . }}
       securityContext:
-        {{- toYaml .Values.am.podSecurityContext | nindent 8 }}
+        {{- $psc := deepCopy (.Values.am.podSecurityContext | default dict) }}
+        {{- $_ := set $psc "runAsUser" (include "platform.runAsUser" (list (index $psc "runAsUser") .) | int) }}
+        {{- toYaml $psc | nindent 8 }}
       volumes:
         - name: custom
           emptyDir: {}

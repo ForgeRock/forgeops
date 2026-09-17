@@ -186,6 +186,24 @@ product ConfigMaps (DS and IDM). The Alpine-based product images
 (IMAGE_MODE=forgeops) run with busybox ash and need the POSIX variants in
 files-alpine; everything else keeps the original files/ scripts.
 */}}
+{{/*
+The uid the product pods run as. The Debian product images expect the
+historic 11111 (forgerock) uid - the podSecurityContext default, passed as the
+single argument. The alpine pingbase-built images (platform.imageMode=forgeops)
+bake their file ownership for the pingbase uid (ping, 9031), so forgeops mode
+replaces the default 11111 with 9031; any runAsUser a deployer sets explicitly
+(anything other than the 11111 default) is left untouched in every mode.
+*/}}
+{{- define "platform.runAsUser" -}}
+{{- $current := int (index . 0) -}}
+{{- $root := index . 1 -}}
+{{- if and (eq ($root.Values.platform.imageMode | default "base") "forgeops") (eq $current 11111) -}}
+{{- printf "9031" -}}
+{{- else -}}
+{{- printf "%d" $current -}}
+{{- end -}}
+{{- end -}}
+
 {{- define "platform.filesDir" -}}
 {{- if eq (.Values.platform.imageMode | default "base") "forgeops" -}}
 {{- printf "files-alpine" -}}
