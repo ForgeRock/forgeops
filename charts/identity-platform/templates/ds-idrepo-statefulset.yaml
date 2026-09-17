@@ -203,7 +203,11 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: metadata.name
-          {{- if eq (.Values.platform.imageMode | default "base") "forgeops" }}
+          {{- $imageModeSet := false }}
+          {{- range concat (default list .Values.platform.env) (default list .Values.ds_cts.env) }}
+          {{- if eq .name "IMAGE_MODE" }}{{- $imageModeSet = true }}{{- end }}
+          {{- end }}
+          {{- if and (eq (.Values.platform.imageMode | default "base") "forgeops") (not $imageModeSet) }}
           - name: IMAGE_MODE
             value: forgeops
           {{- end }}
