@@ -6,5 +6,5 @@ metadata:
   labels:
     {{- include "identity-platform.labels" . | nindent 4 }}
 data:
-  {{ (.Files.Glob "files/idm/import-pem-certs.sh").AsConfig | nindent 2 }}
+  {{ (.Files.Glob (printf "%s/idm/import-pem-certs.sh" (include "platform.filesDir" .))).AsConfig | nindent 2 }}
 {{- end }}

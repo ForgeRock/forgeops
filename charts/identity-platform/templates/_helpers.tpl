@@ -181,12 +181,12 @@ Define a variable that determines if we should enable the ssh_keygen job.
 {{- end }}
 
 {{/*
-Directory under the chart that holds the DS runtime scripts packaged into the
-DS ConfigMaps. The Alpine-based DS images (IMAGE_MODE=forgeops) run with busybox
-ash and need the POSIX variants in files-alpine; everything else keeps the
-original files/ds scripts.
+Directory under the chart that holds the runtime scripts packaged into the
+product ConfigMaps (DS and IDM). The Alpine-based product images
+(IMAGE_MODE=forgeops) run with busybox ash and need the POSIX variants in
+files-alpine; everything else keeps the original files/ scripts.
 */}}
-{{- define "ds.filesDir" -}}
+{{- define "platform.filesDir" -}}
 {{- if eq (.Values.platform.imageMode | default "base") "forgeops" -}}
 {{- printf "files-alpine" -}}
 {{- else -}}

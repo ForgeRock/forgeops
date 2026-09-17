@@ -14,12 +14,27 @@ serviceAccount:
   name: ""
 
 platform:
-  # Which runtime contract the DS images follow: "base" (default) keeps the
-  # upstream samples/docker behavior of the DS image, "forgeops" selects DS
-  # images built with IMAGE_MODE=forgeops (Alpine/busybox runtime, PEM certs,
-  # data.tar.gz priming) and switches the DS ConfigMaps to the busybox-safe
-  # scripts in files-alpine/.
+  # Selects the runtime contract AND the image lineage this chart deploys:
+  # "forgeops" = the Alpine pingbase-built product images (ping*), the
+  # busybox-safe scripts in files-alpine/, the ping uid/home layout, PEM
+  # certs and the DS PVC-priming contract; the runtime IMAGE_MODE=forgeops
+  # env is passed to the product containers. "base" = the Debian upstream
+  # images and files/ scripts (legacy lineage). Note the product images are
+  # single-mode builds since the runtime-IMAGE_MODE rework: IMAGE_MODE only
+  # selects runtime behavior there, never image content, so this value no
+  # longer changes what is baked - only which script trees, uid and paths
+  # the chart uses, and the runtime env.
   imageMode: base
+  # Chart-wide default REPOSITORY for the product images. The full image
+  # ref composes <imageRepository>/<image name> (see the platform.imageRef
+  # helper in _helpers.tpl): e.g. with the defaults below, ds_idrepo pulls
+  # us-docker.pkg.dev/forgeops-public/images/ds. Switch every product to the
+  # alpine CI line by setting imageRepository to
+  # us-docker.pkg.dev/forgeops-public/images/alpine. Precedence per
+  # component: an explicit .image.repository pin (set in a deployer's
+  # values.yaml) always wins; the tag resolution (component .image.tag |
+  # default AppVersion) is unchanged by this.
+  imageRepository: "us-docker.pkg.dev/forgeops-public/images"
   annotations:
     deploymentDate:
       enabled: false
@@ -215,7 +230,14 @@ am:
   replicaCount: 1
 
   image:
-    repository: us-docker.pkg.dev/forgeops-public/images/am
+    # Left empty: the repository resolves platform.imageRepository (see
+    # the platform.imageRef helper). An explicit repository here always
+    # wins.
+    repository: ""
+    # Empty = the platform default name "am" (composed
+    # with platform.imageRepository). Override to pull a
+    # differently-named image from the same repository.
+    name: ""
     tag: latest
     pullPolicy: IfNotPresent
     imagePullSecrets: []
@@ -281,6 +303,9 @@ am:
 
   podSecurityContext:
     fsGroup: 0
+    # 11111 = the forgerock uid of the Debian images. The alpine pingbase
+    # images use uid 9031; when platform.imageMode=forgeops the templates
+    # override runAsUser to match (see _helpers.tpl "platform.runAsUser").
     runAsUser: 11111
 
   securityContext: {}
@@ -318,7 +343,14 @@ amster:
   ttlSecondsAfterFinished: 43200
 
   image:
-    repository: us-docker.pkg.dev/forgeops-public/images/amster
+    # Left empty: the repository resolves platform.imageRepository (see
+    # the platform.imageRef helper). An explicit repository here always
+    # wins.
+    repository: ""
+    # Empty = the platform default name "amster" (composed
+    # with platform.imageRepository). Override to pull a
+    # differently-named image from the same repository.
+    name: ""
     tag: latest
     pullPolicy: IfNotPresent
     imagePullSecrets: []
@@ -374,9 +406,13 @@ ds_set_passwords:
     #   cpu: 100m
     #   memory: 512Mi
 
-  # Defaults to the ds_idrepo image. Uncomment to override; specify all keys.
+  # Defaults to the ds_idrepo image (which itself resolves
+  # platform.imageRepository + the "ds" name). Uncomment to override;
+  # keys left empty/absent fall back per key (repository/name resolve via
+  # the platform chain, tag via AppVersion, pullPolicy via ds_idrepo).
   # image:
-  #   repository: us-docker.pkg.dev/forgeops-public/images/ds
+  #   repository: ""
+  #   name: ""
   #   tag: latest
   #   pullPolicy: Always
   #   imagePullSecrets: []
@@ -413,7 +449,14 @@ idm:
   replicaCount: 1
 
   image:
-    repository: us-docker.pkg.dev/forgeops-public/images/idm
+    # Left empty: the repository resolves platform.imageRepository (see
+    # the platform.imageRef helper). An explicit repository here always
+    # wins.
+    repository: ""
+    # Empty = the platform default name "idm" (composed
+    # with platform.imageRepository). Override to pull a
+    # differently-named image from the same repository.
+    name: ""
     tag: latest
     pullPolicy: IfNotPresent
     imagePullSecrets: []
@@ -478,6 +521,9 @@ idm:
     app: idm
 
   podSecurityContext:
+    # 11111 = the forgerock uid of the Debian images. The alpine pingbase
+    # images use uid 9031; when platform.imageMode=forgeops the templates
+    # override runAsUser to match (see _helpers.tpl "platform.runAsUser").
     runAsUser: 11111
 
   securityContext: {}
@@ -511,7 +557,13 @@ idm_admin_ui:
   replicaCount: 1
 
   image:
-    repository: us-docker.pkg.dev/forgeops-public/images/idm-admin-ui
+    # Left empty: the repository resolves platform.imageRepository + the
+    # platform default name "idm-admin-ui" (see platform.imageRef). An
+    # explicit repository here always wins.
+    repository: ""
+    # Empty = the platform default name "idm-admin-ui". Override to pull a
+    # differently-named image from the same repository.
+    name: ""
     tag: latest
     pullPolicy: IfNotPresent
     imagePullSecrets: []
@@ -602,8 +654,14 @@ keystore_create:
   clusterRoleName: identity-platform-keystore-create
   appendNSToRole: true
 
+  # The AM product image: resolves platform.imageRepository + the "am"
+  # name (us-docker.pkg.dev/forgeops-public/images/am with the chart
+  # defaults). An explicit repository here always wins.
   initImage:
-    repository: us-docker.pkg.dev/forgeops-public/images/am
+    repository: ""
+    # Empty = the platform default name "am". Override to pull a
+    # differently-named image from the same repository.
+    name: ""
     tag: latest
     pullPolicy: IfNotPresent
 
@@ -707,7 +765,14 @@ admin_ui:
   replicaCount: 1
 
   image:
-    repository: us-docker.pkg.dev/forgeops-public/images/admin-ui
+    # Left empty: the repository resolves platform.imageRepository (see
+    # the platform.imageRef helper). An explicit repository here always
+    # wins.
+    repository: ""
+    # Empty = the platform default name "admin-ui" (composed
+    # with platform.imageRepository). Override to pull a
+    # differently-named image from the same repository.
+    name: ""
     tag: latest
     pullPolicy: IfNotPresent
     imagePullSecrets: []
@@ -775,12 +840,29 @@ admin_ui:
     type: ClusterIP
     port: 8080
 
-end_user_ui:
+# Canonical spelling of the end-user-ui component key. (The product, image
+# and registry name are "enduser-ui"; the old "end_user_ui" spelling was
+# born from the same dash/underscore mixup.) The legacy key is STILL FULLY
+# SUPPORTED: the templates deep-merge end_user_ui OVER enduser_ui, so
+# existing values files keep byte-identical semantics — when both keys are
+# set, the legacy key wins on conflicts (the conservative deprecation
+# rule). The rendered Kubernetes objects keep their historical
+# "end-user-ui" names and the OAuth2 client id stays "end-user-ui" (it
+# matches the client registered in the AM image's config), so neither
+# spelling changes what deploys.
+enduser_ui:
   enabled: true
   replicaCount: 1
 
   image:
-    repository: us-docker.pkg.dev/forgeops-public/images/end-user-ui
+    # Left empty: the repository resolves platform.imageRepository (see
+    # the platform.imageRef helper). An explicit repository here always
+    # wins.
+    repository: ""
+    # Empty = the platform default name "enduser-ui" (composed with
+    # platform.imageRepository — the name the CI publishes). Override to
+    # pull a differently-named image from the same repository.
+    name: ""
     tag: latest
     pullPolicy: IfNotPresent
     imagePullSecrets: []
@@ -853,7 +935,14 @@ login_ui:
   replicaCount: 1
 
   image:
-    repository: us-docker.pkg.dev/forgeops-public/images/login-ui
+    # Left empty: the repository resolves platform.imageRepository (see
+    # the platform.imageRef helper). An explicit repository here always
+    # wins.
+    repository: ""
+    # Empty = the platform default name "login-ui" (composed
+    # with platform.imageRepository). Override to pull a
+    # differently-named image from the same repository.
+    name: ""
     tag: latest
     pullPolicy: IfNotPresent
     imagePullSecrets: []
@@ -958,7 +1047,14 @@ ds_idrepo:
   replicaCount: 1
 
   image:
-    repository: us-docker.pkg.dev/forgeops-public/images/ds
+    # Left empty: the repository resolves platform.imageRepository (see
+    # the platform.imageRef helper). An explicit repository here always
+    # wins.
+    repository: ""
+    # Empty = the platform default name "ds" (composed
+    # with platform.imageRepository). Override to pull a
+    # differently-named image from the same repository.
+    name: ""
     tag: latest
     pullPolicy: IfNotPresent
     imagePullSecrets: []
@@ -1037,6 +1133,9 @@ ds_idrepo:
 
   podSecurityContext:
     fsGroup: 0
+    # 11111 = the forgerock uid of the Debian images. The alpine pingbase
+    # images use uid 9031; when platform.imageMode=forgeops the templates
+    # override runAsUser to match (see _helpers.tpl "platform.runAsUser").
     runAsUser: 11111
 
   securityContext: {}
@@ -1081,7 +1180,14 @@ ds_cts:
   replicaCount: 1
 
   image:
-    repository: us-docker.pkg.dev/forgeops-public/images/ds
+    # Left empty: the repository resolves platform.imageRepository (see
+    # the platform.imageRef helper). An explicit repository here always
+    # wins.
+    repository: ""
+    # Empty = the platform default name "ds" (composed
+    # with platform.imageRepository). Override to pull a
+    # differently-named image from the same repository.
+    name: ""
     tag: latest
     pullPolicy: IfNotPresent
     imagePullSecrets: []
@@ -1160,6 +1266,9 @@ ds_cts:
 
   podSecurityContext:
     fsGroup: 0
+    # 11111 = the forgerock uid of the Debian images. The alpine pingbase
+    # images use uid 9031; when platform.imageMode=forgeops the templates
+    # override runAsUser to match (see _helpers.tpl "platform.runAsUser").
     runAsUser: 11111
 
   securityContext: {}

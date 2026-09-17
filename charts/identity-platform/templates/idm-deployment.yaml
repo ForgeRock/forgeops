@@ -128,8 +128,16 @@ spec:
             value: /truststore/idmtruststore
           - name: TRUSTSTORE_PASSWORD
             value: changeit
+          {{- if eq (.Values.platform.imageMode | default "base") "forgeops" }}
+          # Alpine CA bundle path (the Debian image uses /usr/lib/ssl/cert.pem)
+          - name: IDM_PEM_TRUSTSTORE
+            value: /etc/ssl/certs/ca-certificates.crt
+          - name: IMAGE_MODE
+            value: forgeops
+          {{- else }}
           - name: IDM_PEM_TRUSTSTORE
             value: /usr/lib/ssl/cert.pem
+          {{- end }}
           - name: IDM_PEM_TRUSTSTORE_DS
             value: /var/run/secrets/truststore/ca.crt
           {{- if .Values.platform.truststore.secret.enabled }}
@@ -148,6 +156,10 @@ spec:
               fieldRef:
                 apiVersion: v1
                 fieldPath: metadata.namespace
+          {{- if eq (.Values.platform.imageMode | default "base") "forgeops" }}
+          - name: IMAGE_MODE
+            value: forgeops
+          {{- end }}
           - name: OPENIDM_REPO_PASSWORD
             valueFrom:
               secretKeyRef:
