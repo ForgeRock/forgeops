@@ -232,11 +232,19 @@ platform:
     host: ""
     port: 8759
     useSSL: false
-    # Optional: name of a connector conf to deploy from the pingidm image's
-    # config-profiles (not yet wired); registration alone makes all RCS
-    # connector bundles visible in the IDM admin UI's Connectors page.
+    # Optional: write a sample LDAP provisioner conf (connector served via
+    # the RCS, targeting the deployment's own DS idrepo userstore) so the
+    # admin UI shows a working connector and sync can be configured on top.
+    # name sets the connector instance name (file
+    # provisioner.openicf-<name>.json); host/port/base/user default to the
+    # userstore.* resolver properties when empty.
     provisioner:
       enabled: false
+      name: ds_ldap
+      host: ""
+      port: ""
+      base: ""
+      user: ""
 
   tolerations:
     - key: kubernetes.io/arch

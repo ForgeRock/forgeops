@@ -142,6 +142,28 @@ spec:
             value: {{ .Values.platform.rcs.port | quote }}
           - name: RCS_CONNECTOR_SERVER_USE_SSL
             value: {{ .Values.platform.rcs.useSSL | quote }}
+          {{- if .Values.platform.rcs.provisioner.enabled }}
+          - name: RCS_CONNECTOR_SERVER_PROVISIONER_ENABLED
+            value: "true"
+          - name: RCS_CONNECTOR_SERVER_PROVISIONER_NAME
+            value: {{ .Values.platform.rcs.provisioner.name | quote }}
+          {{- with .Values.platform.rcs.provisioner.host }}
+          - name: RCS_CONNECTOR_SERVER_PROVISIONER_HOST
+            value: {{ . | quote }}
+          {{- end }}
+          {{- with .Values.platform.rcs.provisioner.port }}
+          - name: RCS_CONNECTOR_SERVER_PROVISIONER_PORT
+            value: {{ . | quote }}
+          {{- end }}
+          {{- with .Values.platform.rcs.provisioner.base }}
+          - name: RCS_CONNECTOR_SERVER_PROVISIONER_BASE
+            value: {{ . | quote }}
+          {{- end }}
+          {{- with .Values.platform.rcs.provisioner.user }}
+          - name: RCS_CONNECTOR_SERVER_PROVISIONER_USER
+            value: {{ . | quote }}
+          {{- end }}
+          {{- end }}
           {{- end }}
           volumeMounts:
           - mountPath: /fbc

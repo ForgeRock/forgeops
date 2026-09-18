@@ -62,6 +62,87 @@ if [ "${RCS_CONNECTOR_SERVER_ENABLED:-false}" = "true" ] \
 '  ]' \
 '}' > /fbc/conf/org.forgerock.openidm.provisioner.openicf.connectorinfoprovider.json
   echo "Registered Remote Connector Server '$RCS_NAME' at $RCS_HOST:$RCS_PORT"
+  # Optional sample provisioner: an LDAP connector over the RCS targeting the
+  # deployment's own DS idrepo (resolver props userstore.host / port /
+  # basecontext, USERSTORE_PASSWORD from the ds-passwords secret). Gives the
+  # admin UI a working Connectors page entry and a base for sync setup.
+  if [ "${RCS_CONNECTOR_SERVER_PROVISIONER_ENABLED:-false}" = "true" ]; then
+    RCS_PROV_NAME="${RCS_CONNECTOR_SERVER_PROVISIONER_NAME:-ds_ldap}"
+    RCS_PROV_HOST="${RCS_CONNECTOR_SERVER_PROVISIONER_HOST:-&{userstore.host|ds-idrepo-0.ds-idrepo}}"
+    RCS_PROV_PORT="${RCS_CONNECTOR_SERVER_PROVISIONER_PORT:-1636}"
+    RCS_PROV_BASE="${RCS_CONNECTOR_SERVER_PROVISIONER_BASE:-&{userstore.basecontext|ou=identities}}"
+    RCS_PROV_USER="${RCS_CONNECTOR_SERVER_PROVISIONER_USER:-&{userstore.user|uid=admin}}"
+    printf '%s\n' \
+'{' \
+'  "enabled": true,' \
+'  "connectorRef": {' \
+'    "bundleName": "org.forgerock.openicf.connectors.ldap-connector",' \
+'    "bundleVersion": "[1.5.0.0,1.6.0.0)",' \
+'    "connectorName": "org.identityconnectors.ldap.LdapConnector",' \
+'    "connectorHostRef": "'"$RCS_NAME"'"' \
+'  },' \
+'  "producerBufferSize": 100,' \
+'  "connectorPoolingSupported": true,' \
+'  "poolConfigOption": {' \
+'    "maxObjects": 10,' \
+'    "maxIdle": 10,' \
+'    "maxWait": 150000,' \
+'    "minEvictableIdleTimeMillis": 120000,' \
+'    "minIdle": 1' \
+'  },' \
+'  "operationTimeout": {' \
+'    "CREATE": -1,' \
+'    "TEST": -1,' \
+'    "SYNC": -1,' \
+'    "SEARCH": -1' \
+'  },' \
+'  "configurationProperties": {' \
+'    "principal": "'"$RCS_PROV_USER"'",' \
+'    "credentials": "&{userstore.password|}",' \
+'    "host": "'"$RCS_PROV_HOST"'",' \
+'    "port": {"$int": "'"$RCS_PROV_PORT"'"},' \
+'    "ssl": true,' \
+'    "baseContexts": [' \
+'      "'"$RCS_PROV_BASE"'"' \
+'    ],' \
+'    "uidAttribute": "entryUUID",' \
+'    "readSchema": true,' \
+'    "accountObjectClasses": [' \
+'      "top",' \
+'      "person",' \
+'      "organizationalPerson",' \
+'      "inetOrgPerson"' \
+'    ],' \
+'    "accountUserNameAttributes": [' \
+'      "uid",' \
+'      "cn",' \
+'      "sAMAccountName"' \
+'    ],' \
+'    "passwordAttribute": "userPassword",' \
+'    "useBlocks": true,' \
+'    "blockSize": 100,' \
+'    "usePagedResultControl": true' \
+'  },' \
+'  "objectTypes": {' \
+'    "account": {' \
+'      "id": "account",' \
+'      "type": "object",' \
+'      "nativeType": "__ACCOUNT__",' \
+'      "properties": {' \
+'        "dn": {"type": "string", "required": true, "nativeName": "__NAME__", "nativeType": "string"},' \
+'        "uid": {"type": "string", "nativeName": "uid", "nativeType": "string"},' \
+'        "cn": {"type": "string", "nativeName": "cn", "nativeType": "string"},' \
+'        "sn": {"type": "string", "nativeName": "sn", "nativeType": "string"},' \
+'        "mail": {"type": "string", "nativeName": "mail", "nativeType": "string"},' \
+'        "objectClass": {"type": "array", "items": {"type": "string", "nativeType": "string"}, "nativeName": "objectClass", "nativeType": "string"}' \
+'      }' \
+'    }' \
+'  },' \
+'  "resultsHandlerConfig": {"enableAttributesToGetSearchResultsHandler": true},' \
+'  "syncFailureHandler": {"maxRetries": 5, "postRetryAction": "logged-ignore"}' \
+'}' > "/fbc/conf/provisioner.openicf-${RCS_PROV_NAME}.json"
+    echo "Wrote sample LDAP provisioner conf 'provisioner.openicf-${RCS_PROV_NAME}.json' (via RCS $RCS_NAME)"
+  fi
 else
   # A stale registration file would keep pointing IDM at a (possibly
   # removed/rotated) RCS: remove it when the wiring is disabled or the
