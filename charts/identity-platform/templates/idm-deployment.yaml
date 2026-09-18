@@ -102,6 +102,16 @@ spec:
         - name: filesystem-init
           image: "{{ .Values.idm.image.repository }}:{{ .Values.idm.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.idm.image.pullPolicy }}
+          env:
+          {{- if eq (.Values.platform.imageMode | default "base") "forgeops" }}
+          # The pingidm single-mode image ships the deployment conf as an
+          # unapplied CONFIG_PROFILE overlay; filesystem-init applies it
+          # onto the fbc conf when the runtime mode is forgeops.
+          - name: IMAGE_MODE
+            value: forgeops
+          - name: CONFIG_PROFILE
+            value: cdk-base
+          {{- end }}
           volumeMounts:
           - mountPath: /fbc
             name: fbc

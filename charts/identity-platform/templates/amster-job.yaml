@@ -84,6 +84,16 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: metadata.namespace
+          {{- if eq (.Values.platform.imageMode | default "base") "forgeops" }}
+          # The pingamster single-mode image stages the deployment assets
+          # (CONFIG_PROFILE overlay + forgeops scripts) unapplied at
+          # /opt/amster-forgeops; the image entrypoint applies them only in
+          # forgeops runtime mode.
+          - name: IMAGE_MODE
+            value: forgeops
+          - name: CONFIG_PROFILE
+            value: default
+          {{- end }}
           envFrom:
           - configMapRef:
               name: platform-config
@@ -128,6 +138,12 @@ spec:
           env:
           - name: AMSTER_DURATION
             value: {{ .Values.amster.env.DURATION | quote }}
+          {{- else if eq (.Values.platform.imageMode | default "base") "forgeops" }}
+          env:
+          - name: IMAGE_MODE
+            value: forgeops
+          - name: CONFIG_PROFILE
+            value: default
           {{- end }}
           readinessProbe:
             exec:
