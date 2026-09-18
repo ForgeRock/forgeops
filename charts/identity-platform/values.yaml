@@ -217,6 +217,27 @@ platform:
           uu8wd+RU4riEmViAqhOLUTpPSPaLtrM=
           -----END CERTIFICATE-----
 
+  # Out-of-the-box Remote Connector Server (RCS) wiring for IDM: when the
+  # `rcs-key` secret exists in the release namespace (the charts/rcs release
+  # creates it), the idm filesystem-init registers the RCS with IDM's
+  # connector info provider by writing
+  # conf/org.forgerock.openidm.provisioner.openicf.connectorinfoprovider.json
+  # (remoteConnectorServers entry pointing at the RCS headless service with
+  # the shared key). With no rcs-key secret the init step is a no-op, so a
+  # platform deploy without the rcs release behaves exactly as before. host
+  # empty defaults to rcs.<namespace>.svc.cluster.local.
+  rcs:
+    enabled: true
+    name: rcs-0
+    host: ""
+    port: 8759
+    useSSL: false
+    # Optional: name of a connector conf to deploy from the pingidm image's
+    # config-profiles (not yet wired); registration alone makes all RCS
+    # connector bundles visible in the IDM admin UI's Connectors page.
+    provisioner:
+      enabled: false
+
   tolerations:
     - key: kubernetes.io/arch
       operator: Exists

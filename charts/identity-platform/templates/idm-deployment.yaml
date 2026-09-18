@@ -69,6 +69,16 @@ spec:
                   name: {{ .Values.platform.truststore.secret.name }}
                   optional: true
               {{- end }}
+        {{- if .Values.platform.rcs.enabled }}
+        # Shared RCS password, created by the charts/rcs release in this
+        # namespace. Optional: without it (no rcs release) the filesystem-init
+        # RCS wiring is a no-op. RCS_KEY_PASSWORD is the plaintext shared
+        # password; the RCS side derives its key-hash form from it.
+        - name: rcs-key
+          secret:
+            secretName: rcs-key
+            optional: true
+        {{- end }}
         - name: new-truststore
           emptyDir: {}
         - name: logs
@@ -103,6 +113,10 @@ spec:
           image: {{ include "platform.imageRef" (list . (list .Values.idm.image "idm" .Chart.AppVersion)) | quote }}
           imagePullPolicy: {{ .Values.idm.image.pullPolicy }}
           env:
+          - name: NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
           {{- if eq (.Values.platform.imageMode | default "base") "forgeops" }}
           # The pingidm single-mode image ships the deployment conf as an
           # unapplied CONFIG_PROFILE overlay; filesystem-init applies it
@@ -111,6 +125,23 @@ spec:
             value: forgeops
           - name: CONFIG_PROFILE
             value: cdk-base
+          {{- end }}
+          {{- if .Values.platform.rcs.enabled }}
+          # Out-of-the-box RCS wiring: register the RCS with IDM's connector
+          # info provider when the rcs-key secret (charts/rcs release) is
+          # present; a no-op otherwise (see filesystem-init.sh).
+          - name: RCS_CONNECTOR_SERVER_ENABLED
+            value: "true"
+          - name: RCS_CONNECTOR_SERVER_NAME
+            value: {{ .Values.platform.rcs.name | quote }}
+          {{- if .Values.platform.rcs.host }}
+          - name: RCS_CONNECTOR_SERVER_HOST
+            value: {{ .Values.platform.rcs.host | quote }}
+          {{- end }}
+          - name: RCS_CONNECTOR_SERVER_PORT
+            value: {{ .Values.platform.rcs.port | quote }}
+          - name: RCS_CONNECTOR_SERVER_USE_SSL
+            value: {{ .Values.platform.rcs.useSSL | quote }}
           {{- end }}
           volumeMounts:
           - mountPath: /fbc
@@ -121,6 +152,11 @@ spec:
             name: writeable
           - mountPath: /scripts
             name: idm-init-scripts
+          {{- if .Values.platform.rcs.enabled }}
+          - mountPath: /rcs-secrets
+            name: rcs-key
+            readOnly: true
+          {{- end }}
           command: [/scripts/filesystem-init.sh]
         - name: truststore-init
           image: {{ include "platform.imageRef" (list . (list .Values.idm.image "idm" .Chart.AppVersion)) | quote }}
