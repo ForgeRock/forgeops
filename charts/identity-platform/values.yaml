@@ -360,12 +360,6 @@ ds_set_passwords:
   restartPolicy: OnFailure
   ttlSecondsAfterFinished: 43200
 
-  image:
-    repository: us-docker.pkg.dev/forgeops-public/images/ds
-    tag: latest
-    pullPolicy: Always
-    imagePullSecrets: []
-
   resources: {}
     # limits:
     #   cpu: 100m
@@ -373,6 +367,13 @@ ds_set_passwords:
     # requests:
     #   cpu: 100m
     #   memory: 512Mi
+
+  # Defaults to the ds_idrepo image. Uncomment to override; specify all keys.
+  # image:
+  #   repository: us-docker.pkg.dev/forgeops-public/images/ds
+  #   tag: latest
+  #   pullPolicy: Always
+  #   imagePullSecrets: []
 
   readinessProbe:
     initialDelaySeconds: 1
