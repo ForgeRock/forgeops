@@ -23,7 +23,7 @@ inspection.
 ## TLDR
 You create your own collections of component versions, called releases, with this tool.
 
-Site containing release files: http://releases.forgeops.com
+Site containing release files: https://releases.forgeops.com
 
 ### Select 7.5.1 for entire platform
 
@@ -174,7 +174,7 @@ to talk to the platform. It also has a different versioning scheme.
 
 If there is a specific tag you want to use for a component, then you can
 specify it with `--tag`. You can see the list of published tags for each
-version at the release web site (http://releases.forgeops.com).
+version at the release web site (https://releases.forgeops.com).
 
 `forgeops image --release 7.5.0 --release-name 7.5.1 --tag 7.5.0-202412031032 idm`
 
@@ -236,7 +236,7 @@ local file system.
 
 In order to get started with your own set of release files, it's a good idea to
 use the official files as a starting point. The main index page for
-http://releases.forgeops.com has a list of all of the JSON files hosted there.
+https://releases.forgeops.com has a list of all of the JSON files hosted there.
 You should download each of them. They each contain a map that has a key called
 'releases'. Like so:
 
@@ -340,14 +340,14 @@ comment out RELEASES_SRC and BASE_REPO in your forgeops.conf, and run the
 image` commands to point to the official locations. You can find the current
 defaults by looking in `lib/python/defaults.py`.
 
-`forgeops info --releases-src http://releases.forgeops.com --list-releases`
+`forgeops info --releases-src https://releases.forgeops.com --list-releases`
 
 If you want to play with the official images, you can use the `forgeops image` command to do so.
 
 *Update Dockerfiles*
 
-`forgeops image --releases-src http://releases.forgeops.com --image-repo us-docker.pkg.dev/forgeops-public/images-base --release 8.0.1 platform`
+`forgeops image --releases-src https://releases.forgeops.com --image-repo us-docker.pkg.dev/forgeops-public/images-base --release 8.0.1 platform`
 
 *Update Helm/Kustomize*
 
-`forgeops image --releases-src http://releases.forgeops.com --image-repo us-docker.pkg.dev/forgeops-public/images --release 8.0.1 platform`
+`forgeops image --releases-src https://releases.forgeops.com --image-repo us-docker.pkg.dev/forgeops-public/images --release 8.0.1 platform`

@@ -49,7 +49,7 @@
 # Releases
 #
 # You shouldn't use this unless you are building images from scratch
-# RELEASES_SRC=http://releases.forgeops.com
+# RELEASES_SRC=https://releases.forgeops.com
 
 #
 # Container registry URLS

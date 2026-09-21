@@ -20,6 +20,9 @@ Note that the IDM API URL path is now `/api` instead of `/openidm/api`.
 Updated [README](docker/ds/README.md) with some useful customization steps for
 PingDS including adding custom LDAP entries and schema files.
 
+### releases.forgeops.com now served over HTTPS
+The image tag files hosted at releases.forgeops.com are now available over HTTPS
+
 ## Bugfixes
 
 ### forgeops dsconfig leaked password

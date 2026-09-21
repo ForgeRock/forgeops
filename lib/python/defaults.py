@@ -5,7 +5,7 @@ FORGEOPS_PUBLIC_URL = 'us-docker.pkg.dev/forgeops-public'
 BASE_REPO_DEV = "gcr.io/forgerock-io"
 BASE_REPO_DEF = f"{FORGEOPS_PUBLIC_URL}/images-base"
 DEPLOY_REPO_DEF = f"{FORGEOPS_PUBLIC_URL}/images"
-RELEASES_SRC_DEF = 'http://releases.forgeops.com'
+RELEASES_SRC_DEF = 'https://releases.forgeops.com'
 SNAPSHOT_ROLE_NAME = 'ds-snapshot'
 SNAPSHOT_SERVICE_ACCOUNT = 'ds-snapshot'
 

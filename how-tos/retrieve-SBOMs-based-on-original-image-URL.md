@@ -42,7 +42,7 @@ bin/forgeops info --list-releases --json | jq -r '.idm["8.1"]["8.1.0"]'
 # Output: 8.1.0-202606240536
 ```
 
-**From the releases page:** Browse [releases.forgeops.com](http://releases.forgeops.com/).
+**From the releases page:** Browse [releases.forgeops.com](https://releases.forgeops.com/).
 
 ---
 
@@ -51,7 +51,7 @@ bin/forgeops info --list-releases --json | jq -r '.idm["8.1"]["8.1.0"]'
 SBOMs are available at the following URL structure:
 
 ```
-http://releases.forgeops.com/sbom/<PRODUCT_NAME>/<VERSION>/<PRODUCT_NAME>_<TAG>_<ARCH>_<FORMAT>.json
+https://releases.forgeops.com/sbom/<PRODUCT_NAME>/<VERSION>/<PRODUCT_NAME>_<TAG>_<ARCH>_<FORMAT>.json
 ```
 
 | Variable       | Values |
@@ -63,12 +63,12 @@ http://releases.forgeops.com/sbom/<PRODUCT_NAME>/<VERSION>/<PRODUCT_NAME>_<TAG>_
 | `FORMAT`       | `cyclonedx` or `spdx` |
 
 **Example:**
-http://releases.forgeops.com/sbom/idm/8.1.0/idm_8.1.0-202606240536_arm64_cyclonedx.json
+https://releases.forgeops.com/sbom/idm/8.1.0/idm_8.1.0-202606240536_arm64_cyclonedx.json
 
 
 ### Browse available SBOMs
 
-Visit [releases.forgeops.com/sbom](http://releases.forgeops.com/sbom) to browse all published SBOMs.
+Visit [releases.forgeops.com/sbom](https://releases.forgeops.com/sbom) to browse all published SBOMs.
 
 ### Download via curl
 
@@ -81,7 +81,7 @@ ARCH="amd64"  # or arm64
 FORMAT="cyclonedx"  # or spdx
 
 # Download the SBOMs file
-curl -O "http://releases.forgeops.com/sbom/${PRODUCT_NAME}/${VERSION}/${PRODUCT_NAME}_${TAG}_${ARCH}_${FORMAT}.json"
+curl -O "https://releases.forgeops.com/sbom/${PRODUCT_NAME}/${VERSION}/${PRODUCT_NAME}_${TAG}_${ARCH}_${FORMAT}.json"
 
 # File downloaded
 ls
@@ -139,7 +139,7 @@ pip install spdx-tools
 
 ```sh
 # Download the SPDX file first
-curl -O "http://releases.forgeops.com/sbom/${PRODUCT_NAME}/${VERSION}/${PRODUCT_NAME}_${TAG}_${ARCH}_spdx.json"
+curl -O "https://releases.forgeops.com/sbom/${PRODUCT_NAME}/${VERSION}/${PRODUCT_NAME}_${TAG}_${ARCH}_spdx.json"
 
 # Validate
 pyspdxtools -i idm_8.1.0-202606240536_amd64.spdx.json
