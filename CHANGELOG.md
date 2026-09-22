@@ -21,7 +21,7 @@ Updated [README](docker/ds/README.md) with some useful customization steps for
 PingDS including adding custom LDAP entries and schema files.
 
 ### releases.forgeops.com now served over HTTPS
-The image tag files hosted at releases.forgeops.com are now available over HTTPS
+The image tag files hosted at releases.forgeops.com are now available over HTTPS. If you set `RELEASES_SRC` in your own `forgeops.conf`, update it to use `https://`.
 
 ## Bugfixes
 
