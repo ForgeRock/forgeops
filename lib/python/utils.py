@@ -300,7 +300,7 @@ def printurls(ns, to_stdout=True):
         message('\nRelevant URLs:')
         for url in urls:
             print(urls[url])
-        warning('DEPRECATION WARNING: The IDM /admin endpoint (https://{}/admin) is deprecated in platform 8.1 and will be removed in a future ForgeOps release.'.format(fqdn))
+        warning('DEPRECATION WARNING: The IDM /admin endpoint (https://{}/admin) is deprecated in platform 8.1 and will be removed in a future ForgeOps release. You can reenable it with `forgeops env -e my-env --idm-admin-ui-enable` (Helm only).'.format(fqdn))
     return urls
 
 def secretagent(k8s_op, tag='latest'):
