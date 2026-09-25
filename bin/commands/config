@@ -300,7 +300,7 @@ def export_ig(ig_conf, pod_name, dryrun=False):
 def run_export(args, overrides):
     # Amster doesn't use a running instance
     conf_path = pathlib.Path(overrides['build_path'].joinpath(
-        APP_CONF_PATH_FMT[args.component](profile=args.profile))).resolve()
+        APP_CONF_PATH_FMT[args.component](profile=args.config_profile))).resolve()
     # prime the config
     if not conf_path.exists():
         if args.component == 'ig':
@@ -339,7 +339,7 @@ def run_export(args, overrides):
             log.info(f'Running export for {component_name} in {pod_name}')
             if component_name == 'idm':
                 conf_ui_path = pathlib.Path(overrides['build_path'].joinpath(
-                    APP_CONF_PATH_FMT["idm-ui"](profile=args.profile))).resolve()
+                    APP_CONF_PATH_FMT["idm-ui"](profile=args.config_profile))).resolve()
                 export_idm(conf_path, conf_ui_path, pod_name, dryrun=args.dryrun)
             elif component_name == 'ig':
                 export_ig(conf_path, pod_name, dryrun=args.dryrun)
@@ -379,12 +379,12 @@ def run_export(args, overrides):
 def run_build(args, overrides):
     """ Build an custom container and use the image command to set it in a ForgeOps environment"""
 
-    conf_path = _get_profile_path(args.component, args.profile, overrides['build_path'])
+    conf_path = _get_profile_path(args.component, args.config_profile, overrides['build_path'])
     app_path = pathlib.Path(overrides['build_path'].joinpath(args.component)).resolve()
     if not conf_path.is_dir():
-        msg = f"ERROR! No such profile ({args.profile}) at {conf_path}"
+        msg = f"ERROR! No such profile ({args.config_profile}) at {conf_path}"
         utils.exit_msg(1, msg)
-    build_args = f" --build-arg CONFIG_PROFILE={args.profile}"
+    build_args = f" --build-arg CONFIG_PROFILE={args.config_profile}"
     image = f"{args.component}-custom"
     repo = getattr(args, 'push_to')
     if not repo:
@@ -424,10 +424,10 @@ def run_build(args, overrides):
 
 def run_path(args, overrides):
     if args.tool == 'docker' and args.component != 'ds':
-        profile = f'config-profiles/{args.profile}' if args.profile != '' else ''
+        profile = f'config-profiles/{args.config_profile}' if args.config_profile != '' else ''
         print(overrides['build_path'].joinpath(args.component, profile))
     elif args.tool == 'docker' and args.component == 'ds':
-        profile = f'{args.profile}' if args.profile != '' else ''
+        profile = args.config_profile if args.config_profile != '' else ''
         print(overrides['build_path'].joinpath(args.component, profile))
     elif args.tool == 'kustomize':
         print(overrides['kustomize_path'].joinpath(args.layer, args.kustomization, args.sub_kustomization))
@@ -456,7 +456,7 @@ def setup_args(common_args):
     export_cmd_parser.add_argument('component',
                                    choices=EXPORT_COMPONENTS.keys(),
                                    help=HELP_CMD_COMPONENTS)
-    export_cmd_parser.add_argument('profile')
+    export_cmd_parser.add_argument('config_profile')
     export_cmd_parser.add_argument('--sort', '-s',
                                    help=HELP_EXPORT_CMD_SORT,
                                    action='store_true')
@@ -520,7 +520,7 @@ def setup_args(common_args):
     path_docker_parser.add_argument('component',
                                     help=HELP_CMD_COMPONENTS,
                                     choices=PLATFORM_COMPONENTS.keys())
-    path_docker_parser.add_argument('profile',
+    path_docker_parser.add_argument('config_profile',
                                     help=HELP_PATH_DOCKER_PROFILE_NAME,
                                     nargs='?',
                                     default='')

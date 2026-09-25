@@ -42,6 +42,11 @@ you specify the `repository`, `tag`, and `pullPolicy` keys.
 This changes the default pullPolicy for ds-set-passwords from Always to
 IfNotPresent.
 
+### forgeops config build fixed
+
+The `forgeops config build` command had a bug preventing it from executing.
+This has been fixed.
+
 ## How-tos
 
 ### New Procedures
