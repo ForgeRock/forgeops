@@ -1,0 +1,53 @@
+#
+# Copyright 2020-2026 Ping Identity Corporation. All Rights Reserved
+# 
+# This code is to be used exclusively in connection with Ping Identity 
+# Corporation software or services. Ping Identity Corporation only offers
+# such software or services to legal entities who have entered into a 
+# binding license agreement with Ping Identity Corporation.
+#
+
+dn: o=REALM_NAME,o=root,ou=identities
+objectClass: top
+objectClass: organization
+o: REALM_NAME
+
+dn: ou=groups,o=REALM_NAME,o=root,ou=identities
+objectClass: top
+objectClass: organizationalUnit
+ou: groups
+
+dn: ou=people,o=REALM_NAME,o=root,ou=identities
+objectClass: top
+objectClass: organizationalUnit
+ou: people
+
+dn: ou=role,o=REALM_NAME,o=root,ou=identities
+objectClass: top
+objectClass: organizationalUnit
+ou: role
+
+dn: ou=assignment,o=REALM_NAME,o=root,ou=identities
+objectClass: top
+objectClass: organizationalUnit
+ou: assignment
+
+dn: ou=usermeta,o=REALM_NAME,o=root,ou=identities
+objectClass: top
+objectClass: organizationalUnit
+ou: usermeta
+
+dn: ou=application,o=REALM_NAME,o=root,ou=identities
+objectClass: top
+objectClass: organizationalUnit
+ou: application
+
+dn: ou=aiagents,o=REALM_NAME,o=root,ou=identities
+objectClass: top
+objectClass: organizationalUnit
+ou: aiagents
+
+dn: ou=aiagentprivilege,o=REALM_NAME,o=root,ou=identities
+objectClass: top
+objectClass: organizationalUnit
+ou: aiagentprivilege

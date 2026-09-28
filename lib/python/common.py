@@ -2,6 +2,7 @@
 
 import argparse
 import yaml
+import lib.python.defaults as defaults
 
 
 # Avoid using anchors/aliases in outputted YAML
@@ -41,6 +42,8 @@ def setup_args():
 
     config_profile_help_msg = 'Name of config profile in docker/<component>/config-profiles'
     env_help_msg = 'Forgeops environment to target'
+    source_help_msg = 'Name of source env'
+    helm_chart_defaults = defaults.HELM_CHART_DEFAULTS
 
     namespace_arg = argparse.ArgumentParser(add_help=False)
     namespace_arg.add_argument(
@@ -74,6 +77,12 @@ def setup_args():
         '--config-profile',
         '-p',
         default='default',
+        help=config_profile_help_msg)
+    config_profile_req_arg = argparse.ArgumentParser(add_help=False)
+    config_profile_req_arg.add_argument(
+        '--config-profile',
+        '-p',
+        required=True,
         help=config_profile_help_msg)
     env_name_arg = argparse.ArgumentParser(add_help=False)
     env_name_arg.add_argument(
@@ -113,11 +122,55 @@ def setup_args():
         dest='no_kustomize',
         action='store_true',
         help="Skip Kustomize")
+    push_to_arg = argparse.ArgumentParser(add_help=False)
+    push_to_arg.add_argument(
+        '--push-to',
+        '-r',
+        help='Container registry to push images to')
     source_arg = argparse.ArgumentParser(add_help=False)
     source_arg.add_argument(
         '--source',
         '-s',
-        help='Name of source Kustomize overlay')
+        help=source_help_msg)
+    source_arg_req = argparse.ArgumentParser(add_help=False)
+    source_arg_req.add_argument(
+        '--source',
+        '-s',
+        required=True,
+        help=source_help_msg)
+    tag_arg = argparse.ArgumentParser(add_help=False)
+    tag_arg.add_argument(
+        '--tag',
+        '-t',
+        help='Image tag to use')
+    tag_def_arg = argparse.ArgumentParser(add_help=False)
+    tag_def_arg.add_argument(
+        '--tag',
+        '-t',
+        default='latest',
+        help='Image tag to use')
+    skip_image_append_arg = argparse.ArgumentParser(add_help=False)
+    skip_image_append_arg.add_argument(
+        '--skip-image-append',
+        action='store_true',
+        help='Do not append image name to the registry')
+    chart_name_arg = argparse.ArgumentParser(add_help=False)
+    chart_name_arg.add_argument(
+        '--chart-name',
+        '-c',
+        default=helm_chart_defaults['name'],
+        help='Name of Helm chart as installed')
+    chart_version_arg = argparse.ArgumentParser(add_help=False)
+    chart_version_arg.add_argument(
+        '--chart-version',
+        '-V',
+        help='Version of Helm chart to apply')
+    chart_repo_arg = argparse.ArgumentParser(add_help=False)
+    chart_repo_arg.add_argument(
+        '--chart-repo',
+        '-o',
+        default=helm_chart_defaults['repo'],
+        help='Helm repository to use')
 
     return {
         'debug': debug_arg,
@@ -126,6 +179,7 @@ def setup_args():
         'namespace': namespace_arg,
         'config_profile': config_profile_arg,
         'config_profile_def': config_profile_def_arg,
+        'config_profile_req': config_profile_req_arg,
         'env_name': env_name_arg,
         'env_name_req': env_name_arg_req,
         'build_path': build_path_arg,
@@ -133,5 +187,13 @@ def setup_args():
         'kustomize_path': kustomize_path_arg,
         'no_helm': no_helm_arg,
         'no_kustomize': no_kustomize_arg,
+        'push_to': push_to_arg,
+        'skip_image_append': skip_image_append_arg,
         'source': source_arg,
+        'source_req': source_arg_req,
+        'tag': tag_arg,
+        'tag_def': tag_def_arg,
+        'chart_name': chart_name_arg,
+        'chart_version': chart_version_arg,
+        'chart_repo': chart_repo_arg,
     }

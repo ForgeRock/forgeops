@@ -13,6 +13,7 @@ import logging
 import json
 import re
 import site
+import uuid
 from pathlib import Path
 file_name = Path(__file__)
 current_file_path = file_name.parent.resolve()
@@ -22,7 +23,14 @@ dependencies_dir = os.path.join(root_path, 'lib', 'dependencies')
 sys.path.insert(0, str(root_path))
 sys.path.insert(1, str(dependencies_dir) + site.USER_SITE.replace(site.USER_BASE, ''))
 
-from lib.python.defaults import RELEASES_SRC_DEF, ENV_COMPONENTS_VALID
+from lib.python.defaults import (
+    RELEASES_SRC_DEF,
+    ENV_COMPONENTS_VALID,
+    HELM_CHART_NAME_DEF,
+    HELM_CHART_REPO_DEF,
+    KUBECTL,
+    HELM_CMD
+)
 
 CYAN = '\033[1;96m'
 PURPLE = '\033[1;95m'
@@ -190,17 +198,19 @@ def run(cmd, *cmdArgs, stdin=None, cstdout=False, cstderr=False, cwd=None, env=N
     log.debug(f'Running: "{runcmd}"' + (f' in CWD="{os.path.abspath(cwd)}"' if cwd else ''))
     if dryrun:
         print(runcmd)
-    else:
-        if debug:
-            print(runcmd)
-        try:
-            _r = subprocess.run(shlex.split(runcmd), stdout=stdo_pipe, stderr=stde_pipe,
-                                check=True, input=stdin, text=text, cwd=cwd, env=env)
-            return _r.returncode == 0, _r.stdout, _r.stderr
-        except Exception as e:
-            if ignoreFail:
-                return False, None, None
-            raise(e)
+        if text:
+            return True, "", ""
+        return True, b"", b""
+    if debug:
+        print(runcmd)
+    try:
+        _r = subprocess.run(shlex.split(runcmd), stdout=stdo_pipe, stderr=stde_pipe,
+                            check=True, input=stdin, text=text, cwd=cwd, env=env)
+        return _r.returncode == 0, _r.stdout, _r.stderr
+    except Exception as e:
+        if ignoreFail:
+            return False, None, None
+        raise(e)
 
 def run_condfail(cmd, *cmdArgs, stdin=None, cstdout=False, cstderr=False, cwd=None, env=None, ignoreFail=False):
     """Wrapper function for run() that ignores failures if selected."""
@@ -547,7 +557,7 @@ def replace_or_append_dict(array, search_key, search_str, target_key, replace_da
 
     return array
 
-def process_overrides(root_path, helm, kustomize, build, no_helm, no_kustomize, releases_src, pull_policy, source, ssl_secretname, debug=False):
+def process_overrides(root_path, helm, kustomize, build, no_helm, no_kustomize, releases_src, pull_policy, source, ssl_secretname, push_to=None, debug=False):
     """
     Process common paths from arguments
     """
@@ -624,6 +634,9 @@ def process_overrides(root_path, helm, kustomize, build, no_helm, no_kustomize, 
         else:
             r_src = root_path / r_src
 
+    if not push_to and os.getenv('PUSH_TO'):
+        push_to = os.getenv('PUSH_TO')
+
     if debug:
         print(f'helm_path = {helm_path}')
         print(f'kustomize_path = {kustomize_path}')
@@ -634,6 +647,7 @@ def process_overrides(root_path, helm, kustomize, build, no_helm, no_kustomize, 
         print(f'releases_src = {releases_src}')
         print(f'forgeops_data = {forgeops_data}')
         print(f'pull_policy = {pull_policy_real}')
+        print(f'push_to = {push_to}')
         print(f'source_overlay = {source_overlay}')
         print(f'ssl_secretname = {ssl_secretname}')
 
@@ -647,6 +661,7 @@ def process_overrides(root_path, helm, kustomize, build, no_helm, no_kustomize, 
         'releases_src': r_src,
         'forgeops_data': forgeops_data,
         'pull_policy': pull_policy_real,
+        'push_to': push_to,
         'source_overlay': source_overlay,
         'ssl_secretname': ssl_secret
     }
@@ -696,3 +711,248 @@ def check_path(path, name, path_type, fail_on_err=False):
         exit_msg(f"{name} ({path}) isn't a {path_type} or doesn't exist")
 
     return exists
+
+
+def run_helm_cmd(values_file, namespace,
+                 chart_name=HELM_CHART_NAME_DEF,
+                 chart_version=None,
+                 chart_repo=HELM_CHART_REPO_DEF,
+                 debug=False, dryrun=False,
+                 force_ds_passwords=False, force_amster=False):
+    """ Run Helm command """
+    repo_opt = chart_repo
+    if chart_repo.startswith('http'):
+        version_opt = ""
+        if chart_version:
+            version_opt = f"--version {chart_version}"
+        repo_opt = f"{chart_name} --repo {chart_repo} {version_opt}"
+    cmd_opts = f"upgrade -i {chart_name} {repo_opt} --values {values_file} -n {namespace}"
+    if force_ds_passwords:
+        cmd_opts = f"{cmd_opts} --set ds_set_passwords.force=true"
+    if force_amster:
+        cmd_opts = f"{cmd_opts} --set amster.force=true"
+    print("Running helm")
+    run(HELM_CMD, cmd_opts, dryrun=dryrun, debug=debug)
+
+
+def check_helm_installed():
+    """ Check if HELM_CMD is installed """
+    return bool(HELM_CMD)
+
+
+def check_chart(namespace: str, chart_name:str=None) -> bool:
+    """ Check check namespace for a Helm chart called chart_name.  """
+    if not chart_name:
+        chart_name = 'identity-platform'
+    try:
+        _, out, _ = run(HELM_CMD, f"list -q -n {namespace}",
+                            cstdout=True, cstderr=True, ignoreFail=True)
+        charts = out.decode('utf-8').splitlines()
+        return bool(chart_name in charts)
+    except:
+        return False
+
+
+def is_k8s_resource(res_type, res, namespace):
+    """ Check to see if a Kubernetes resource exists """
+    is_pass, _, _ = run(KUBECTL, f"get {res_type} {res} -n {namespace}",
+                               cstdout=True, cstderr=True, ignoreFail=True)
+    return is_pass
+
+
+def is_local_k8s_context():
+    """ Check if our current Kubernetes context is local """
+    _, current_ctx, _ = run(KUBECTL, "config current-context", cstdout=True)
+    current_ctx = current_ctx.decode('utf-8')
+    _, cluster_info, _ = run(KUBECTL, f"cluster-info {current_ctx}", cstdout=True)
+    for line in cluster_info.decode('utf-8').splitlines():
+        if 'control plane' in line and '127.0.0.1' in line:
+            return True
+    return False
+
+
+def get_pod_names(label: str, namespace: str):
+    """ Get pod names by label """
+    _, out, _ = run(KUBECTL,
+                    f"get pods --no-headers -l {label} -n {namespace} -o custom-columns=':metadata.name'",
+                    cstdout=True, cstderr=True)
+    return [ name.decode('ascii') for name in out.splitlines() ]
+
+
+def kube_cp(files: list, namespace: str, debug=False, dryrun=False):
+    """ Use kubectl cp to copy file(s) to a pod.
+
+        Provide files as a list of dicts where the dict contains at least src:
+        str and pod:str keys. This is the path to the source file and the pod
+        to copy it to.  You can also specify a dst: str key if the destination
+        file is different than the source.
+
+        Optionally, you can provide container: str, no_preserve: bool, and
+        retries: int as keys as well to configure those settings.
+
+        [
+          {
+            'pod': 'ds-idrepo-0',
+            'src': '/tmp/my_file',
+            'dst': '/opt/opendj/my_file', # optional
+            'container': 'ds', # optional
+            'no_preserve': True, # optional
+            'retries': 5 # optional
+          }
+        ]
+
+    """
+    for file in files:
+        dst = file['src']
+        if 'dst' in file.keys():
+            dst = file['dst']
+        opts = ""
+        if 'container' in file.keys():
+            opts += f" -c {file['container']}"
+        if 'no_preserve' in file.keys():
+            opts += " --no-preserve"
+        if 'retries' in file.keys():
+            opts += f" --retries {file['retries']}"
+        if is_k8s_resource('pod', file['pod'], namespace):
+            run(KUBECTL, f"cp -n {namespace} {file['src']} {file['pod']}:{dst} {opts}", debug=debug, dryrun=dryrun)
+
+
+def kube_rm(targets: list, namespace: str, debug=False, dryrun=False):
+    """ Remove files from a pod.
+
+        Provide files as a list of dicts where the dict contains pod
+        and file keys.
+        [
+          {
+            'pod': 'ds-idrepo-0',
+            'file': '/opt/opendj/my_file',
+            'container': 'ds' # optional
+          }
+        ]
+    """
+    name_sp = get_namespace(namespace)
+    for target in targets:
+        opts = ""
+        if 'container' in target.keys():
+            opts += f" -c {target['container']}"
+        run(KUBECTL, f"exec -n {name_sp} {opts} {target['pod']} -- rm {target['file']}", debug=debug, dryrun=dryrun)
+
+
+def gen_ds_conn(namespace: str):
+    """ Generate a connection string to connect to a DS on localhost using a password file.
+        Accepts a namespace as an input. Outputs a tuple of connection string and the password file..
+    """
+    pass_file = f"/tmp/{uuid.uuid4()}"
+    conn_str = "-h localhost -p 1636 --trustAll"
+    user_str = "-D 'uid=admin'"
+    pass_str = f"--bindPassword:file {pass_file}"
+    return f"{conn_str} {user_str} {pass_str}", pass_file
+
+
+def setup_ds_cmds(pods: list, namespace: str, debug=False, dryrun=False):
+    """ Setup a DS pod to run local commands """
+    conn_str, pass_file = gen_ds_conn(namespace)
+    admin_pass = get_secret_value(namespace, 'ds-passwords', 'dirmanager\\\\.pw')
+    pods_str = " ".join(pods)
+    print(f"Setting up pod(s) {pods_str} to run dsconfig and ldap commands")
+    if not dryrun:
+        file_desc = os.open(pass_file, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+        with open(file_desc, "w", encoding='utf-8') as file:
+            file.write(admin_pass)
+    print(f"Copying password file to pod(s): {pods_str}")
+    files_pass = [{
+        'pod': pod,
+        'src': pass_file,
+        'no_preserve': False } for pod in pods ]
+    kube_cp(files_pass, namespace, debug=debug, dryrun=dryrun)
+    return conn_str, pass_file
+
+
+def cleanup_ds_cmds(pods: list, namespace: str, pass_file: str, debug=False, dryrun=False):
+    """ Clean up files needed for running commands against the server.
+        * password file (remote and local)
+    """
+    pods_str = " ".join(pods)
+    files_rm = [{
+        'pod': pod,
+        'file': pass_file
+    } for pod in pods ]
+    print(f"Removing {pass_file} from {pods_str}")
+    try:
+        kube_rm(files_rm, namespace, debug=debug, dryrun=dryrun)
+    except:
+        print(f"WARNING!! Failed to delete {pass_file} from {pods_str}. Delete them manually.")
+    print(f"Removing {pass_file} from localhost")
+    try:
+        rm_local_files([pass_file], debug=debug, dryrun=dryrun)
+    except:
+        print(f"Failed to delete {pass_file} from localhost. Delete it manually.")
+
+
+def rm_local_files(files: list, debug=False, dryrun=False):
+    """ Remove some local files
+        files: list of paths to files as strings
+    """
+    for file in files:
+        if debug:
+            print(f"Removing {file}")
+        if dryrun:
+            print(f"Would remove {file}")
+        if not dryrun:
+            f_path = Path(file)
+            if f_path.exists():
+                if f_path.is_dir():
+                    f_path.rmdir()
+                else:
+                    f_path.unlink()
+            else:
+                print(f"{f_path} doesn't exist. Skipping.")
+
+
+def ldif_apply(files: list, namespace: str, conn_str: str, debug=False, dryrun=False):
+    """ Apply an ldif to a pod
+        files: list of dicts to pass to kube_cp
+        namespace: namespace
+        conn_str: string of connection options from setup_ds_cmds
+    """
+    #files_rm = [ { 'pod': f['pod'], 'file': f['dst'] } for f in files ]
+    print("Copying ldif files to pod(s)")
+    kube_cp(files, namespace, debug=debug, dryrun=dryrun)
+    for file in files:
+        if is_k8s_resource('pod', file['pod'], namespace):
+            print(f"Apply ldif: {file['dst']}")
+            run(KUBECTL,
+                f"exec {file['pod']} -n {namespace} -- ldapmodify -a {conn_str} {file['dst']}",
+                debug=debug, dryrun=dryrun)
+    #print("Removing ldif files from pod(s)")
+    #kube_rm(files_rm, namespace, debug=debug, dryrun=dryrun)
+
+
+def check_realm_in_ds(realm: str, pod: str, namespace: str, conn_str: str,
+                      debug=False, dryrun=False):
+    """ Check if a realm already exists in a DS
+        realm: name of realm
+        pod: DS pod to check
+        namespace: namespace
+        conn_str: string of connection options from setup_ds_cmds()
+    """
+    base_dn = '--baseDn ou=services,ou=am-config'
+    _, out, _ = run(KUBECTL, f"exec -n {namespace} {pod} -- ldapsearch {conn_str} {base_dn} o={realm}",
+                    cstdout=True, debug=debug, dryrun=dryrun)
+    if out.decode('utf=8') != "":
+        return True
+    return False
+
+
+def apply_amster_profile(profile: str , env_name: str , namespace: str, root_path: str,
+                         helm_path:str=None, kustomize_path:str=None,
+                         debug:bool=False, dryrun:bool=False):
+    """ Apply the amster profile created in create_amster_profile """
+    forgeops_cmd = root_path / 'bin/forgeops'
+    cmd_opts = f"amster import -e {env_name} -n {namespace}"
+    if helm_path:
+        cmd_opts += f" -H {helm_path}"
+    if kustomize_path:
+        cmd_opts += f" -k {kustomize_path}"
+    cmd_opts += f" {profile}"
+    run(forgeops_cmd, cmd_opts, debug=debug, dryrun=dryrun)

@@ -83,6 +83,7 @@ COMMANDS=(
   'image'
   'migrate'
   'prereqs'
+  'realm'
   'rotate'
   'version'
   'wait'

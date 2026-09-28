@@ -4,7 +4,7 @@ RELEASE=2026.3.3
 
 ## Kustomize deprecation
 
-Support for Kustomize-based deployments is deprecated. Users should migrate to Helm chart-based deployments.  
+Support for Kustomize-based deployments is deprecated. Users should migrate to Helm chart-based deployments.
 You can use the <a href="how-tos/migrate-kustomize-to-helm.md">Migrate Kustomize to Helm</a> guide in the ForgeOps repository.
 
 Deprecated in: 2026.3.2
@@ -12,6 +12,12 @@ Deprecated in: 2026.3.2
 Expected removal: 12 months after 2026.3.2 release
 
 ## New Features/Updated functionality
+
+### New forgeops realm command
+
+Realms are a complicated configuration task, and this new command streamlines
+the process for users. More information on using the command can be found in <a
+href="how-tos/configuring-realms.md">this guide</a>.
 
 ### One POSIX script tree for the Debian and Alpine image lines (FORGEOPS-6971)
 
@@ -79,6 +85,13 @@ base-generate.sh. The following flags have been removed from the Helm charts.
 * keystore_create.force
 
 ## Bugfixes
+
+### Amster command now honors bare config-profile names
+
+Providing a bare config profile name to `forgeops amster` did not properly
+resolve the path to the config profile. Now, providing just the name of the
+config profile properly resolves the path to
+`docker/amster/config-profiles/PROFILE_NAME`.
 
 ### DS upgrade no longer crash-loops in add-schema when the instance schema lags the binary
 

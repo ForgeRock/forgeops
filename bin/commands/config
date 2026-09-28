@@ -39,14 +39,7 @@ HELP_EXPORT_AM_UPG_RULES = "Directory of rules to pass to upgrade-am-config"
 HELP_PATH_CMD_TOOL_NAME = "Directory of tool configuration files e.g. docker, docker-alpine, kustomize"
 HELP_PATH_CMD_DESCRIPTION = "Resolve an absolute path to a location in the forgeops directory tree."
 
-HELP_NAMESPACE = "Kubernetes namespace to target"
-
-HELP_ENV_NAME = "ForgeOps environment to use or modify."
-HELP_CONFIG_PROFILE = "Config profile to copy into image."
 HELP_BUILD_DOCKER_ARGS = "Extra arguments to pass to docker. Use -- after config build arguments to specify."
-HELP_BUILD_PUSH_TO = "Container registry to push built images to."
-HELP_BUILD_TAG = "Tag to use on custom image."
-HELP_BUILD_SKIP_IMG_APP = "Don't append image to the repo"
 
 HELP_PATH_DOCKER_CMD = """
 Resolve the path to a directory which contains a Dockerfile, optionally resolve
@@ -54,9 +47,7 @@ Resolve the path to a directory which contains a Dockerfile, optionally resolve
 """
 HELP_PATH_DOCKER_PROFILE_NAME = "Add the config profile name to the path."
 HELP_BUILD_PATH = "Docker build path to use [absolute or relative to forgeops root] (default: docker)"
-HELP_DRYRUN = "Do a dry run."
 
-HELP_HELM_PATH = "Dir to store Helm values files [absolute or relative to forgeops root] (default: helm)"
 HELP_PATH_HELM_ENV_NAME = "Environment name to get path to"
 
 HELP_PATH_KUSTOMIZE_CMD = """
@@ -454,7 +445,8 @@ def setup_args(common_args):
     # export sub command
     export_cmd_parents = [common_args['debug'],
                           common_args['dryrun'],
-                          common_args['build_path']]
+                          common_args['build_path'],
+                          common_args['env_name']]
     export_cmd_parser = sub_cmd_parser.add_parser('export',
                                                   epilog=textwrap.dedent(HELP_EXPORT_EXAMPLES),
                                                   formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -479,7 +471,6 @@ def setup_args(common_args):
     export_envrel = export_cmd_parser.add_mutually_exclusive_group()
     export_envrel.add_argument('--release-name', '-l',
                                    help=HELP_RELEASE_NAME)
-    export_envrel.add_argument('--env-name', '-e', help=HELP_ENV_NAME)
     export_cmd_parser.set_defaults(func=run_export)
 
     # build sub command
@@ -487,6 +478,10 @@ def setup_args(common_args):
                      common_args['dryrun'],
                      common_args['build_path'],
                      common_args['config_profile_def'],
+                     common_args['env_name_req'],
+                     common_args['push_to'],
+                     common_args['skip_image_append'],
+                     common_args['tag_def'],
                      common_args['helm_path'],
                      common_args['kustomize_path']]
     build_cmd_parser = sub_cmd_parser.add_parser('build',
@@ -494,12 +489,6 @@ def setup_args(common_args):
                                                 formatter_class=argparse.RawTextHelpFormatter,
                                                 parents=build_parents,
                                                 description=HELP_BUILD_CMD_DESCRIPTION)
-    build_cmd_parser.add_argument('--env-name', '-e', required=True, help=HELP_ENV_NAME)
-    build_cmd_parser.add_argument('--push-to', '-r', help=HELP_BUILD_PUSH_TO)
-    build_cmd_parser.add_argument('--tag', '-t', default='latest', help=HELP_BUILD_TAG)
-    build_cmd_parser.add_argument('--skip-image-append', dest='skip_image_append',
-                                   help=HELP_BUILD_SKIP_IMG_APP,
-                                   action='store_true', default=False)
     build_cmd_parser.add_argument('component',
                                   choices=BUILD_COMPONENTS.keys(),
                                   help=HELP_CMD_COMPONENTS)
@@ -601,5 +590,6 @@ if __name__ == '__main__':
                                         getattr(args, 'pull_policy', None),
                                         getattr(args, 'source', None),
                                         getattr(args, 'ssl_secretname', None),
+                                        getattr(args, 'push_to', None),
                                         debug=args.debug)
     run(args, overrides)

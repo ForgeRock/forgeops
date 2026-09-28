@@ -1,4 +1,6 @@
 """ Global defaults """
+import sys
+from shutil import which
 
 ALT_RELEASES = ['dev', 'latest']
 FORGEOPS_PUBLIC_URL = 'us-docker.pkg.dev/forgeops-public'
@@ -8,6 +10,16 @@ DEPLOY_REPO_DEF = f"{FORGEOPS_PUBLIC_URL}/images"
 RELEASES_SRC_DEF = 'https://releases.forgeops.com'
 SNAPSHOT_ROLE_NAME = 'ds-snapshot'
 SNAPSHOT_SERVICE_ACCOUNT = 'ds-snapshot'
+
+KUBECTL = which('kubectl')
+if not KUBECTL:
+    print("ERROR!! kubectl missing from PATH. Exiting.")
+    sys.exit(1)
+HELM_CMD = which('helm')
+
+# Helm defaults
+HELM_CHART_NAME_DEF = "identity-platform"
+HELM_CHART_REPO_DEF = "https://ForgeRock.github.io/forgeops"
 
 # This seems like it could be a list. However, these component names can be
 # overridden in the release JSON files. If a release has a custom component name,
@@ -41,3 +53,8 @@ ENV_COMPONENTS_VALID = [
     'end-user-ui',
     'login-ui'
 ]
+
+HELM_CHART_DEFAULTS = {
+    'name': HELM_CHART_NAME_DEF,
+    'repo': HELM_CHART_REPO_DEF,
+}

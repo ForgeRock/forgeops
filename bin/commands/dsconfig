@@ -7,7 +7,6 @@ import sys
 import os
 import shutil
 import site
-import uuid
 from pathlib import Path
 
 file_name = Path(__file__)
@@ -113,56 +112,24 @@ Examples:
 def run(params):
     """ Run command logic """
     check_prereqs(params)
-    namespace = utils.get_namespace()
-    if getattr(params, 'namespace', None):
-        namespace = params.namespace
+    namespace = utils.get_namespace(getattr(params, 'namespace', None))
     namespace_opt = f"-n {namespace}"
-    pass_file = f"/tmp/{uuid.uuid4()}"
-    admin_pass = utils.get_secret_value(namespace, 'ds-passwords', 'dirmanager\\\\.pw')
-    with open(pass_file, "w", encoding='utf-8') as f:
-        f.write(admin_pass)
-    conn_str = "-h localhost -p 1636 --trustAll"
-    user_str = "-D 'uid=admin'"
-    pass_str = f"--bindPassword:file {pass_file}"
+    conn_str, pass_file = utils.setup_ds_cmds([params.pod], namespace,
+                                              debug=params.debug, dryrun=params.dryrun)
     if params.debug:
         print(f"command = {params.command}")
     dsconfig_opts = craft_opt_str(params.command)
     extra_opts = "--no-prompt"
-    dsconfig = f"dsconfig {conn_str} {user_str} {pass_str} {extra_opts} {dsconfig_opts}"
+    dsconfig = f"dsconfig {conn_str} {extra_opts} {dsconfig_opts}"
     cmd_opts = f"exec {namespace_opt} {params.pod} -- "
 
-    try:
-        print(f"Copying password file to /tmp on {params.pod}.")
-        utils.run(KUBECTL, f"cp {namespace_opt} {pass_file} {params.pod}:{pass_file} --no-preserve=true",
-                  dryrun=params.dryrun,
-                  debug=params.debug)
-    except:
-        print(f"ERROR!!! Unable to copy {pass_file} to {params.pod}. Exiting.", file=sys.stderr)
-        sys.exit(1)
     try:
         utils.run(KUBECTL, f"{cmd_opts} {dsconfig}",
                   dryrun=params.dryrun,
                   debug=params.debug)
     except:
         print(f"ERROR!!! The dsconfig command failed, cleaning up '{pass_file}'.", file=sys.stderr)
-    try:
-        print(f"Deleting password file from {params.pod}")
-        utils.run(KUBECTL, f"exec {namespace_opt} {params.pod} -- rm {pass_file}",
-                  dryrun=params.dryrun,
-                  debug=params.debug)
-    except:
-        print(f"ERROR!!! Unable to delete {pass_file} from {params.pod}. Remove it manually.",
-              file=sys.stderr)
-        sys.exit(1)
-    try:
-        print(f"Deleting {pass_file} from the local system.")
-        utils.run('rm', pass_file,
-                  dryrun=params.dryrun,
-                  debug=params.debug)
-    except:
-        print(f"ERROR!!! Unable to delete {pass_file} from the local system. Remove it manually.",
-              file=sys.stderr)
-        sys.exit(1)
+    utils.cleanup_ds_cmds([params.pod], namespace, pass_file, debug=params.debug, dryrun=params.dryrun)
 
 
 if __name__ == '__main__':

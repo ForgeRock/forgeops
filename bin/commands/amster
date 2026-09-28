@@ -265,7 +265,7 @@ def run(args, config):
         if Path(args.src).is_absolute():
             src = Path(args.src) / 'config'
         else:
-            src = root_path / args.src / 'config'
+            src = config['forgeops_data'] / f'docker/amster/config-profiles/{args.src}/config'
 
         amster_import(namespace, src, amster_job_path, args.retain)
         return
@@ -276,7 +276,7 @@ def run(args, config):
         if Path(args.dst).is_absolute():
             dst = Path(args.dst)
         else:
-            dst = config['forgeops_data'] / args.dst
+            dst = config['forgeops_data'] / f"docker/amster/config-profiles/{args.dst}"
 
         amster_export(namespace, dst, amster_job_path, args.glob, args.full, args.retain)
         return
@@ -286,10 +286,11 @@ def run(args, config):
         if Path(args.src).is_absolute():
             src = Path(args.src)
         else:
-            src = config['forgeops_data'] / args.src
+            src = config['forgeops_data'] / f"docker/amster/config-profiles/{args.src}"
 
         upgrade_all_amster_files(args.src, args.fqdn)
         return
+
 
 if __name__ == '__main__':
     common_args = common.setup_args()

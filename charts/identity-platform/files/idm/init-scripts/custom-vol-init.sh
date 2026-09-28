@@ -2,7 +2,7 @@
 
 if [ -d /custom/config ]; then
     echo "Existing openidm configuration found in /custom. Skipping copy."
-elif [ "$(ls -A /config)" ]; then
+elif [ -n "$(ls -A /config)" ]; then
     echo "Copying configuration files to the custom volume."
     mkdir -p /custom/config
     cp -rv /config/* /custom/config/
@@ -11,7 +11,7 @@ else
     echo "No custom FBC found. Continuing with defaults."
 fi
 
-if [ -d /connectors ] && [ "$(ls -A /connectors)" ] ; then
+if [ -d /connectors ] && [ -n "$(ls -A /connectors)" ] ; then
     echo "Copying custom connectors to the custom volume."
     mkdir -p /custom/connectors
     cp -rv /connectors/* /custom/connectors
