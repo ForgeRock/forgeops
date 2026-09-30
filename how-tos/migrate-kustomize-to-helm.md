@@ -9,7 +9,19 @@ If you deployed with Kustomize on ForgeOps 2025.1.0+, or you have already
 migrated your legacy deployment to Kustomize, follow this document to migrate
 to using Helm.
 
+If you identify any enhancements that could improve the current Helm chart, please  
+raise an enhancement request either via your official  support channel or raise a  
+Github Issue here: https://github.com/ForgeRock/forgeops/issues.  
+
 ## Prepare your ForgeOps env
+
+If you created a ForgeOps env using the --no-helm option of the `forgeops env` command, carry out the following steps:
+
+* Open `/path/to/forgeops/kustomize/overlay/my-env/env.log`.
+* Replay the commands from the log but remove the --no-helm option.
+
+These commands will create an equivalent Helm env under `/path/to/forgeops/helm/my-env`.  
+Once the Helm env is created, proceed with the rest of the instructions below.
 
 ### Set your SSL secret name
 
@@ -63,13 +75,23 @@ pods so they keep running once the StatefulSet is gone.
 
 You must use Helm 3.17.0 or higher. It's recommended to use the latest stable
 version of Helm. Also, you need to use the ForgeOps 2026.3.2+ Helm chart.
+> NOTE Add --dry-run=server to the Helm command to validate the upgrade without applying the chart.
 
 ```
 helm upgrade -i identity-platform identity-platform \
   --repo https://ForgeRock.github.io/forgeops \
   --version 2026.3.2 -f helm/my-env/values.yaml \
-  --take-ownership --namespace my-ns
+  --take-ownership --force-conflicts \
+  --namespace my-ns
 ```
+
+`--force-conflicts` resolves Server-Side Apply field-ownership conflicts on the
+first run. Kustomize applied the Deployments with `kubectl apply`, so fields
+such as the `am-secrets`/`idm-secrets` volumes are still owned by the
+`kubectl-client-side-apply` field manager; `--take-ownership` alone only makes
+Helm adopt the objects, not their fields, and the apply fails with `conflict
+occurred while applying object ... conflict with "kubectl-client-side-apply"`.
+Once Helm owns the fields, later upgrades need no extra flags.
 
 ## Restart DS
 
