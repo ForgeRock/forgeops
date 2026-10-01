@@ -18,7 +18,7 @@ Github Issue here: https://github.com/ForgeRock/forgeops/issues.
 If you created a ForgeOps env using the --no-helm option of the `forgeops env` command, carry out the following steps:
 
 * Open `/path/to/forgeops/kustomize/overlay/my-env/env.log`.
-* Replay the commands from the log but remove the --no-helm option.
+* Replay the commands from the log but swap the --no-helm option for --no-kustomize. This avoids modifying your working Kustomize overlay.
 
 These commands will create an equivalent Helm env under `/path/to/forgeops/helm/my-env`.  
 Once the Helm env is created, proceed with the rest of the instructions below.
