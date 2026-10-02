@@ -67,7 +67,7 @@ spec:
         - name: amster
           securityContext:
             {{- toYaml .Values.amster.securityContext | nindent 12 }}
-          image: "{{ .Values.amster.image.repository }}:{{ .Values.amster.image.tag | default .Chart.AppVersion }}"
+          image: {{ include "platform.imageRef" (list . (list .Values.amster.image "amster" "us-docker.pkg.dev/forgeops-public/images/amster" .Chart.AppVersion)) | quote }}
           imagePullPolicy: {{ .Values.amster.image.pullPolicy }}
           command:
             - /bin/sh
@@ -122,7 +122,7 @@ spec:
         - name: pause
           securityContext:
             {{- toYaml .Values.amster.securityContext | nindent 12 }}
-          image: "{{ .Values.amster.image.repository }}:{{ .Values.amster.image.tag | default .Chart.AppVersion }}"
+          image: {{ include "platform.imageRef" (list . (list .Values.amster.image "amster" "us-docker.pkg.dev/forgeops-public/images/amster" .Chart.AppVersion)) | quote }}
           imagePullPolicy: {{ .Values.amster.image.pullPolicy }}
           args:
             - bash

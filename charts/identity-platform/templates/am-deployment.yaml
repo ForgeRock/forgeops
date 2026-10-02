@@ -122,7 +122,7 @@ spec:
             name: am-init-scripts
           command: [/scripts/custom-vol-init.sh]
         - name: filesystem-init
-          image: "{{ .Values.am.image.repository }}:{{ .Values.am.image.tag | default .Chart.AppVersion }}"
+          image: {{ include "platform.imageRef" (list . (list .Values.am.image "am" "us-docker.pkg.dev/forgeops-public/images/am" .Chart.AppVersion)) | quote }}
           imagePullPolicy: {{ .Values.am.image.pullPolicy }}
           volumeMounts:
           - mountPath: /fbc
@@ -135,7 +135,7 @@ spec:
             name: writeable
           command: [/scripts/filesystem-init.sh]
         - name: truststore-init
-          image: "{{ .Values.am.image.repository }}:{{ .Values.am.image.tag | default .Chart.AppVersion }}"
+          image: {{ include "platform.imageRef" (list . (list .Values.am.image "am" "us-docker.pkg.dev/forgeops-public/images/am" .Chart.AppVersion)) | quote }}
           imagePullPolicy: {{ .Values.am.image.pullPolicy }}
           volumeMounts:
           - name: new-truststore
@@ -163,7 +163,7 @@ spec:
         - name: openam
           securityContext:
             {{- toYaml .Values.am.securityContext | nindent 12 }}
-          image: "{{ .Values.am.image.repository }}:{{ .Values.am.image.tag | default .Chart.AppVersion }}"
+          image: {{ include "platform.imageRef" (list . (list .Values.am.image "am" "us-docker.pkg.dev/forgeops-public/images/am" .Chart.AppVersion)) | quote }}
           imagePullPolicy: {{ .Values.am.image.pullPolicy }}
           command:
             - bash

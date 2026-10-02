@@ -71,7 +71,7 @@ The topologySpreadConstraint blocks for ds-cts and ds-idrepo were misconfigured.
 
 ### New Procedures
 
-[Migrate to Helm from Kustomize](how-tos/kustomize-to-helm.md)
+[Migrate to Helm from Kustomize](how-tos/migrate-kustomize-to-helm.md)
 [PingDS Customization Guide](how-tos/pingds-customization-guide.md)
 
 ### Updated Procedures

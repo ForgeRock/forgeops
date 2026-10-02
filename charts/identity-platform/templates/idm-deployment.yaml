@@ -100,7 +100,7 @@ spec:
             name: idm-init-scripts
           command: [/scripts/custom-vol-init.sh]
         - name: filesystem-init
-          image: "{{ .Values.idm.image.repository }}:{{ .Values.idm.image.tag | default .Chart.AppVersion }}"
+          image: {{ include "platform.imageRef" (list . (list .Values.idm.image "idm" "us-docker.pkg.dev/forgeops-public/images/idm" .Chart.AppVersion)) | quote }}
           imagePullPolicy: {{ .Values.idm.image.pullPolicy }}
           env:
           {{- if eq (.Values.platform.imageMode | default "base") "forgeops" }}
@@ -123,7 +123,7 @@ spec:
             name: idm-init-scripts
           command: [/scripts/filesystem-init.sh]
         - name: truststore-init
-          image: "{{ .Values.idm.image.repository }}:{{ .Values.idm.image.tag | default .Chart.AppVersion }}"
+          image: {{ include "platform.imageRef" (list . (list .Values.idm.image "idm" "us-docker.pkg.dev/forgeops-public/images/idm" .Chart.AppVersion)) | quote }}
           imagePullPolicy: {{ .Values.idm.image.pullPolicy }}
           volumeMounts:
           - name: new-truststore
@@ -160,7 +160,7 @@ spec:
         - name: openidm
           securityContext:
             {{- toYaml .Values.idm.securityContext | nindent 12 }}
-          image: "{{ .Values.idm.image.repository }}:{{ .Values.idm.image.tag | default .Chart.AppVersion }}"
+          image: {{ include "platform.imageRef" (list . (list .Values.idm.image "idm" "us-docker.pkg.dev/forgeops-public/images/idm" .Chart.AppVersion)) | quote }}
           imagePullPolicy: {{ .Values.idm.image.pullPolicy }}
           env:
           - name: NAMESPACE
