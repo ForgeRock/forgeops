@@ -997,15 +997,15 @@ ds_idrepo:
   topologySpreadConstraints:
     - labelSelector:
         matchLabels:
-          app.kubernetes.io/instance: ds-idrepo
+          app.kubernetes.io/component: ds-idrepo
       maxSkew: 1
       topologyKey: topology.kubernetes.io/zone
       whenUnsatisfiable: ScheduleAnyway
     - labelSelector:
         matchLabels:
-          app.kubernetes.io/instance: ds-idrepo
+          app.kubernetes.io/component: ds-idrepo
       maxSkew: 1
-      topologyKey: topology.kubernetes.io/hostname
+      topologyKey: kubernetes.io/hostname
       whenUnsatisfiable: ScheduleAnyway
 
   affinity:
@@ -1120,15 +1120,15 @@ ds_cts:
   topologySpreadConstraints:
     - labelSelector:
         matchLabels:
-          app.kubernetes.io/instance: ds-cts
+          app.kubernetes.io/component: ds-cts
       maxSkew: 1
       topologyKey: topology.kubernetes.io/zone
       whenUnsatisfiable: ScheduleAnyway
     - labelSelector:
         matchLabels:
-          app.kubernetes.io/instance: ds-cts
+          app.kubernetes.io/component: ds-cts
       maxSkew: 1
-      topologyKey: topology.kubernetes.io/hostname
+      topologyKey: kubernetes.io/hostname
       whenUnsatisfiable: ScheduleAnyway
 
   affinity:

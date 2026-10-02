@@ -50,6 +50,14 @@ IfNotPresent.
 The `forgeops config build` command had a bug preventing it from executing.
 This has been fixed.
 
+### topologySpreadConstraint configs fixed
+
+The topologySpreadConstraint blocks for ds-cts and ds-idrepo were misconfigured.
+
+* The matchLabels was changed from `app.kubernetes.io/instance` to `app.kubernetes.io/component`
+* The topologyKey was changed from `topology.kubernetes.io/hostname` to `kubernetes.io/hostname`
+* Upgrading will rolling update the DS pods
+
 ## How-tos
 
 ### New Procedures
