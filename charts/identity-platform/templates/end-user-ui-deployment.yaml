@@ -52,7 +52,7 @@ spec:
           emptyDir: {}
       initContainers:
         - name: filesystem-init
-          image: {{ include "platform.imageRef" (list . (list .Values.end_user_ui.image "end-user-ui" "us-docker.pkg.dev/forgeops-public/images/end-user-ui" .Chart.AppVersion)) | quote }}
+          image: {{ include "platform.imageRef" (list . (list .Values.end_user_ui.image "end-user-ui" .Chart.AppVersion)) | quote }}
           imagePullPolicy: IfNotPresent
           volumeMounts:
             - mountPath: /scripts
@@ -64,7 +64,7 @@ spec:
         - name: end-user-ui
           securityContext:
             {{- toYaml .Values.end_user_ui.securityContext | nindent 12 }}
-          image: {{ include "platform.imageRef" (list . (list .Values.end_user_ui.image "end-user-ui" "us-docker.pkg.dev/forgeops-public/images/end-user-ui" .Chart.AppVersion)) | quote }}
+          image: {{ include "platform.imageRef" (list . (list .Values.end_user_ui.image "end-user-ui" .Chart.AppVersion)) | quote }}
           imagePullPolicy: {{ .Values.end_user_ui.image.pullPolicy }}
           lifecycle:
             preStop:

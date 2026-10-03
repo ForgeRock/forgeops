@@ -213,33 +213,30 @@ replaces the default 11111 with 9031; any runAsUser a deployer sets explicitly
 {{- end -}}
 
 {{/*
-The full "<repository>:<tag>" image ref a product component runs. The
-repository resolves per component as:
+The full "<repository>/<name>:<tag>" image ref a product component runs.
+The repository resolves per component as:
   1. component .image.repository (an explicit deployer pin) - always wins
-  2. platform.imageRepository + the component's platform basename (arg 2) -
-     the chart-wide default, e.g. .../images/alpine + "ds"
-  3. the values-file default repository (arg 3) - the historical full path
-     (.../images/ds), which keeps the default render identical to a chart
-     without the platform.imageRepository feature
-The tag (arg 4) is resolved by the caller as before (component .image.tag |
-default AppVersion). basename is the platform-agnostic image name (am,
-amster, ds, idm, admin-ui, end-user-ui, login-ui, idm-admin-ui). Example:
-  include "platform.imageRef" (list .Values.ds_idrepo.image "ds" .Values.ds_idrepo.image.repository .Chart.AppVersion)
+  2. platform.imageRepository (the chart-wide default, e.g.
+     us-docker.pkg.dev/forgeops-public/images)
+and the name (the image's basename inside that repository) as:
+  1. component .image.name (an explicit deployer override) - when set
+  2. the platform default name (arg 2: ds, am, idm, amster, admin-ui,
+     end-user-ui, login-ui, idm-admin-ui)
+Both platform values compose: platform.imageRepository + "/" + name. The
+tag resolves as component .image.tag | default AppVersion (arg 3), exactly
+as the templates resolved it before this helper existed. Example:
+  include "platform.imageRef" (list . .Values.ds_idrepo.image "ds" .Chart.AppVersion)
 */}}
 {{- define "platform.imageRef" -}}
 {{- $root := index . 0 -}}
 {{- $args := index . 1 -}}
 {{- $image := index $args 0 -}}
-{{- $basename := index $args 1 -}}
-{{- $defaultRepo := index $args 2 -}}
-{{- $tag := index $args 3 -}}
-{{- $repo := "" -}}
+{{- $defaultName := index $args 1 -}}
+{{- $tag := index $args 2 -}}
 {{- if and (index $image "repository") (ne (toString (index $image "repository")) "") -}}
-{{- $repo = toString (index $image "repository") -}}
-{{- else if $root.Values.platform.imageRepository -}}
-{{- $repo = printf "%s/%s" (toString $root.Values.platform.imageRepository) $basename -}}
+{{- printf "%s:%s" (toString (index $image "repository")) (index $image "tag" | default $tag) -}}
 {{- else -}}
-{{- $repo = toString $defaultRepo -}}
+{{- $name := default $defaultName (index $image "name") -}}
+{{- printf "%s/%s:%s" (toString $root.Values.platform.imageRepository) $name (index $image "tag" | default $tag) -}}
 {{- end -}}
-{{- printf "%s:%s" $repo (index $image "tag" | default $tag) -}}
 {{- end -}}

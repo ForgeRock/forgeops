@@ -95,7 +95,7 @@ spec:
         - name: filesystem-init
           securityContext:
             {{- toYaml .Values.ds_idrepo.securityContext | nindent 12 }}
-          image: {{ include "platform.imageRef" (list . (list .Values.ds_idrepo.image "ds" "us-docker.pkg.dev/forgeops-public/images/ds" .Chart.AppVersion)) | quote }}
+          image: {{ include "platform.imageRef" (list . (list .Values.ds_idrepo.image "ds" .Chart.AppVersion)) | quote }}
           imagePullPolicy: {{ .Values.ds_idrepo.image.pullPolicy }}
           volumeMounts:
           - name: writeable
@@ -107,7 +107,7 @@ spec:
         - name: init
           securityContext:
             {{- toYaml .Values.ds_idrepo.securityContext | nindent 12 }}
-          image: {{ include "platform.imageRef" (list . (list .Values.ds_idrepo.image "ds" "us-docker.pkg.dev/forgeops-public/images/ds" .Chart.AppVersion)) | quote }}
+          image: {{ include "platform.imageRef" (list . (list .Values.ds_idrepo.image "ds" .Chart.AppVersion)) | quote }}
           imagePullPolicy: {{ .Values.ds_idrepo.image.pullPolicy }}
           volumeMounts:
           {{- if .Values.ds_idrepo.securityContext.readOnlyRootFilesystem }}
@@ -196,7 +196,7 @@ spec:
         - name: ds
           securityContext:
             {{- toYaml .Values.ds_idrepo.securityContext | nindent 12 }}
-          image: {{ include "platform.imageRef" (list . (list .Values.ds_idrepo.image "ds" "us-docker.pkg.dev/forgeops-public/images/ds" .Chart.AppVersion)) | quote }}
+          image: {{ include "platform.imageRef" (list . (list .Values.ds_idrepo.image "ds" .Chart.AppVersion)) | quote }}
           imagePullPolicy: {{ .Values.ds_idrepo.image.pullPolicy }}
           args:
           - start-ds
