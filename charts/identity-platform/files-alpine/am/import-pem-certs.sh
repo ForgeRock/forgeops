@@ -1,4 +1,6 @@
-#!/usr/bin/env bash
+#!/bin/sh
+# busybox ash (no bash in the alpine images); POSIX-safe form of
+# files/am/import-pem-certs.sh (same body, sh-compatible shebang).
 # This script copies the default cacerts to $TRUSTSTORE_PATH
 # and imports all the certs contained in the $AM_PEM_TRUSTSTORE if it exists
 
@@ -12,6 +14,7 @@
 #
 
 set -e
+# busybox ash supports pipefail; kept for parity with the bash variant
 set -o pipefail
 
 AM_DEFAULT_TRUSTSTORE=${AM_DEFAULT_TRUSTSTORE:-$JAVA_HOME/lib/security/cacerts}

@@ -179,7 +179,7 @@ spec:
           image: {{ include "platform.imageRef" (list . (list .Values.am.image "am" .Chart.AppVersion)) | quote }}
           imagePullPolicy: {{ .Values.am.image.pullPolicy }}
           command:
-            - bash
+            - {{ include "platform.amShell" . }}
             - {{ include "platform.amHome" . }}/entrypoint-scripts/entrypoint.sh
           env:
           - name: NAMESPACE

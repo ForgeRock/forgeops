@@ -240,6 +240,16 @@ replaces the default 11111 with 9031; any runAsUser a deployer sets explicitly
 {{- end -}}
 {{- end -}}
 
+{{/* Shell to run the am entrypoint wrapper with: the Debian images have
+     bash; the alpine pingbase images are busybox-ash only. */}}
+{{- define "platform.amShell" -}}
+{{- if eq (.Values.platform.imageMode | default "base") "forgeops" -}}
+{{- printf "sh" -}}
+{{- else -}}
+{{- printf "bash" -}}
+{{- end -}}
+{{- end -}}
+
 {{- define "platform.filesDir" -}}
 {{- if eq (.Values.platform.imageMode | default "base") "forgeops" -}}
 {{- printf "files-alpine" -}}

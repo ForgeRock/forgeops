@@ -1,4 +1,6 @@
-#!/usr/bin/env bash
+#!/bin/sh
+# busybox ash (no bash in the alpine images); POSIX-safe form of
+# files/am/entrypoint-scripts/entrypoint.sh.
 # Alpine pingam variant of files/am/entrypoint-scripts/entrypoint.sh: the
 # pingbase images use /home/ping (PING_HOME/FORGEROCK_HOME) instead of
 # /home/forgerock, and the image's docker-entrypoint.sh lives there too.
