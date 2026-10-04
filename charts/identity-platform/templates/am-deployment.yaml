@@ -42,11 +42,18 @@ spec:
       {{- end }}
       serviceAccountName: {{ include "identity-platform.serviceAccountName" . }}
       securityContext:
-        {{/* AM still runs the Debian image (uid 11111 owns /home/forgerock,
-             mode 750), so platform.runAsUser's forgeops 9031 swap is NOT
-             applied here — it only goes on products with alpine images
-             (ds-cts, ds-idrepo, idm). Revisit when am ships an alpine image. */}}
-        {{- toYaml (.Values.am.podSecurityContext | default dict) | nindent 8 }}
+        {{- $psc := dict }}
+        {{- range $k, $v := (.Values.am.podSecurityContext | default dict) }}
+          {{- if eq $k "runAsUser" }}
+            {{- $_ := set $psc $k (int (include "platform.runAsUser" (list $v $))) }}
+          {{- else }}
+            {{- $_ := set $psc $k $v }}
+          {{- end }}
+        {{- end }}
+        {{/* platform.runAsUser swaps the Debian uid (11111) for the pingbase
+             alpine uid (9031) in forgeops mode — the alpine pingam image
+             runs as 9031 (ping) and owns /home/ping. */}}
+        {{- toYaml $psc | nindent 8 }}
       volumes:
         - name: custom
           emptyDir: {}
@@ -143,16 +150,22 @@ spec:
           - name: truststore
             mountPath: /var/run/secrets/truststore
           - name: am-import-pem-certs
-            mountPath: /home/forgerock/import-pem-certs.sh
+            mountPath: {{ include "platform.amHome" . }}/import-pem-certs.sh
             subPath: import-pem-certs.sh
-          command: ["/home/forgerock/import-pem-certs.sh"]
+          command: ["{{ include "platform.amHome" . }}/import-pem-certs.sh"]
           env:
           - name: TRUSTSTORE_PATH
             value: /truststore/amtruststore
           - name: TRUSTSTORE_PASSWORD
             value: changeit
+          {{- if eq (.Values.platform.imageMode | default "base") "forgeops" }}
+          # Alpine CA bundle path (the Debian image uses /usr/lib/ssl/cert.pem)
+          - name: AM_PEM_TRUSTSTORE
+            value: /etc/ssl/certs/ca-certificates.crt
+          {{- else }}
           - name: AM_PEM_TRUSTSTORE
             value: /usr/lib/ssl/cert.pem
+          {{- end }}
           - name: AM_PEM_TRUSTSTORE_DS
             value: /var/run/secrets/truststore/ca.crt
           {{- if .Values.platform.truststore.secret.enabled }}
@@ -167,7 +180,7 @@ spec:
           imagePullPolicy: {{ .Values.am.image.pullPolicy }}
           command:
             - bash
-            - /home/forgerock/entrypoint-scripts/entrypoint.sh
+            - {{ include "platform.amHome" . }}/entrypoint-scripts/entrypoint.sh
           env:
           - name: NAMESPACE
             valueFrom:
@@ -183,7 +196,7 @@ spec:
           - name: AM_STORES_SSL_ENABLED
             value: "true"
           - name: TRUSTSTORE_PATH
-            value: /home/forgerock/amtruststore
+            value: {{ include "platform.amHome" . }}/amtruststore
           - name: TRUSTSTORE_PASSWORD
             value: changeit
           - name: AM_STORES_USER_TYPE
@@ -242,11 +255,12 @@ spec:
           resources:
             {{- toYaml .Values.am.resources | nindent 12 }}
           volumeMounts:
+          {{- $amHome := include "platform.amHome" . }}
           - name: writeable
-            mountPath: /home/forgerock
-            subPath: home/forgerock
+            mountPath: {{ $amHome }}
+            subPath: {{ printf "home/%s" (base $amHome) }}
           - name: new-truststore
-            mountPath: /home/forgerock/amtruststore
+            mountPath: {{ $amHome }}/amtruststore
             readOnly: true
             subPath: amtruststore
           - name: am-secrets
@@ -259,13 +273,13 @@ spec:
           - name: amster-key
             mountPath: /var/run/secrets/amster
           - name: fbc
-            mountPath: /home/forgerock/openam
+            mountPath: {{ $amHome }}/openam
           - name: am-logback
-            mountPath: /home/forgerock/logging
+            mountPath: {{ $amHome }}/logging
           - name: entrypoint-scripts
-            mountPath: /home/forgerock/entrypoint-scripts
+            mountPath: {{ $amHome }}/entrypoint-scripts
           - name: writeable
-            mountPath: /usr/local/tomcat
+            mountPath: {{ include "platform.amCatalina" . }}
             subPath: tomcat
           - name: writeable
             mountPath: /tmp

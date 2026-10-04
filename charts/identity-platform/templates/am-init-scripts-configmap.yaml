@@ -9,5 +9,5 @@ metadata:
       {{- toYaml . | nindent 4 }}
     {{- end }}
 data:
-  {{ (.Files.Glob "files/am/init-scripts/**.sh").AsConfig | nindent 2 }}
+  {{ (.Files.Glob (printf "%s/am/init-scripts/**.sh" (include "platform.filesDir" .))).AsConfig | nindent 2 }}
 {{- end }}

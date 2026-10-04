@@ -204,6 +204,29 @@ replaces the default 11111 with 9031; any runAsUser a deployer sets explicitly
 {{- end -}}
 {{- end -}}
 
+{{/* Home directory of the product images: the Debian images run the
+     forgerock user (/home/forgerock); the alpine pingbase images run ping
+     (/home/ping = $PING_HOME = $FORGEROCK_HOME baked into the alpine
+     images). Branches every path that overlays the image's home. */}}
+{{- define "platform.amHome" -}}
+{{- if eq (.Values.platform.imageMode | default "base") "forgeops" -}}
+{{- printf "/home/ping" -}}
+{{- else -}}
+{{- printf "/home/forgerock" -}}
+{{- end -}}
+{{- end -}}
+
+{{/* Tomcat install directory: the Debian images put it at
+     /usr/local/tomcat; the alpine pingbase-tomcat images use
+     /opt/tomcat (CATALINA_HOME). */}}
+{{- define "platform.amCatalina" -}}
+{{- if eq (.Values.platform.imageMode | default "base") "forgeops" -}}
+{{- printf "/opt/tomcat" -}}
+{{- else -}}
+{{- printf "/usr/local/tomcat" -}}
+{{- end -}}
+{{- end -}}
+
 {{- define "platform.filesDir" -}}
 {{- if eq (.Values.platform.imageMode | default "base") "forgeops" -}}
 {{- printf "files-alpine" -}}
