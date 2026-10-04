@@ -1,22 +1,26 @@
-{{- if and .Values.end_user_ui.enabled .Values.end_user_ui.pdb.enabled }}
+{{- /* Values alias: prefer enduser_ui, fall back to the deprecated
+     end_user_ui key (see platform.endUserUi in _helpers.tpl). */}}
+{{- $eui := .Values.enduser_ui }}
+{{- $eui = mustMergeOverwrite (deepCopy $eui) (deepCopy (.Values.end_user_ui | default dict)) }}
+{{- if and $eui.enabled $eui.pdb.enabled }}
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
   name: end-user-ui
   labels:
     {{- include "identity-platform.labels" . | nindent 4 }}
-    {{- with .Values.end_user_ui.podLabels }}
+    {{- with $eui.podLabels }}
       {{- toYaml . | nindent 4 }}
     {{- end }}
 spec:
-  {{- if .Values.end_user_ui.pdb.minAvailable }}
-  minAvailable: {{ .Values.end_user_ui.pdb.minAvailable }}
-  {{- else if .Values.end_user_ui.pdb.maxUnavailable }}
-  maxUnavailable: {{ .Values.end_user_ui.pdb.maxUnavailable }}
+  {{- if $eui.pdb.minAvailable }}
+  minAvailable: {{ $eui.pdb.minAvailable }}
+  {{- else if $eui.pdb.maxUnavailable }}
+  maxUnavailable: {{ $eui.pdb.maxUnavailable }}
   {{- end }}
   selector:
     matchLabels:
-      {{- with .Values.end_user_ui.podLabels }}
+      {{- with $eui.podLabels }}
         {{- toYaml . | nindent 6 }}
       {{- end }}
 {{- end }}

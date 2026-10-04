@@ -15,7 +15,9 @@
   https://{{ $host }}/admin
 {{- end }}
 {{- end }}
-{{- if .Values.end_user_ui.ingress.enabled }}
+{{- $eui := .Values.enduser_ui }}
+{{- $eui = mustMergeOverwrite (deepCopy $eui) (deepCopy (.Values.end_user_ui | default dict)) }}
+{{- if $eui.ingress.enabled }}
 {{- range $host := .Values.platform.ingress.hosts }}
   https://{{ $host }}/enduser
 {{- end }}

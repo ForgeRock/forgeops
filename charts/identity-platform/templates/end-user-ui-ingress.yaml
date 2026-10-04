@@ -1,17 +1,21 @@
-{{- if and .Values.end_user_ui.enabled .Values.platform.ingress.enabled -}}
-{{- $svcPort := .Values.end_user_ui.service.port -}}
+{{- /* Values alias: prefer enduser_ui, fall back to the deprecated
+     end_user_ui key (see platform.endUserUi in _helpers.tpl). */}}
+{{- $eui := .Values.enduser_ui }}
+{{- $eui = mustMergeOverwrite (deepCopy $eui) (deepCopy (.Values.end_user_ui | default dict)) }}
+{{- if and $eui.enabled .Values.platform.ingress.enabled -}}
+{{- $svcPort := $eui.service.port -}}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: end-user-ui
   labels:
     {{- include "identity-platform.labels" . | nindent 4 }}
-    {{- with .Values.end_user_ui.podLabels }}
+    {{- with $eui.podLabels }}
       {{- toYaml . | nindent 4 }}
     {{- end }}
   annotations:
-    {{- if .Values.end_user_ui.ingress.annotations }}
-      {{- toYaml .Values.end_user_ui.ingress.annotations | nindent 4 }}
+    {{- if $eui.ingress.annotations }}
+      {{- toYaml $eui.ingress.annotations | nindent 4 }}
     {{- else if .Values.platform.ingress.annotations }}
       {{- toYaml .Values.platform.ingress.annotations | nindent 4 }}
     {{- end }}
@@ -23,7 +27,7 @@ metadata:
     {{- end }}
     {{- end }}
 spec:
-  ingressClassName: {{ .Values.end_user_ui.ingress.className | default .Values.platform.ingress.className }}
+  ingressClassName: {{ $eui.ingress.className | default .Values.platform.ingress.className }}
   tls:
     {{- range $host := .Values.platform.ingress.hosts }}
     - hosts:

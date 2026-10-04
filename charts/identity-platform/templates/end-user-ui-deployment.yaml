@@ -1,21 +1,25 @@
-{{- if .Values.end_user_ui.enabled }}
+{{- /* Values alias: prefer enduser_ui, fall back to the deprecated
+     end_user_ui key (see platform.endUserUi in _helpers.tpl). */}}
+{{- $eui := .Values.enduser_ui }}
+{{- $eui = mustMergeOverwrite (deepCopy $eui) (deepCopy (.Values.end_user_ui | default dict)) }}
+{{- if $eui.enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: end-user-ui
   labels:
     {{- include "identity-platform.labels" . | nindent 4 }}
-    {{- with .Values.end_user_ui.podLabels }}
+    {{- with $eui.podLabels }}
       {{- toYaml . | nindent 4 }}
     {{- end }}
 spec:
-  {{- if not .Values.end_user_ui.autoscaling.enabled }}
-  replicas: {{ .Values.end_user_ui.replicaCount }}
+  {{- if not $eui.autoscaling.enabled }}
+  replicas: {{ $eui.replicaCount }}
   {{- end }}
   selector:
     matchLabels:
       {{- include "identity-platform.selectorLabels" . | nindent 6 }}
-      {{- with .Values.end_user_ui.podLabels }}
+      {{- with $eui.podLabels }}
         {{- toYaml . | nindent 6 }}
       {{- end }}
   template:
@@ -24,25 +28,25 @@ spec:
         {{- if .Values.platform.annotations.deploymentDate.enabled }}
         deployment-date: {{ now | quote }}
         {{- end }}
-        {{- with .Values.end_user_ui.podAnnotations }}
+        {{- with $eui.podAnnotations }}
           {{- toYaml . | nindent 8 }}
         {{- end }}
       labels:
         {{- include "identity-platform.selectorLabels" . | nindent 8 }}
-        {{- with .Values.end_user_ui.podLabels }}
+        {{- with $eui.podLabels }}
           {{- toYaml . | nindent 8 }}
         {{- end }}
     spec:
-      {{- if .Values.end_user_ui.image.imagePullSecrets }}
+      {{- if $eui.image.imagePullSecrets }}
       imagePullSecrets:
-        {{- toYaml .Values.end_user_ui.image.imagePullSecrets | nindent 8 }}
+        {{- toYaml $eui.image.imagePullSecrets | nindent 8 }}
       {{- else if .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml .Values.imagePullSecrets | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ include "identity-platform.serviceAccountName" . }}
       securityContext:
-        {{- toYaml .Values.end_user_ui.podSecurityContext | nindent 8 }}
+        {{- toYaml $eui.podSecurityContext | nindent 8 }}
       volumes:
         - name: end-user-ui-init-scripts
           configMap:
@@ -52,7 +56,7 @@ spec:
           emptyDir: {}
       initContainers:
         - name: filesystem-init
-          image: {{ include "platform.imageRef" (list . (list .Values.end_user_ui.image "end-user-ui" .Chart.AppVersion)) | quote }}
+          image: {{ include "platform.imageRef" (list . (list $eui.image "enduser-ui" .Chart.AppVersion)) | quote }}
           imagePullPolicy: IfNotPresent
           volumeMounts:
             - mountPath: /scripts
@@ -63,9 +67,9 @@ spec:
       containers:
         - name: end-user-ui
           securityContext:
-            {{- toYaml .Values.end_user_ui.securityContext | nindent 12 }}
-          image: {{ include "platform.imageRef" (list . (list .Values.end_user_ui.image "end-user-ui" .Chart.AppVersion)) | quote }}
-          imagePullPolicy: {{ .Values.end_user_ui.image.pullPolicy }}
+            {{- toYaml $eui.securityContext | nindent 12 }}
+          image: {{ include "platform.imageRef" (list . (list $eui.image "enduser-ui" .Chart.AppVersion)) | quote }}
+          imagePullPolicy: {{ $eui.image.pullPolicy }}
           lifecycle:
             preStop:
               exec:
@@ -85,25 +89,25 @@ spec:
           startupProbe:
             exec:
               command: ['true']
-            {{- with .Values.end_user_ui.startupProbe }}
+            {{- with $eui.startupProbe }}
               {{- toYaml . | nindent 12 }}
             {{- end }}
           livenessProbe:
             httpGet:
               path: /
               port: http
-            {{- with .Values.end_user_ui.livenessProbe }}
+            {{- with $eui.livenessProbe }}
               {{- toYaml . | nindent 12 }}
             {{- end }}
           readinessProbe:
             httpGet:
               path: /
               port: http
-            {{- with .Values.end_user_ui.readinessProbe }}
+            {{- with $eui.readinessProbe }}
               {{- toYaml . | nindent 12 }}
             {{- end }}
           resources:
-            {{- toYaml .Values.end_user_ui.resources | nindent 12 }}
+            {{- toYaml $eui.resources | nindent 12 }}
           volumeMounts:
             - mountPath: /tmp
               name: writeable
@@ -111,17 +115,17 @@ spec:
             - mountPath: /usr/share/nginx
               name: writeable
               subPath: usr/share/nginx
-      {{- with .Values.end_user_ui.nodeSelector }}
+      {{- with $eui.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.end_user_ui.affinity }}
+      {{- with $eui.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       tolerations:
-      {{- if .Values.end_user_ui.tolerations }}
-        {{- toYaml .Values.end_user_ui.tolerations | nindent 8 }}
+      {{- if $eui.tolerations }}
+        {{- toYaml $eui.tolerations | nindent 8 }}
       {{- else if .Values.platform.tolerations }}
         {{- toYaml .Values.platform.tolerations | nindent 8 }}
       {{- end }}

@@ -1,11 +1,15 @@
-{{- if and .Values.end_user_ui.enabled .Values.end_user_ui.autoscaling.enabled }}
+{{- /* Values alias: prefer enduser_ui, fall back to the deprecated
+     end_user_ui key (see platform.endUserUi in _helpers.tpl). */}}
+{{- $eui := .Values.enduser_ui }}
+{{- $eui = mustMergeOverwrite (deepCopy $eui) (deepCopy (.Values.end_user_ui | default dict)) }}
+{{- if and $eui.enabled $eui.autoscaling.enabled }}
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: end-user-ui
   labels:
     {{- include "identity-platform.labels" . | nindent 4 }}
-    {{- with .Values.end_user_ui.podLabels }}
+    {{- with $eui.podLabels }}
       {{- toYaml . | nindent 4 }}
     {{- end }}
 spec:
@@ -13,19 +17,19 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: {{ include "identity-platform.fullname" . }}
-  minReplicas: {{ .Values.end_user_ui.autoscaling.minReplicas }}
-  maxReplicas: {{ .Values.end_user_ui.autoscaling.maxReplicas }}
+  minReplicas: {{ $eui.autoscaling.minReplicas }}
+  maxReplicas: {{ $eui.autoscaling.maxReplicas }}
   metrics:
-    {{- if .Values.end_user_ui.autoscaling.targetCPUUtilizationPercentage }}
+    {{- if $eui.autoscaling.targetCPUUtilizationPercentage }}
     - type: Resource
       resource:
         name: cpu
-        targetAverageUtilization: {{ .Values.end_user_ui.autoscaling.targetCPUUtilizationPercentage }}
+        targetAverageUtilization: {{ $eui.autoscaling.targetCPUUtilizationPercentage }}
     {{- end }}
-    {{- if .Values.end_user_ui.autoscaling.targetMemoryUtilizationPercentage }}
+    {{- if $eui.autoscaling.targetMemoryUtilizationPercentage }}
     - type: Resource
       resource:
         name: memory
-        targetAverageUtilization: {{ .Values.end_user_ui.autoscaling.targetMemoryUtilizationPercentage }}
+        targetAverageUtilization: {{ $eui.autoscaling.targetMemoryUtilizationPercentage }}
     {{- end }}
 {{- end }}

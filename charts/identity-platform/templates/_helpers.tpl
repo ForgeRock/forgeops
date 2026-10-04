@@ -216,6 +216,19 @@ replaces the default 11111 with 9031; any runAsUser a deployer sets explicitly
 {{- end -}}
 {{- end -}}
 
+{{/* end-user-ui values alias. The component's values key was historically
+     misspelled "end_user_ui" (the product/UI/image is "enduser-ui"); the
+     corrected key is "enduser_ui" (values.yaml carries the full defaults
+     under it). The alias deep-merges the user's maps with the LEGACY key
+     winning conflicts — the conservative deprecation rule: existing values
+     files keep byte-identical semantics, new files are for fresh adoption.
+     Templates inline this merge (a per-template $eui variable) because
+     helpers cannot return maps for field access; keep the two in sync. */}}
+{{- define "platform.endUserUi" -}}
+{{- $merged := mustMergeOverwrite (deepCopy (.Values.enduser_ui | default dict)) (deepCopy (.Values.end_user_ui | default dict)) -}}
+{{- $merged | toYaml -}}
+{{- end -}}
+
 {{/* Tomcat install directory: the Debian images put it at
      /usr/local/tomcat; the alpine pingbase-tomcat images use
      /opt/tomcat (CATALINA_HOME). */}}

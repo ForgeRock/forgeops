@@ -1,11 +1,15 @@
-{{- if .Values.end_user_ui.enabled }}
+{{- /* Values alias: prefer enduser_ui, fall back to the deprecated
+     end_user_ui key (see platform.endUserUi in _helpers.tpl). */}}
+{{- $eui := .Values.enduser_ui }}
+{{- $eui = mustMergeOverwrite (deepCopy $eui) (deepCopy (.Values.end_user_ui | default dict)) }}
+{{- if $eui.enabled }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: end-user-ui-init-scripts
   labels:
     {{- include "identity-platform.labels" . | nindent 4 }}
-    {{- with .Values.end_user_ui.podLabels }}
+    {{- with $eui.podLabels }}
       {{- toYaml . | nindent 4 }}
     {{- end }}
 data:
