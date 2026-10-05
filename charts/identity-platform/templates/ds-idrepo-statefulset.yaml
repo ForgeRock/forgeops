@@ -206,7 +206,7 @@ spec:
               fieldRef:
                 fieldPath: metadata.name
           {{- $imageModeSet := false }}
-          {{- range concat (default list .Values.platform.env) (default list .Values.ds_cts.env) }}
+          {{- range concat (default list .Values.platform.env) (default list .Values.ds_idrepo.env) }}
           {{- if eq .name "IMAGE_MODE" }}{{- $imageModeSet = true }}{{- end }}
           {{- end }}
           {{- if and (eq (.Values.platform.imageMode | default "base") "forgeops") (not $imageModeSet) }}
@@ -274,11 +274,11 @@ spec:
           - name: writeable
             mountPath: /tmp
             subPath: tmp
+          {{- end }}
           - name: ds-runtime-scripts
             mountPath: /opt/opendj/runtime-scripts
           - name: ds-idrepo-runtime-scripts
             mountPath: /opt/opendj/runtime-scripts/ds-idrepo
-          {{- end }}
           {{- if .Values.ds_idrepo.volumeClaimSpec }}
           - mountPath: /opt/opendj/data
             name: data

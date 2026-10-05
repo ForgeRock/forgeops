@@ -137,8 +137,12 @@ init() {
     upgradeDataAndRebuildDegradedIndexes
     # Set the admin and monitor passwords from K8S secrets
     setAdminAndMonitorPasswords
-    # Add app schema
-    ./runtime-scripts/${POD_NAME%-*}/add-schema
+    # Add app schema. add-schema is only shipped for ds-idrepo, so absence
+    # is not an error on ds-cts - don't spam its init logs with "No such
+    # file or directory" every boot.
+    if [ -f "./runtime-scripts/${POD_NAME%-*}/add-schema" ]; then
+        ./runtime-scripts/${POD_NAME%-*}/add-schema
+    fi
 
 }
 

@@ -181,12 +181,6 @@ Define a variable that determines if we should enable the ssh_keygen job.
 {{- end }}
 
 {{/*
-Directory under the chart that holds the runtime scripts packaged into the
-product ConfigMaps (DS and IDM). The Alpine-based product images
-(IMAGE_MODE=forgeops) run with busybox ash and need the POSIX variants in
-files-alpine; everything else keeps the original files/ scripts.
-*/}}
-{{/*
 The uid the product pods run as. The Debian product images expect the
 historic 11111 (forgerock) uid - the podSecurityContext default, passed as the
 single argument. The alpine pingbase-built images (platform.imageMode=forgeops)
@@ -250,6 +244,12 @@ replaces the default 11111 with 9031; any runAsUser a deployer sets explicitly
 {{- end -}}
 {{- end -}}
 
+{{/*
+Directory under the chart that holds the runtime scripts packaged into the
+product ConfigMaps (DS and IDM). The Alpine-based product images
+(IMAGE_MODE=forgeops) run with busybox ash and need the POSIX variants in
+files-alpine; everything else keeps the original files/ scripts.
+*/}}
 {{- define "platform.filesDir" -}}
 {{- if eq (.Values.platform.imageMode | default "base") "forgeops" -}}
 {{- printf "files-alpine" -}}
