@@ -2,6 +2,15 @@ RELEASE=2026.3.2
 
 # Release Notes
 
+## Kustomize deprecation
+
+Support for Kustomize-based deployments is deprecated. Users should migrate to Helm chart-based deployments.  
+You can use the <a href="how-tos/migrate-kustomize-to-helm.md">Migrate Kustomize to Helm</a> guide in the ForgeOps repository.
+
+Deprecated in: 2026.3.2
+
+Expected removal: 12 months after 2026.3.2 release
+
 ## New Features/Updated functionality
 
 ### Adding idm-admin-ui for 8.1.0+
