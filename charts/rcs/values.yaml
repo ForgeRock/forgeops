@@ -2,9 +2,11 @@
 mode: server
 replicaCount: 1
 image:
-  repository: us-docker.pkg.dev/forgeops-public/images/pingrcs
-  tag: 8-alpine-example
-  pullPolicy: Always
+  repository: us-docker.pkg.dev/forgeops-public/images/rcs
+  # The alpine CI line's pingrcs image (platform.imageMode=forgeops equivalent):
+  #   repository: us-docker.pkg.dev/forgeops-public/images/alpine/rcs
+  #   tag: 1-alpine3.24.2-jre21.0.12.1  (floating <major>-<dims> tier)
+  pullPolicy: IfNotPresent
 podAnnotations: {}
 podLabels: {}
 podSecurityContext: {}

@@ -87,17 +87,20 @@ ig:
     repository: us-docker.pkg.dev/forgeops-public/images/ig
     tag: latest
     pullPolicy: IfNotPresent
+    # The alpine CI line's pingig image (platform.imageMode=forgeops equivalent):
+    #   repository: us-docker.pkg.dev/forgeops-public/images/alpine/ig
+    #   tag: 2026-alpine3.24.2-jre21.0.12.1  (floating <major>-<dims> tier)
     imagePullSecrets: []
 
   ingress:
     enabled: true
-    # Uncomment className and/or annotations to override global platform values
+    # Uncomment className and/or annotations to override global platform values.
+    # NOTE: no rewrite-target is set — the IG image strips the /ig prefix
+    # itself (see pingig config-profiles 50-reverseproxy.json), so the ingress
+    # must forward the FULL path. Providers that ignore nginx rewrite
+    # annotations (e.g. Traefik's ingress-nginx compat) work unchanged.
     # className: "nginx"
-    annotations:
-      haproxy-ingress.github.io/ssl-redirect: "true"
-      haproxy-ingress.github.io/rewrite-target: "/$2"
-      nginx.ingress.kubernetes.io/ssl-redirect: "true"
-      nginx.ingress.kubernetes.io/rewrite-target: "/$2"
+    annotations: {}
 
   env:
     - name: AM_URL
