@@ -71,19 +71,6 @@ Create the name of the service account to use
 {{- end }}
 
 {{/*
-Create a common image helper that can setup a good image string
-*/}}
-{{- define "common.image" }}
-{{- $repository := .image.repository | toString }}
-{{- $tag := (.image.tag | default .default_tag) | toString }}
-{{- if hasPrefix "sha256:" $tag }}
-{{- printf "%s@%s" $repository $tag }}
-{{- else }}
-{{- printf "%s:%s" $repository $tag }}
-{{- end }}
-{{- end }}
-
-{{/*
 Create the name of the snapshot script configmap use
 */}}
 {{- define "ds-snapshot.configMapName" }}
@@ -270,8 +257,9 @@ and the name (the image's basename inside that repository) as:
      end-user-ui, login-ui, idm-admin-ui)
 Both platform values compose: platform.imageRepository + "/" + name. The
 tag resolves as component .image.tag | default AppVersion (arg 3), exactly
-as the templates resolved it before this helper existed. Example:
-  include "platform.imageRef" (list . .Values.ds_idrepo.image "ds" .Chart.AppVersion)
+as the templates resolved it before this helper existed. A tag of the form
+"sha256:<hex>" is a pinned digest and renders with "@" instead of ":":
+  include "platform.imageRef" (list . (list .Values.ds_idrepo.image "ds" .Chart.AppVersion))
 */}}
 {{- define "platform.imageRef" -}}
 {{- $root := index . 0 -}}
@@ -279,10 +267,17 @@ as the templates resolved it before this helper existed. Example:
 {{- $image := index $args 0 -}}
 {{- $defaultName := index $args 1 -}}
 {{- $tag := index $args 2 -}}
+{{- $resolvedTag := toString (index $image "tag" | default $tag) -}}
+{{- $repository := "" -}}
 {{- if and (index $image "repository") (ne (toString (index $image "repository")) "") -}}
-{{- printf "%s:%s" (toString (index $image "repository")) (index $image "tag" | default $tag) -}}
+{{- $repository = toString (index $image "repository") -}}
 {{- else -}}
 {{- $name := default $defaultName (index $image "name") -}}
-{{- printf "%s/%s:%s" (toString $root.Values.platform.imageRepository) $name (index $image "tag" | default $tag) -}}
+{{- $repository = printf "%s/%s" (toString $root.Values.platform.imageRepository) $name -}}
+{{- end -}}
+{{- if hasPrefix "sha256:" $resolvedTag -}}
+{{- printf "%s@%s" $repository $resolvedTag -}}
+{{- else -}}
+{{- printf "%s:%s" $repository $resolvedTag -}}
 {{- end -}}
 {{- end -}}
