@@ -48,7 +48,12 @@ spec:
       subdomain: ds-idrepo
       securityContext:
         {{- $psc := deepCopy (.Values.ds_idrepo.podSecurityContext | default dict) }}
+        {{- /* Only force runAsUser when the deployer's podSecurityContext actually
+             carries one: int(nil) is 0 and a wholesale override without
+             runAsUser would otherwise render runAsUser: 0 (root). */}}
+        {{- if kindIs "invalid" (index $psc "runAsUser") | not }}
         {{- $_ := set $psc "runAsUser" (include "platform.runAsUser" (list (index $psc "runAsUser") .) | int) }}
+        {{- end }}
         {{- toYaml $psc | nindent 8 }}
       volumes:
         - name: ds-master-keypair

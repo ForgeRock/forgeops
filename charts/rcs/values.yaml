@@ -29,15 +29,17 @@ nodeSelector: {}
 tolerations: []
 affinity: {}
 
-# Server mode needs the shared rcs-key secret: generate a random plaintext
-# password (the entrypoint derives the key-hash form; IDM's registration
-# config uses the same value), or create it yourself per the README.
-# secrets:
-#   rcs_key:
-#     generate:
-#       RCS_KEY_PASSWORD:
-#         length: 32
-secrets: {}
+# Server mode needs the shared rcs-key secret. The chart generates a random
+# plaintext password by default (the entrypoint derives the key-hash form;
+# IDM's registration config reads the same value out of the secret). The
+# generator is upgrade-safe: an existing rcs-key secret is preserved, so
+# creating the secret yourself per the README before (or after) install
+# also works and the chart keeps your values.
+secrets:
+  rcs_key:
+    generate:
+      RCS_KEY_PASSWORD:
+        length: 32
 
 custom_properties: []
 # - "connectorserver.url=wss://idp.example.com/openicf"

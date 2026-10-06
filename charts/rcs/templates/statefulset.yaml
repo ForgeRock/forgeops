@@ -4,13 +4,22 @@ metadata:
   name: {{ include "rcs.fullname" . }}
 spec:
   replicas: {{ .Values.replicaCount }}
+  # Required pre-K8s-1.34 (the API server rejects the StatefulSet without
+  # it), and what gives pods their stable per-pod DNS (rcs-0.<fullname>)
+  # that the headless Service and IDM's RCS_CONNECTOR_SERVER_NAME rely on.
+  serviceName: {{ include "rcs.fullname" . }}
   selector:
     matchLabels:
       {{- include "rcs.selectorLabels" . | nindent 6 }}
   template:
     metadata:
-      {{- with .Values.podAnnotations }}
       annotations:
+        # Roll the pods when the rendered properties/logback or custom libs
+        # change: the entrypoint copies these into /opt/openicf once at
+        # init, so a helm upgrade without this annotation would report
+        # success while the running pods kept serving the old config.
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+      {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
@@ -41,7 +50,10 @@ spec:
         - name: trusted-ca-vol
           secret:
             secretName: rcs-certs
-            defaultMode: 0640
+            # 0444: the runtime uid is 11111 (non-root, no fsGroup set), and
+            # secret volumes are owned root:root - 0640 left the PEMs
+            # unreadable and keytool silently produced an empty truststore.
+            defaultMode: 0444
             optional: true
         - name: lib
           configMap:

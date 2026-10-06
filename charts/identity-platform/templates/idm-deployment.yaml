@@ -43,7 +43,12 @@ spec:
       serviceAccountName: {{ include "identity-platform.serviceAccountName" . }}
       securityContext:
         {{- $psc := deepCopy (.Values.idm.podSecurityContext | default dict) }}
+        {{- /* Only force runAsUser when the deployer's podSecurityContext actually
+             carries one: int(nil) is 0 and a wholesale override without
+             runAsUser would otherwise render runAsUser: 0 (root). */}}
+        {{- if kindIs "invalid" (index $psc "runAsUser") | not }}
         {{- $_ := set $psc "runAsUser" (include "platform.runAsUser" (list (index $psc "runAsUser") .) | int) }}
+        {{- end }}
         {{- toYaml $psc | nindent 8 }}
       volumes:
         - name: custom

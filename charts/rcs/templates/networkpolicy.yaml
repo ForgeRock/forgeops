@@ -4,9 +4,13 @@ kind: NetworkPolicy
 metadata:
   name: rcs-network-policy
 spec:
+  # The chart's own selector (name + instance + part-of): a hardcoded
+  # app.kubernetes.io/name: rcs would silently stop selecting these pods
+  # under nameOverride, and would leak this policy across two rcs releases
+  # in one namespace.
   podSelector:
     matchLabels:
-      app.kubernetes.io/name: rcs
+      {{- include "rcs.selectorLabels" . | nindent 6 }}
   policyTypes:
     - Ingress
     - Egress
@@ -21,6 +25,10 @@ spec:
       ports:
         - protocol: UDP
           port: 53
+    # LDAPS egress stays open to all destinations on 1636: the connector
+    # server fronts whatever LDAP backend its connectors target (the
+    # platform's ds-idrepo, an external directory, ...), so it cannot be
+    # scoped to one workload's labels without breaking the general case.
     - to:
       ports:
         - protocol: TCP
@@ -37,7 +45,12 @@ spec:
     {{- end }}
   {{- if eq .Values.mode "server" }}
   ingress:
+    # In-cluster consumers (the platform chart's IDM) are admitted by
+    # same-namespace selector: the documented deployment shape is both
+    # charts in one namespace, and a CIDR list of external clients alone
+    # would block IDM's pod IP. remoteIps then covers everything outside.
     - from:
+        - podSelector: {}
         {{- range $cidr := .Values.remoteIps }}
         - ipBlock:
             cidr: {{ $cidr }}

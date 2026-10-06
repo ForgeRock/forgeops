@@ -44,6 +44,10 @@ if [ "${RCS_CONNECTOR_SERVER_ENABLED:-false}" = "true" ] \
   RCS_NAME="${RCS_CONNECTOR_SERVER_NAME:-rcs-0}"
   RCS_USE_SSL="${RCS_CONNECTOR_SERVER_USE_SSL:-false}"
   RCS_KEY=$(cat /rcs-secrets/RCS_KEY_PASSWORD)
+  # Escape for JSON interpolation below: a password containing " or \
+  # would otherwise produce a malformed conf file and fail IDM's config
+  # load with an opaque parse error.
+  RCS_KEY=$(printf '%s' "$RCS_KEY" | sed 's/[\\"]/\\&/g')
   printf '%s\n' \
 '{' \
 '  "connectorsLocation": "connectors",' \
@@ -146,8 +150,15 @@ if [ "${RCS_CONNECTOR_SERVER_ENABLED:-false}" = "true" ] \
 else
   # A stale registration file would keep pointing IDM at a (possibly
   # removed/rotated) RCS: remove it when the wiring is disabled or the
-  # secret is gone.
-  rm -f /fbc/conf/org.forgerock.openidm.provisioner.openicf.connectorinfoprovider.json 2>/dev/null || true
+  # secret is gone. Only touch the files this script writes - a deployer
+  # who ships their own connectorinfoprovider.json in /custom/config just
+  # had it copied to /fbc/conf, and must not lose it to our cleanup.
+  if [ ! -e /custom/config/org.forgerock.openidm.provisioner.openicf.connectorinfoprovider.json ]; then
+    rm -f /fbc/conf/org.forgerock.openidm.provisioner.openicf.connectorinfoprovider.json 2>/dev/null || true
+  fi
+  if [ ! -e /custom/config/provisioner.openicf-"${RCS_PROV_NAME:-ds_ldap}".json ]; then
+    rm -f /fbc/conf/provisioner.openicf-"${RCS_PROV_NAME:-ds_ldap}".json 2>/dev/null || true
+  fi
 fi
 
 echo "Setting up writeable volume."
