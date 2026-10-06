@@ -7,9 +7,6 @@ metadata:
   name: ds-runtime-scripts
   labels:
     {{- include "identity-platform.labels" . | nindent 4 }}
-    {{- with .Values.idm.podLabels }}
-      {{- toYaml . | nindent 4 }}
-    {{- end }}
 data:
   {{ (.Files.Glob (printf "%s/ds/runtime-scripts/*.sh" (include "platform.filesDir" .))).AsConfig | nindent 2 }}
   {{ (.Files.Glob (printf "%s/ds/runtime-scripts/rstatus" (include "platform.filesDir" .))).AsConfig | nindent 2 }}
@@ -23,9 +20,6 @@ metadata:
   name: ds-cts-runtime-scripts
   labels:
     {{- include "identity-platform.labels" . | nindent 4 }}
-    {{- with .Values.idm.podLabels }}
-      {{- toYaml . | nindent 4 }}
-    {{- end }}
 data:
   {{ (.Files.Glob (printf "%s/ds/runtime-scripts/ds-cts/**" (include "platform.filesDir" .))).AsConfig | nindent 2 }}
 {{- end }}
@@ -37,9 +31,6 @@ metadata:
   name: ds-idrepo-runtime-scripts
   labels:
     {{- include "identity-platform.labels" . | nindent 4 }}
-    {{- with .Values.idm.podLabels }}
-      {{- toYaml . | nindent 4 }}
-    {{- end }}
 data:
   {{ (.Files.Glob (printf "%s/ds/runtime-scripts/ds-idrepo/**" (include "platform.filesDir" .))).AsConfig | nindent 2 }}
 {{- end }}

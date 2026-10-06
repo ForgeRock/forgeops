@@ -1,5 +1,5 @@
 #!/bin/sh
-source /opt/opendj/env.sh
+. /opt/opendj/env.sh
 
 
 echo "DS Status"

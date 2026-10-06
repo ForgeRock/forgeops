@@ -14,7 +14,9 @@ securityContext:
   allowPrivilegeEscalation: false
   capabilities:
     drop:
-      - All
+      # Kubernetes' token is ALL (case-sensitive): "All" is passed through as
+      # an unknown capability name and rejected by the container runtime.
+      - ALL
   readOnlyRootFilesystem: true
   runAsNonRoot: true
 

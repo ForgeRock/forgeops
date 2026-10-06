@@ -83,10 +83,17 @@ spec:
           configMap:
             name: ds-idrepo-runtime-scripts
             defaultMode: 0755
+        {{- /* Only override the image's baked entrypoint in forgeops mode:
+             the alpine images need the chart's POSIX entrypoint, but the
+             debian ds image already carries the identical script (files/ds
+             and docker/ds are kept byte-identical), so mounting the chart's
+             copy in base mode would only add chart/image version skew. */}}
+        {{- if eq (.Values.platform.imageMode | default "base") "forgeops" }}
         - name: ds-entrypoint
           configMap:
             name: ds-entrypoint
             defaultMode: 0755
+        {{- end }}
         {{- if .Values.ds_idrepo.securityContext.readOnlyRootFilesystem }}
         - name: writeable
           emptyDir: {}
@@ -144,9 +151,11 @@ spec:
             name: keys
           - mountPath: /var/run/secrets/cloud-credentials-cache/
             name: cloud-credentials-cache
+          {{- if eq (.Values.platform.imageMode | default "base") "forgeops" }}
           - name: ds-entrypoint
             mountPath: /opt/opendj/docker-entrypoint.sh
             subPath: docker-entrypoint.sh
+          {{- end }}
           - name: ds-runtime-scripts
             mountPath: /opt/opendj/runtime-scripts
           - name: ds-idrepo-runtime-scripts
@@ -302,9 +311,11 @@ spec:
             name: keys
           - mountPath: /var/run/secrets/cloud-credentials-cache/
             name: cloud-credentials-cache
+          {{- if eq (.Values.platform.imageMode | default "base") "forgeops" }}
           - name: ds-entrypoint
             mountPath: /opt/opendj/docker-entrypoint.sh
             subPath: docker-entrypoint.sh
+          {{- end }}
       {{- with .Values.ds_idrepo.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

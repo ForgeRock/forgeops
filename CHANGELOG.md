@@ -13,6 +13,16 @@ Expected removal: 12 months after 2026.3.2 release
 
 ## New Features/Updated functionality
 
+### ping-gateway ingress forwards the full path (no rewrite-target)
+
+The `ig` ingress now uses plain `Prefix` paths and no longer sets
+`rewrite-target`: the IG image strips the `/ig` and `/igadmin` prefixes
+itself, so ingress controllers that ignore nginx rewrite annotations
+work unchanged. If you override `ig.ingress.annotations` yourself, do
+not set `rewrite-target`, or requests will be double-prefixed. The
+`ssl-redirect` annotations (nginx and haproxy) are unchanged from the
+previous default.
+
 ### Adding idm-admin-ui for 8.1.0+
 
 In 8.1.0, the IDM legacy admin-ui was deprecated and removed. It is now

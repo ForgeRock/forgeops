@@ -94,13 +94,17 @@ ig:
 
   ingress:
     enabled: true
-    # Uncomment className and/or annotations to override global platform values.
-    # NOTE: no rewrite-target is set — the IG image strips the /ig prefix
-    # itself (see pingig config-profiles 50-reverseproxy.json), so the ingress
-    # must forward the FULL path. Providers that ignore nginx rewrite
-    # annotations (e.g. Traefik's ingress-nginx compat) work unchanged.
+    # Same annotations as main minus the two rewrite-target entries: the IG
+    # image strips the /ig and /igadmin prefixes itself (pingig
+    # config-profiles 50-reverseproxy.json), so the ingress must forward the
+    # FULL path and no rewrite-target may be set. Keeping the rest explicit
+    # (not falling through to platform.ingress.annotations) preserves main's
+    # semantics: this ingress carries ssl-redirect only, and a deployer
+    # setting this map fully replaces it.
     # className: "nginx"
-    annotations: {}
+    annotations:
+      haproxy-ingress.github.io/ssl-redirect: "true"
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
 
   env:
     - name: AM_URL

@@ -1,6 +1,28 @@
 {{- if and .Values.ig.enabled .Values.platform.ingress.enabled -}}
 {{- $svcPort := .Values.ig.service.port -}}
 {{- $adminPort := .Values.ig.serviceAdmin.port -}}
+{{/* Two Ingress objects, because rewrite-target is per-Ingress and the two
+     paths need opposite rewriting:
+
+     - /ig: plain Prefix, NO rewrite-target. The image's 50-reverseproxy
+       route strips the /ig prefix itself (UriPathRewriteFilter, no-op when
+       the path is already unprefixed), so path-preserving providers work -
+       including controllers that ignore the nginx rewrite-target
+       annotation (e.g. Traefik's ingress-nginx compat provider). A
+       rewrite-target here would strip /ig at the controller AND in the
+       image (double-strip).
+
+     - /igadmin: the exact paths main shipped (ImplementationSpecific
+       regex + rewrite-target /$2). The admin router serves /api and has no
+       in-image /igadmin strip, so without the rewrite every
+       /igadmin/<path> request 404s. On controllers that ignore
+       rewrite-target this behaves exactly as main did on them (broken) -
+       restoring the rewrite does not regress anything, and fixes nginx.
+
+     Prefix matching is element-wise on path segments, so /ig and /igadmin
+     never overlap. */}}
+
+{{- /* /ig: the main API path, forwarded verbatim. */}}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -40,6 +62,52 @@ spec:
     - host: {{ $host | quote }}
       http:
         paths:
+          - path: /ig
+            pathType: Prefix
+            backend:
+              service:
+                name: ig
+                port:
+                  number: {{ $svcPort }}
+    {{- end }}
+---
+{{- /* /igadmin: admin port, rewritten exactly as main did. */}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ig-admin
+  labels:
+    {{- include "ping-gateway.labels" . | nindent 4 }}
+    {{- with .Values.ig.podLabels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+  annotations:
+    haproxy-ingress.github.io/rewrite-target: /$2
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    {{- if and .Values.platform.cert_manager.enabled .Values.platform.ingress.tls.issuer.name }}
+    {{- if (eq "ClusterIssuer" .Values.platform.ingress.tls.issuer.kind) }}
+    cert-manager.io/cluster-issuer: {{ .Values.platform.ingress.tls.issuer.name }}
+    {{- else }}
+    cert-manager.io/issuer: {{ .Values.platform.ingress.tls.issuer.name }}
+    {{- end }}
+    {{- end }}
+spec:
+  ingressClassName: {{ .Values.ig.ingress.className | default .Values.platform.ingress.className }}
+  tls:
+    {{- range $host := .Values.platform.ingress.hosts }}
+    - hosts:
+        - {{ $host | quote }}
+      {{- if $.Values.platform.ingress.tls.secret.name }}
+      secretName: {{ $.Values.platform.ingress.tls.secret.name }}
+      {{- else }}
+      secretName: "tls-{{ $host }}"
+      {{- end }}
+    {{- end }}
+  rules:
+    {{- range $host := .Values.platform.ingress.hosts }}
+    - host: {{ $host | quote }}
+      http:
+        paths:
           - path: /igadmin(/|$)(.*)
             pathType: ImplementationSpecific
             backend:
@@ -47,12 +115,5 @@ spec:
                 name: ig
                 port:
                   number: {{ $adminPort }}
-          - path: /ig(/|$)(.*)
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: ig
-                port:
-                  number: {{ $svcPort }}
     {{- end }}
 {{- end }}

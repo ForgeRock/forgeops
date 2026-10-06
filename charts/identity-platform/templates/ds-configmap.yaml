@@ -7,13 +7,14 @@ metadata:
   name: ds-init-scripts
   labels:
     {{- include "identity-platform.labels" . | nindent 4 }}
-    {{- with .Values.idm.podLabels }}
-      {{- toYaml . | nindent 4 }}
-    {{- end }}
 data:
   {{ (.Files.Glob (printf "%s/ds/init-scripts/**.sh" (include "platform.filesDir" .))).AsConfig | nindent 2 }}
 {{- end }}
-{{- if or .Values.ds_cts.enabled .Values.ds_idrepo.enabled }}
+{{- /* The entrypoint override is only consumed by the forgeops-mode mounts
+     (the debian ds image carries the identical script baked in); skip
+     creating the ConfigMap in base mode. */}}
+{{- if and (or .Values.ds_cts.enabled .Values.ds_idrepo.enabled)
+    (eq (.Values.platform.imageMode | default "base") "forgeops") }}
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -21,9 +22,6 @@ metadata:
   name: ds-entrypoint
   labels:
     {{- include "identity-platform.labels" . | nindent 4 }}
-    {{- with .Values.idm.podLabels }}
-      {{- toYaml . | nindent 4 }}
-    {{- end }}
 data:
   {{ (.Files.Glob (printf "%s/ds/docker-entrypoint.sh" (include "platform.filesDir" .))).AsConfig | nindent 2 }}
 {{- end }}

@@ -1,9 +1,6 @@
 name: Publish RCS Chart
 on:
   workflow_dispatch:
-
-env:
-  REGISTRY: "us-docker.pkg.dev"
 jobs:
   build:
     if: github.repository == 'ForgeRock/forgeops'
@@ -23,6 +20,13 @@ jobs:
         id: set_tag
         run: |
           RELEASE_TAG=$(head -n 1 charts/rcs/README.md | awk -F= '{print $2}')
+          # Fail early (before anything is published) if the README header
+          # no longer carries the version: an empty RELEASE_TAG would write
+          # a bare "version:" into Chart.yaml and publish a broken chart.
+          if [ -z "$RELEASE_TAG" ]; then
+            echo "CHART_VERSION not found on charts/rcs/README.md line 1" >&2
+            exit 1
+          fi
           echo "RELEASE_TAG=$RELEASE_TAG" >> $GITHUB_ENV
 
       - name: Update helm chart versions
@@ -30,12 +34,24 @@ jobs:
         run: |
           sed -i -e "s/^version:.*/version:\ ${{ env.RELEASE_TAG }}/" charts/rcs/Chart.yaml
 
+      # Scope the release to the rcs chart: charts_dir points at a staging
+      # directory holding only charts/rcs. Pointing the action at charts/
+      # would sweep identity-platform and ping-gateway as well, and their
+      # Chart.yaml versions are placeholders (1.0.0) that main.yml rewrites
+      # at its own release time - publishing them from here would ship a
+      # bogus versioned chart.
+      - name: Stage rcs chart
+        run: |
+          mkdir -p /tmp/rcs-release
+          cp -r charts/rcs /tmp/rcs-release/rcs
+
       - name: Run chart-releaser
         uses: helm/chart-releaser-action@v1.7.0
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         with:
-          charts_dir: charts
+          charts_dir: /tmp/rcs-release
           pages_branch: gh-pages
           skip_existing: true
           mark_as_latest: false
+

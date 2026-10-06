@@ -25,6 +25,9 @@ spec:
       ports:
         - protocol: UDP
           port: 53
+        # TCP fallback for DNS responses that exceed the UDP size limit.
+        - protocol: TCP
+          port: 53
     # LDAPS egress stays open to all destinations on 1636: the connector
     # server fronts whatever LDAP backend its connectors target (the
     # platform's ds-idrepo, an external directory, ...), so it cannot be

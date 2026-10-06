@@ -66,6 +66,10 @@ if [ $? == 0 ] ; then
   echo "Job finished. Job logs"
   kubectl --namespace $NAMESPACE wait -l app="${DS_SNAPSHOT_NAME}-job" --for=condition=Ready pod
   kubectl --namespace $NAMESPACE  --all-containers=true logs -l app="${DS_SNAPSHOT_NAME}-job"
+  # The backup job owns the cloned PVC via its volumeMounts; the job must be
+  # deleted for the PVC to be released and reclaimed (the header above
+  # promises this cleanup).
+  kubectl --namespace $NAMESPACE delete job -l app="${DS_SNAPSHOT_NAME}-job"
   exit 0
 fi
 

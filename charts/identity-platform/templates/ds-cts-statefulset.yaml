@@ -82,10 +82,17 @@ spec:
           configMap:
             name: ds-cts-runtime-scripts
             defaultMode: 0755
+        {{- /* Only override the image's baked entrypoint in forgeops mode:
+             the alpine images need the chart's POSIX entrypoint, but the
+             debian ds image already carries the identical script (files/ds
+             and docker/ds are kept byte-identical), so mounting the chart's
+             copy in base mode would only add chart/image version skew. */}}
+        {{- if eq (.Values.platform.imageMode | default "base") "forgeops" }}
         - name: ds-entrypoint
           configMap:
             name: ds-entrypoint
             defaultMode: 0755
+        {{- end }}
         {{- if .Values.ds_cts.securityContext.readOnlyRootFilesystem }}
         - name: ds-init-scripts
           configMap:
@@ -298,9 +305,11 @@ spec:
             mountPath: /opt/opendj/runtime-scripts
           - name: ds-cts-runtime-scripts
             mountPath: /opt/opendj/runtime-scripts/ds-cts
+          {{- if eq (.Values.platform.imageMode | default "base") "forgeops" }}
           - name: ds-entrypoint
             mountPath: /opt/opendj/docker-entrypoint.sh
             subPath: docker-entrypoint.sh
+          {{- end }}
       {{- with .Values.ds_cts.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

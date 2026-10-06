@@ -135,8 +135,10 @@ if [ ! -z "${BACKEND_NAMES}" ]; then
         # BACKEND_NAMES is a "--backendName <name> --backendName <name> ..." list.
         # Walk it pairwise with a while-read: name=the --backendName marker,
         # next line = the backend name itself (busybox ash has no arrays).
-        printf '%s\n' ${BACKEND_NAMES} | awk 'NR % 2 == 0' > /tmp/.recovery_backends
-        while IFS= read -r backend; do
+        # Piped, not staged through a /tmp file: the loop runs in a subshell
+        # but only reads variables, and /tmp may not be writable when
+        # readOnlyRootFilesystem is set without a /tmp mount.
+        printf '%s\n' ${BACKEND_NAMES} | awk 'NR % 2 == 0' | while IFS= read -r backend; do
             [ -z "$backend" ] && continue
             if ! [ "${backend}" = "schema" ]; then
                 basedns=$(dsconfig get-backend-prop --offline --script-friendly --no-prompt --backend-name ${backend} --property base-dn | awk '{print $2}')
@@ -145,8 +147,7 @@ if [ ! -z "${BACKEND_NAMES}" ]; then
                 echo "Running disaster recovery on basedn ${basedn} for backend ${backend}"
                 dsrepl disaster-recovery --no-prompt --user-generated-id ${DISASTER_RECOVERY_ID} --baseDn "${basedn}"
             done
-        done < /tmp/.recovery_backends
-        rm -f /tmp/.recovery_backends
+        done
         echo "Disaster recovery completed."
     else
         echo
