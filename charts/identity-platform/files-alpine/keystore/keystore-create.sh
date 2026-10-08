@@ -36,6 +36,14 @@ set -e
 # platform's components failing to open it ("Keystore was tampered with, or
 # password was incorrect"). Probe the secret-mounted copy (if any) with the
 # CURRENT password and mark the outcome for the push step.
+#
+# LIMIT: this probe only validates the store password, NOT that the existing
+# keystore holds every alias keystore.json declares. A secret built by an
+# older chart revision (missing a since-added alias) opens fine and is
+# reused; the consuming component then fails on the missing key. That
+# failure is loud and the remedy is keystore_create.config.secret.replace
+# (or deleting the secret) -- the probe deliberately does not destroy key
+# material on an alias-set mismatch.
 MARKER=$KEYSTORE_DIR/.reuse-existing
 rm -f "$MARKER"
 EXISTING=$EXISTING_DIR/keystore.$KEYSTORE_TYPE
@@ -44,7 +52,11 @@ if [ -s "$EXISTING" ]; then
         touch "$MARKER"
         echo "Existing keystore secret opens with the current store password; it will be reused."
     else
-        echo "Existing keystore secret does NOT open with the current store password (stale secret from a previous install); it will be replaced."
+        # The job template only honors this on INSTALL (no deployed
+        # release); on upgrade the secret is left in place so a live
+        # deployment whose password changed can never have its key
+        # material silently regenerated here.
+        echo "Existing keystore secret does NOT open with the current store password (stale secret from a previous install); the push step will replace it. Replacement is IRREVERSIBLE: all key material in the old keystore (JWT signing keys, IDM symmetric keys) is lost."
     fi
 fi
 
