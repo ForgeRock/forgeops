@@ -125,7 +125,7 @@ spec:
           image: {{ include "platform.imageRef" (list . (list .Values.amster.image "amster" .Chart.AppVersion)) | quote }}
           imagePullPolicy: {{ .Values.amster.image.pullPolicy }}
           args:
-            - bash
+            - {{ include "platform.amShell" . }}
             - -c
             - sleep ${AMSTER_DURATION:-10}
           envFrom:

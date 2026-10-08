@@ -6,7 +6,8 @@ metadata:
   labels:
     {{- include "identity-platform.labels" . | nindent 4 }}
 binaryData:
-{{- range $path, $_ := .Files.Glob "files/amster/scripts/**" }}
-  {{ $path | replace "files/amster/scripts/" "" | sha256sum }}: {{ $.Files.Get $path | b64enc }}
+{{- $dir := include "platform.filesDir" . }}
+{{- range $path, $_ := .Files.Glob (printf "%s/amster/scripts/**" $dir) }}
+  {{ $path | replace (printf "%s/amster/scripts/" $dir) "" | sha256sum }}: {{ $.Files.Get $path | b64enc }}
 {{- end }}
 {{- end }}
