@@ -54,6 +54,32 @@ annotations work unchanged. `/igadmin` keeps its previous regex + rewrite behavi
 
 ## Bugfixes
 
+### identity-platform keystore secret replaced when stale after a failed install
+
+The `keystore-create` job pushed its built keystore into the `keystore`
+secret with create-if-absent semantics, and that secret is not part of the
+release manifest — a failed `--atomic` install uninstalls the release but
+leaves the secret behind. The next install generated a fresh
+`KEYSTORE_PASSWORD`, rebuilt the keystore with it, then skipped the push
+(the secret existed): platform components booted against a keystore
+encrypted with the *previous* install's password and failed with
+`Keystore was tampered with, or password was incorrect` (IDM's datasource
+module in particular), which the install's `--wait` can never satisfy.
+
+The job's init container now probes the existing secret (if any) with the
+current store password before building: on INSTALL (no deployed release),
+a secret that opens is left in place and one that does not (left behind by
+an uninstalled failed install) is replaced instead of skipped; on UPGRADE
+the secret is always left in place as before — a password mismatch there
+can be a live deployment whose `KEYSTORE_PASSWORD` changed on purpose
+(e.g. a custom-secrets migration), where rebuilding would silently
+regenerate the JWT-signing and IDM symmetric keys, so it keeps failing
+loudly until the operator sets `keystore_create.config.secret.replace:
+true`. The push is atomic (`--dry-run=client` piped to `kubectl apply`),
+so a failed create can no longer leave the namespace with no keystore
+secret. This fix is Helm-only; the deprecated Kustomize overlay retains
+the old behavior.
+
 ### DS init no longer logs add-schema errors on ds-cts
 
 The DS entrypoint ran the per-pod `add-schema` script unconditionally, logging
