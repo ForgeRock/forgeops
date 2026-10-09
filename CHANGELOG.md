@@ -72,12 +72,13 @@ profile directly into `/opt/amster` at build time.
 In forgeops image mode the job's init container now applies the staged
 profile before running the import. Older amster images that bake the profile
 into `/opt/amster` at build time (and any deployment that supplies its own
-`amster-import.tar.gz` ConfigMap) keep working unchanged; the hook only
-fails loudly when there is nothing to import at all, instead of silently
-importing nothing. The job's script mounts also resolve their files through
-`platform.filesDir` like the `amster-scripts` ConfigMap does — the mount
-subPaths are sha256 hashes of the relative filenames, so the two sides must
-derive from the same directory or pods fail on missing keys. The client
+`amster-import.tar.gz` ConfigMap) keep working unchanged; an `export` run is
+unaffected, and the hook only fails loudly when there is nothing to import
+at all, instead of silently importing nothing. The job's script mounts also
+resolve their files through `platform.filesDir` like the `amster-scripts`
+ConfigMap does — both sides derive from the same directory, so the mount
+subPaths (sha256 hashes of the relative filenames) can no longer drift from
+the ConfigMap keys. The client
 passwords stay in their `&{...}` env-substitution form (amster resolves
 them at import from the job's own environment, and `bin/commands/amster
 export` writes them back in that form).

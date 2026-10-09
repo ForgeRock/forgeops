@@ -737,7 +737,9 @@ keystore_create:
   config:
     secret:
       name: keystore
-      replace: false  # Delete and recreate the keystore if it already exists?
+      # Replace a keystore secret that fails the init container's probe on
+      # INSTALL, and replace unconditionally on UPGRADE when set true.
+      replace: false
     storeType: jceks
     keytoolAliases:
     # AM keys

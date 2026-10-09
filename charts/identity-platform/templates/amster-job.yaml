@@ -100,25 +100,42 @@ spec:
                    amster-env-secrets values for the dotted secret names),
                    which is also the form bin/commands/amster writes back on
                    export. */}}
-              if [ -d /opt/amster-forgeops/profile/config ] && [ -n "$(ls -A /opt/amster-forgeops/profile/config 2>/dev/null)" ]; then
-                cp -r /opt/amster-forgeops/profile/. /opt/amster/ || {
-                  echo "amster-job: failed to apply the staged config profile from /opt/amster-forgeops/profile" >&2
+              {{/* Only the import cares about the guard: an export or
+                   upload run has no use for staged import JSONs. The elif
+                   cannot just test the directory: the optional amster-config
+                   ConfigMap is subPath-mounted at
+                   /opt/amster/config/amster-import.tar.gz, and kubelet
+                   materialises a MISSING subPath target as an empty
+                   directory there (which is also why import.sh guards with
+                   [ -f ] instead of assuming the path) -- so ls -A always
+                   sees the mount artifact. Distinguish real content from
+                   the artifact: anything NOT named amster-import.tar.gz
+                   (pre-baked config), or a real FILE at that name (the
+                   actual tarball; the artifact is a directory). A staging
+                   path mismatch is logged with what WAS found under
+                   /opt/amster-forgeops so it is diagnosable from the job
+                   log. */}}
+              case "${FUNCTION:-}" in
+              ""|import)
+                if [ -d /opt/amster-forgeops/profile/config ] && [ -n "$(ls -A /opt/amster-forgeops/profile/config 2>/dev/null)" ]; then
+                  cp -r /opt/amster-forgeops/profile/. /opt/amster/ || {
+                    echo "amster-job: failed to apply the staged config profile from /opt/amster-forgeops/profile" >&2
+                    exit 1
+                  }
+                elif [ -n "$(find /opt/amster/config -mindepth 1 ! -name amster-import.tar.gz -print -quit 2>/dev/null)" ] || [ -f /opt/amster/config/amster-import.tar.gz ]; then
+                  echo "amster-job: the amster image stages no config profile; importing the existing /opt/amster/config content"
+                else
+                  echo "amster-job: nothing to import -- the amster image stages no config profile under /opt/amster-forgeops (found: $(ls -A /opt/amster-forgeops 2>/dev/null | tr '\n' ' ')) and /opt/amster/config is empty; refusing to run an import that would silently configure nothing" >&2
                   exit 1
-                }
-              elif [ -n "$(ls -A /opt/amster/config 2>/dev/null)" ]; then
-                echo "amster-job: the amster image stages no config profile; importing the existing /opt/amster/config content"
-              else
-                {{/* Nothing staged and nothing pre-baked would replay the
-                     exact silent empty-import failure this block exists to
-                     fix: the import reports success over zero objects and
-                     AM ends up with no oauth2 clients. Fail the hook
-                     loudly instead. */}}
-                echo "amster-job: nothing to import -- the amster image stages no config profile and /opt/amster/config is empty; refusing to run an import that would silently configure nothing" >&2
-                exit 1
-              fi
+                fi
+                ;;
+              esac
               {{- end }}
               for f in $(find /amster-scripts); do
-                cp -r $f /opt/amster/ && chmod 775 /opt/amster/$(basename $f)
+                cp -r $f /opt/amster/ && chmod 775 /opt/amster/$(basename $f) || {
+                  echo "amster-job: failed to install the chart's amster script $f over the image's own" >&2
+                  exit 1
+                }
               done
               [ -z "$FUNCTION" ] && FUNCTION="import"
               ./docker-entrypoint.sh $FUNCTION
