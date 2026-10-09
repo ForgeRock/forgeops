@@ -19,7 +19,7 @@ BASE_VERSION = '7.2.0'
 def pipeline
 def pipelineRun
 
-node('gce-vm-forgeops-n2d-standard-4') {
+node('gce-vm-standard-4') {
     stage('Clone repo') {
         checkout scm
 

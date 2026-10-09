@@ -75,7 +75,7 @@ def runPostcommitInNode(int stageNumber, Integer[] sleepTimeMinutes, Closure run
     if (sleepTimeMinutes[stageNumber] != null) {
         sleep(time: sleepTimeMinutes[stageNumber], unit: 'MINUTES')
 
-        node('gce-vm-forgeops-n2d-standard-32') {
+        node('gce-vm-standard-16') {
             checkout scm
             sh "git checkout ${commonModule.GIT_COMMIT}"
 
