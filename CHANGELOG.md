@@ -66,8 +66,16 @@ staged config profile failed with `Permission denied` (observed
 is now mounted at a neutral path (`/amster-import`) and the init
 container copies it into `/opt/amster/config` after the profile apply,
 so the ConfigMap's content still wins on path collisions — the same
-ordering the in-place mount's extraction had. The tarball extraction in
-`import.sh` is unchanged.
+ordering the in-place mount's extraction had. The copy runs for
+`import` runs only (an `export` neither needs nor writes the tarball).
+The tarball extraction in `import.sh` is unchanged. Note the new
+precondition: importing requires the image's runtime uid to be able to
+create/write `/opt/amster/config` — true for the images this chart
+deploys (the staged-profile copy creates the directory owned by the
+runtime uid, and the upstream amster image chmods `/opt/amster` 0777),
+but a deployment that overrides the image with one shipping a
+root-owned config directory, or enables `readOnlyRootFilesystem`,
+fails the copy — loudly, with the failing uid in the message.
 
 ### identity-platform amster job applies the staged config profile again
 

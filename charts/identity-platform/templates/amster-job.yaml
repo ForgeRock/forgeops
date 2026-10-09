@@ -107,13 +107,24 @@ spec:
                    AFTER the profile: subPath-mounting it INSIDE
                    /opt/amster/config made kubelet pre-create that parent
                    directory as root:root 0755 when the ConfigMap is
-                   absent, and the runtime uid (9031) could then not write
-                   the staged profile into it (observed 2026-10-09: the
-                   profile cp failed with "Permission denied"). With the
+                   absent, and the runtime uid could then not write the
+                   staged profile into it (observed 2026-10-09: the
+                   profile cp failed with "Permission denied"; the uid is
+                   the image's USER -- 9031 on the alpine pingamster
+                   image, whatever the image ships otherwise). With the
                    mount out of the way, /opt/amster/config only ever
                    contains real importable content: pre-baked config from
                    older images, the staged profile, and/or the tarball
-                   copied in below. */}}
+                   copied in below. NOTE the new precondition this creates:
+                   importing now requires the runtime uid to be able to
+                   create/write /opt/amster/config. It holds for the images
+                   this chart deploys (the profile cp creates the dir
+                   owned by the runtime uid; upstream docker/amster
+                   chmods /opt/amster 777), but an externally-built image
+                   with a root-owned config dir, or
+                   readOnlyRootFilesystem: true, would fail the tarball
+                   copy -- deliberately loudly, with the diagnostic
+                   below. */}}
               case "${FUNCTION:-}" in
               ""|import)
                 if [ -d /opt/amster-forgeops/profile/config ] && [ -n "$(ls -A /opt/amster-forgeops/profile/config 2>/dev/null)" ]; then
@@ -122,25 +133,32 @@ spec:
                     exit 1
                   }
                 elif [ -n "$(find /opt/amster/config -mindepth 1 -print -quit 2>/dev/null)" ] || [ -f /amster-import/amster-import.tar.gz ]; then
-                  echo "amster-job: the amster image stages no config profile; importing the existing /opt/amster/config content"
+                  echo "amster-job: the amster image stages no config profile; importing the /opt/amster/config content (pre-baked, and/or the amster-config tarball staged below)"
                 else
                   echo "amster-job: nothing to import -- the amster image stages no config profile under /opt/amster-forgeops (found: $(ls -A /opt/amster-forgeops 2>/dev/null | tr '\n' ' ')) and /opt/amster/config is empty; refusing to run an import that would silently configure nothing" >&2
                   exit 1
                 fi
+                # The optional amster-config tarball lands AFTER the
+                # profile so its content wins on path collisions,
+                # matching what import.sh's in-place extraction did when
+                # the ConfigMap was subPath-mounted inside
+                # /opt/amster/config. Scoped to import runs: an export
+                # neither needs nor writes the tarball, and staging it
+                # would abort an export against a leftover ConfigMap on
+                # an image whose /opt/amster/config is not writable.
+                if [ -f /amster-import/amster-import.tar.gz ]; then
+                  mkdir -p /opt/amster/config || {
+                    echo "amster-job: could not create /opt/amster/config (runtime uid $(id -u) cannot write /opt/amster?)" >&2
+                    exit 1
+                  }
+                  cp /amster-import/amster-import.tar.gz /opt/amster/config/ || {
+                    echo "amster-job: failed to stage the amster-import.tar.gz ConfigMap content into /opt/amster/config (runtime uid $(id -u) cannot write it?)" >&2
+                    exit 1
+                  }
+                fi
                 ;;
               esac
               {{- end }}
-              # The optional amster-config tarball lands AFTER the profile
-              # so its content wins on path collisions, matching what
-              # import.sh's in-place extraction did when the ConfigMap
-              # was subPath-mounted inside /opt/amster/config.
-              if [ -f /amster-import/amster-import.tar.gz ]; then
-                mkdir -p /opt/amster/config
-                cp /amster-import/amster-import.tar.gz /opt/amster/config/ || {
-                  echo "amster-job: failed to stage the amster-import.tar.gz ConfigMap content into /opt/amster/config" >&2
-                  exit 1
-                }
-              fi
               for f in $(find /amster-scripts); do
                 cp -r $f /opt/amster/ && chmod 775 /opt/amster/$(basename $f) || {
                   echo "amster-job: failed to install the chart's amster script $f over the image's own" >&2
