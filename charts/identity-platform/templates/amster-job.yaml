@@ -101,20 +101,19 @@ spec:
                    which is also the form bin/commands/amster writes back on
                    export. */}}
               {{/* Only the import cares about the guard: an export or
-                   upload run has no use for staged import JSONs. The elif
-                   cannot just test the directory: the optional amster-config
-                   ConfigMap is subPath-mounted at
-                   /opt/amster/config/amster-import.tar.gz, and kubelet
-                   materialises a MISSING subPath target as an empty
-                   directory there (which is also why import.sh guards with
-                   [ -f ] instead of assuming the path) -- so ls -A always
-                   sees the mount artifact. Distinguish real content from
-                   the artifact: anything NOT named amster-import.tar.gz
-                   (pre-baked config), or a real FILE at that name (the
-                   actual tarball; the artifact is a directory). A staging
-                   path mismatch is logged with what WAS found under
-                   /opt/amster-forgeops so it is diagnosable from the job
-                   log. */}}
+                   upload run has no use for staged import JSONs. The
+                   amster-import.tar.gz ConfigMap is mounted OUTSIDE
+                   /opt/amster (at /amster-import/) and copied in below,
+                   AFTER the profile: subPath-mounting it INSIDE
+                   /opt/amster/config made kubelet pre-create that parent
+                   directory as root:root 0755 when the ConfigMap is
+                   absent, and the runtime uid (9031) could then not write
+                   the staged profile into it (observed 2026-10-09: the
+                   profile cp failed with "Permission denied"). With the
+                   mount out of the way, /opt/amster/config only ever
+                   contains real importable content: pre-baked config from
+                   older images, the staged profile, and/or the tarball
+                   copied in below. */}}
               case "${FUNCTION:-}" in
               ""|import)
                 if [ -d /opt/amster-forgeops/profile/config ] && [ -n "$(ls -A /opt/amster-forgeops/profile/config 2>/dev/null)" ]; then
@@ -122,7 +121,7 @@ spec:
                     echo "amster-job: failed to apply the staged config profile from /opt/amster-forgeops/profile" >&2
                     exit 1
                   }
-                elif [ -n "$(find /opt/amster/config -mindepth 1 ! -name amster-import.tar.gz -print -quit 2>/dev/null)" ] || [ -f /opt/amster/config/amster-import.tar.gz ]; then
+                elif [ -n "$(find /opt/amster/config -mindepth 1 -print -quit 2>/dev/null)" ] || [ -f /amster-import/amster-import.tar.gz ]; then
                   echo "amster-job: the amster image stages no config profile; importing the existing /opt/amster/config content"
                 else
                   echo "amster-job: nothing to import -- the amster image stages no config profile under /opt/amster-forgeops (found: $(ls -A /opt/amster-forgeops 2>/dev/null | tr '\n' ' ')) and /opt/amster/config is empty; refusing to run an import that would silently configure nothing" >&2
@@ -131,6 +130,17 @@ spec:
                 ;;
               esac
               {{- end }}
+              # The optional amster-config tarball lands AFTER the profile
+              # so its content wins on path collisions, matching what
+              # import.sh's in-place extraction did when the ConfigMap
+              # was subPath-mounted inside /opt/amster/config.
+              if [ -f /amster-import/amster-import.tar.gz ]; then
+                mkdir -p /opt/amster/config
+                cp /amster-import/amster-import.tar.gz /opt/amster/config/ || {
+                  echo "amster-job: failed to stage the amster-import.tar.gz ConfigMap content into /opt/amster/config" >&2
+                  exit 1
+                }
+              fi
               for f in $(find /amster-scripts); do
                 cp -r $f /opt/amster/ && chmod 775 /opt/amster/$(basename $f) || {
                   echo "amster-job: failed to install the chart's amster script $f over the image's own" >&2
@@ -177,8 +187,8 @@ spec:
             subPath: {{ $path | replace (printf "%s/amster/scripts/" $dir) "" | sha256sum }}
           {{- end }}
           - name: config
-            mountPath: /opt/amster/config/amster-import.tar.gz
-            subPath: amster-import.tar.gz
+            mountPath: /amster-import
+            readOnly: true
           - name: amster-secrets
             mountPath: /var/run/secrets/amster
             readOnly: true

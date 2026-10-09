@@ -54,6 +54,21 @@ annotations work unchanged. `/igadmin` keeps its previous regex + rewrite behavi
 
 ## Bugfixes
 
+### identity-platform amster job no longer mounts the import tarball inside the config directory
+
+The optional `amster-config` ConfigMap's tarball was subPath-mounted at
+`/opt/amster/config/amster-import.tar.gz`. When the ConfigMap is absent,
+kubelet materialises the missing subPath target's parent directory —
+`/opt/amster/config` — as root-owned (`root:root` 0755), and the job's
+non-root runtime uid can then not write anything into it: applying the
+staged config profile failed with `Permission denied` (observed
+2026-10-09 on a clean install with the alpine amster image). The tarball
+is now mounted at a neutral path (`/amster-import`) and the init
+container copies it into `/opt/amster/config` after the profile apply,
+so the ConfigMap's content still wins on path collisions — the same
+ordering the in-place mount's extraction had. The tarball extraction in
+`import.sh` is unchanged.
+
 ### identity-platform amster job applies the staged config profile again
 
 With `platform.imageMode: forgeops`, the `pingamster` image now stages the
