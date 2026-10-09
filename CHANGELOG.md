@@ -64,9 +64,15 @@ non-root runtime uid can then not write anything into it: applying the
 staged config profile failed with `Permission denied` (observed
 2026-10-09 on a clean install with the alpine amster image). The tarball
 is now mounted at a neutral path (`/amster-import`) and the init
-container copies it into `/opt/amster/config` after the profile apply,
-so the ConfigMap's content still wins on path collisions — the same
-ordering the in-place mount's extraction had. The copy runs for
+container copies it into `/opt/amster/config` before the import, so the
+ConfigMap's content wins over the image's own config — the same
+precedence the in-place mount's extraction had (import.sh extracts the
+tarball at import time, overwriting). This applies in both image modes:
+a base-mode deployment supplying an `amster-config` ConfigMap keeps
+working (its tarball is staged the same way), and a ConfigMap without
+the expected `amster-import.tar.gz` key now fails the job loudly instead
+of silently importing none of the supplied config (the old subPath mount
+failed the pod in that case). The copy runs for
 `import` runs only (an `export` neither needs nor writes the tarball).
 The tarball extraction in `import.sh` is unchanged. Note the new
 precondition: importing requires the image's runtime uid to be able to
