@@ -70,9 +70,17 @@ precedence the in-place mount's extraction had (import.sh extracts the
 tarball at import time, overwriting). This applies in both image modes:
 a base-mode deployment supplying an `amster-config` ConfigMap keeps
 working (its tarball is staged the same way), and a ConfigMap without
-the expected `amster-import.tar.gz` key now fails the job loudly instead
-of silently importing none of the supplied config (the old subPath mount
-failed the pod in that case). The copy runs for
+the expected `amster-import.tar.gz` key now fails the job loudly with
+the keys that were found — the old subPath mount failed the pod in that
+case, and a plain directory mount without this check would have
+imported none of the supplied config. Note that base mode also gains
+the loud-fail-for-empty guard this series introduced for forgeops mode
+(base mode previously ran the import unguarded): a base-mode deployment
+that pins `amster.image.repository` to an amster image with no pre-baked
+`/opt/amster/config` and supplies no `amster-config` ConfigMap now
+fails its install instead of completing with a no-op import — the
+default `platform.imageRepository` images all bake the profile, so the
+default path is unaffected. The copy runs for
 `import` runs only (an `export` neither needs nor writes the tarball).
 The tarball extraction in `import.sh` is unchanged. Note the new
 precondition: importing requires the image's runtime uid to be able to

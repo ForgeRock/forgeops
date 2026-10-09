@@ -107,7 +107,12 @@ spec:
                    the guard are NOT -- base mode imports the tarball and
                    the image's pre-baked config the same way, and the
                    loud-fail branch protects both modes against the
-                   silent empty import. */}}
+                   silent empty import. (The deprecated kustomize
+                   overlay's amster job still subPath-mounts the tarball
+                   inside /opt/amster/config; it does not hit the
+                   root-owned-parent bug only because its flow always
+                   creates the ConfigMap immediately before the import.
+                   This chart's job is the reference implementation.) */}}
               case "${FUNCTION:-}" in
               ""|import)
                 {{- if eq (.Values.platform.imageMode | default "base") "forgeops" }}
@@ -119,7 +124,7 @@ spec:
                 elif [ -n "$(find /opt/amster/config -mindepth 1 -print -quit 2>/dev/null)" ] || [ -f /amster-import/amster-import.tar.gz ]; then
                   echo "amster-job: the amster image stages no config profile; importing the /opt/amster/config content (pre-baked, and/or the amster-config tarball staged below)"
                 else
-                  echo "amster-job: nothing to import -- the amster image stages no config profile under /opt/amster-forgeops (found: $(ls -A /opt/amster-forgeops 2>/dev/null | tr '\n' ' ')) and /opt/amster/config is empty; refusing to run an import that would silently configure nothing" >&2
+                  echo "amster-job: nothing to import -- the amster image stages no config profile under /opt/amster-forgeops (found: $(ls -A /opt/amster-forgeops 2>/dev/null | tr '\n' ' ')), /opt/amster/config is empty, and no amster-config tarball is mounted; refusing to run an import that would silently configure nothing" >&2
                   exit 1
                 fi
                 {{- else }}
@@ -151,14 +156,21 @@ spec:
                     echo "amster-job: failed to stage the amster-import.tar.gz ConfigMap content into /opt/amster/config (runtime uid $(id -u) cannot write it?)" >&2
                     exit 1
                   }
-                elif [ -n "$(ls -A /amster-import 2>/dev/null)" ]; then
+                elif [ -n "$(find -L /amster-import -mindepth 1 -maxdepth 1 ! -name '..*' -print -quit 2>/dev/null)" ]; then
                   {{/* The whole-ConfigMap mount removed the old loud
                        failure for a ConfigMap without the expected key
                        (a subPath to a missing key fails the pod; a
                        directory mount succeeds and the import would run
                        over none of the supplied config). Restore the
-                       loud failure, with the keys that were found. */}}
-                  echo "amster-job: the amster-config ConfigMap has no amster-import.tar.gz key (found: $(ls -A /amster-import | tr '\n' ' ')); refusing to run an import that would silently ignore the supplied config" >&2
+                       loud failure, with the keys that were found. The
+                       test must exclude kubelet's own projection
+                       artifacts: a ConfigMap volume ALWAYS carries a
+                       ..data symlink and a ..<timestamp> payload dir
+                       (even when the optional ConfigMap is absent and
+                       kubelet projects an empty one), so a plain ls -A
+                       non-empty test would fail EVERY install. The same
+                       filter applies to the listing below. */}}
+                  echo "amster-job: the amster-config ConfigMap has no amster-import.tar.gz key (found: $(find -L /amster-import -mindepth 1 -maxdepth 1 ! -name '..*' -printf '%f ' 2>/dev/null | sed 's/ $//')); refusing to run an import that would silently ignore the supplied config" >&2
                   exit 1
                 fi
                 ;;
