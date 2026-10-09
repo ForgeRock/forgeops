@@ -79,26 +79,41 @@ spec:
                    assets (CONFIG_PROFILE overlay) unapplied at
                    /opt/amster-forgeops. The image entrypoint wrapper applies
                    them -- but this init container overrides the entrypoint
-                   with its own command, so apply them here instead. Upstream
-                   (docker/amster/Dockerfile) bakes the profile DIRECTLY into
-                   /opt/amster at build time, which is why this worked on
-                   clusters deployed before the staged-overlay refactor. The
-                   chart cm scripts (copied below) intentionally win over the
-                   staged forgeops scripts. The profile's client/agent
-                   passwords stay in their &{...} env-substitution form
-                   (verified live: amster resolves them at import from this
-                   container's env -- VERSION, FQDN via envFrom below, and
-                   the amster-env-secrets values for the dotted secret
-                   names), which is also the form bin/commands/amster writes
-                   back on export. */}}
-              if [ -d /opt/amster-forgeops/profile/config ]; then
-                cp -r /opt/amster-forgeops/profile/. /opt/amster/
+                   with its own command, so apply them here instead. The
+                   staging path is the image's FIXED contract: CONFIG_PROFILE
+                   selects WHICH profile the image stages at BUILD time (see
+                   the pingamster Dockerfile COPY), so the runtime path never
+                   varies and is not derived from the CONFIG_PROFILE env
+                   below (that env exists for the image's own wrapper, which
+                   standalone runs use). Amster images that predate the
+                   staged-overlay refactor bake the profile DIRECTLY into
+                   /opt/amster at build time (upstream docker/amster/
+                   Dockerfile still does) -- those keep working through the
+                   elif: their pre-baked config is imported as before, as is
+                   any deployment that supplies an amster-import.tar.gz.
+                   The chart cm scripts (copied after this block) are applied
+                   last, so they win over anything the profile happens to
+                   contain. The profile's client/agent passwords stay in
+                   their &{...} env-substitution form (verified live: amster
+                   resolves them at import from this container's env --
+                   VERSION, FQDN via envFrom below, and the
+                   amster-env-secrets values for the dotted secret names),
+                   which is also the form bin/commands/amster writes back on
+                   export. */}}
+              if [ -d /opt/amster-forgeops/profile/config ] && [ -n "$(ls -A /opt/amster-forgeops/profile/config 2>/dev/null)" ]; then
+                cp -r /opt/amster-forgeops/profile/. /opt/amster/ || {
+                  echo "amster-job: failed to apply the staged config profile from /opt/amster-forgeops/profile" >&2
+                  exit 1
+                }
+              elif [ -n "$(ls -A /opt/amster/config 2>/dev/null)" ]; then
+                echo "amster-job: the amster image stages no config profile; importing the existing /opt/amster/config content"
               else
-                {{/* A missing staging dir would replay the exact silent
-                     empty-import failure this block fixes: the import
-                     reports success over zero objects and AM ends up with
-                     no oauth2 clients. Fail the hook loudly instead. */}}
-                echo "amster-job: /opt/amster-forgeops/profile/config missing from the amster image; refusing to run an import that would silently configure nothing" >&2
+                {{/* Nothing staged and nothing pre-baked would replay the
+                     exact silent empty-import failure this block exists to
+                     fix: the import reports success over zero objects and
+                     AM ends up with no oauth2 clients. Fail the hook
+                     loudly instead. */}}
+                echo "amster-job: nothing to import -- the amster image stages no config profile and /opt/amster/config is empty; refusing to run an import that would silently configure nothing" >&2
                 exit 1
               fi
               {{- end }}

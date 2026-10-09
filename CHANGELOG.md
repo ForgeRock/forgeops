@@ -56,25 +56,31 @@ annotations work unchanged. `/igadmin` keeps its previous regex + rewrite behavi
 
 ### identity-platform amster job applies the staged config profile again
 
-The `pingamster` image now stages the forgeops config profile (the realm
-oauth2 clients `idm-admin-ui`, `end-user-ui`, `resource-server`,
-`idm-resource-server`, `idm-provisioning`, the IG agent, and the policy
-applications) unapplied at `/opt/amster-forgeops`, expecting the image
-entrypoint wrapper to apply it in `IMAGE_MODE=forgeops`. The
-`amster` job's init container overrides the image entrypoint with its own
-command, so the wrapper never ran and amster imported an empty config:
-AM ended up with no oauth2 clients, the platform admin UI's authorize
-call failed with `400 invalid_client` (a blank `/platform` page), and
-PingGateway could not authenticate to AM. Upstream
+With `platform.imageMode: forgeops`, the `pingamster` image now stages the
+forgeops config profile (the realm oauth2 clients `idm-admin-ui`,
+`end-user-ui`, `resource-server`, `idm-resource-server`, `idm-provisioning`,
+the IG agent, and the policy applications) unapplied at
+`/opt/amster-forgeops`, expecting the image entrypoint wrapper to apply it in
+`IMAGE_MODE=forgeops`. The `amster` job's init container overrides the image
+entrypoint with its own command, so the wrapper never ran and amster imported
+an empty config: AM ended up with no oauth2 clients, the platform admin UI's
+authorize call failed with `400 invalid_client` (a blank `/platform` page),
+and PingGateway could not authenticate to AM. Upstream
 (`docker/amster/Dockerfile`) never had this gap because it copies the
 profile directly into `/opt/amster` at build time.
 
-The job's init container now applies the staged profile before running
-the import, and fails the hook loudly if the staging directory is
-missing rather than silently importing nothing. The client passwords
-stay in their `&{...}` env-substitution form (amster resolves them at
-import from the job's own environment, and `bin/commands/amster export`
-writes them back in that form).
+In forgeops image mode the job's init container now applies the staged
+profile before running the import. Older amster images that bake the profile
+into `/opt/amster` at build time (and any deployment that supplies its own
+`amster-import.tar.gz` ConfigMap) keep working unchanged; the hook only
+fails loudly when there is nothing to import at all, instead of silently
+importing nothing. The job's script mounts also resolve their files through
+`platform.filesDir` like the `amster-scripts` ConfigMap does — the mount
+subPaths are sha256 hashes of the relative filenames, so the two sides must
+derive from the same directory or pods fail on missing keys. The client
+passwords stay in their `&{...}` env-substitution form (amster resolves
+them at import from the job's own environment, and `bin/commands/amster
+export` writes them back in that form).
 
 ### identity-platform keystore secret replaced when stale after a failed install
 
