@@ -74,10 +74,46 @@ spec:
             - -c
           args:
             - |
+              {{- if eq (.Values.platform.imageMode | default "base") "forgeops" }}
+              {{/* The pingamster single-mode image stages the deployment
+                   assets (CONFIG_PROFILE overlay) unapplied at
+                   /opt/amster-forgeops. The image entrypoint wrapper applies
+                   them -- but this init container overrides the entrypoint
+                   with its own command, so apply them here instead. Upstream
+                   (docker/amster/Dockerfile) bakes the profile DIRECTLY into
+                   /opt/amster at build time, which is why this worked on
+                   clusters deployed before the staged-overlay refactor. The
+                   chart cm scripts (copied below) intentionally win over the
+                   staged forgeops scripts. */}}
+              if [ -d /opt/amster-forgeops/profile/config ]; then
+                cp -r /opt/amster-forgeops/profile/. /opt/amster/
+              fi
+              {{/* The staged profile carries the client/agent passwords as
+                   AM env-substitutions with DEMO fallbacks
+                   (&{idm.rs.client.secret|password}). Substitute the real
+                   helm-generated values so the AM-side clients match the
+                   secrets the IDM pod actually uses. The gateway-related
+                   secrets (ig.agent.password, ig.rs.client.secret,
+                   pit.client.secret) are left at their demo fallbacks on
+                   purpose: the gateway image bakes the same demo secret
+                   into its amSecretsProvider, so demo-vs-demo is
+                   consistent; substituting only one side would break the
+                   pairing. */}}
+              for pair in \
+                "idm.rs.client.secret|$IDM_RS_CLIENT_SECRET" \
+                "idm.provisioning.client.secret|$IDM_PROVISIONING_CLIENT_SECRET"
+              do
+                name="${pair%%|*}"; value="${pair#*|}"
+                [ -n "$value" ] || continue
+                grep -rl "&{${name}|" /opt/amster/config 2>/dev/null | while IFS= read -r f; do
+                  sed -i "s|&{${name}[^}]*}|${value}|g" "$f"
+                done
+              done
+              {{- end }}
               for f in $(find /amster-scripts); do
                 cp -r $f /opt/amster/ && chmod 775 /opt/amster/$(basename $f)
               done
-              [ -z "$FUNCTION" ] && FUNCTION="import" 
+              [ -z "$FUNCTION" ] && FUNCTION="import"
               ./docker-entrypoint.sh $FUNCTION
           env:
           - name: NAMESPACE
