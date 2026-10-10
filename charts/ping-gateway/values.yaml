@@ -109,16 +109,22 @@ ig:
   env:
     - name: AM_URL
       value: "http://am/am"
+    # Target of the image's 50-reverseproxy route (&{idm.url} in
+    # pingig config-profiles 50-reverseproxy.json -- upstream hardcodes
+    # http://idm:80/ as a route-level baseURI; we expose it as env so
+    # cross-namespace deploys can override, same pattern as AM_URL).
+    - name: IDM_URL
+      value: "http://idm:80/"
   envFrom: []
     #- secretRef:
   #    name: "my_ig_secret"
 
   resources:
     limits:
-      memory: 512Mi
+      memory: 1Gi
     requests:
       cpu: 200m
-      memory: 512Mi
+      memory: 1Gi
 
   livenessProbe:
     periodSeconds: 30
