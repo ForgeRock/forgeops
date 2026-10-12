@@ -357,6 +357,13 @@ am:
       secretUser: prometheus
       secretPassword: prometheus
 
+# The custom-config carrier image. Its filesystem must provide /config with
+# the deployment configuration to seed; the am filesystem-init treats that
+# content as a WHOLESALE REPLACEMENT of the config tree: everything under
+# /config replaces the image's /fbc/config ("deployer-provided
+# configuration wins"; unlike idm there is no profile-overlay marker — the
+# AM image applies its CONFIG_PROFILE at build time). Ship the complete
+# config tree (boot.json included) or nothing.
 am_custom:
   image:
     repository: busybox

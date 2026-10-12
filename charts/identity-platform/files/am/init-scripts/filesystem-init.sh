@@ -6,7 +6,15 @@ elif [ -d /custom/config ]; then
   echo "Found config in custom volume."
   cd /home/forgerock/openam
   cp -rv .homeVersion * /fbc
+  # Deployer-provided configuration wins: the custom content is a WHOLESALE
+  # replacement of the config tree (unlike idm there is no profile-overlay
+  # marker to drop — the AM image applies its CONFIG_PROFILE at build time).
   cp -av /custom/config /fbc
+  if [ ! -f /fbc/config/boot.json ]; then
+    echo "WARNING: the custom config does not include config/boot.json, so" >&2
+    echo "WARNING: this does not look like a complete openam configuration." >&2
+    echo "WARNING: AM may fail to boot or restart cleanly." >&2
+  fi
   cp /fbc/config/boot.json /fbc/default-boot.json
 else
   echo "Copying docker image configuration files to the shared volume"
