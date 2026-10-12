@@ -8,8 +8,19 @@ elif [ -d /custom/config ]; then
   cp -rv ui conf script /fbc
   # Deployer-provided configuration wins: drop the pristine-conf marker so
   # the image's apply-config-profile.sh never overlays the profile on top.
+  # The custom content is a WHOLESALE config replacement — a partial config
+  # (one stray file) leaves the conf as the pristine maven-build zip conf,
+  # whose repo.ds.json points at localhost. Warn loudly when the custom
+  # content does not look like a complete configuration; the profile
+  # suppression below is still by design and untouched.
   rm -f /fbc/conf/.pristine-zip-conf
   cp -av /custom/config/* /fbc/
+  if [ ! -f /fbc/conf/repo.ds.json ]; then
+    echo "WARNING: the custom config does not include repo.ds.json, so this" >&2
+    echo "WARNING: does not look like a complete IDM configuration. The" >&2
+    echo "WARNING: CONFIG_PROFILE (cdk-base) overlay is suppressed for custom" >&2
+    echo "WARNING: configs by design; IDM may fail to reach its repository." >&2
+  fi
 else
   echo "Copying docker image configuration files to the shared volume"
   cd /opt/openidm

@@ -575,6 +575,17 @@ idm:
       secretUser: prometheus
       secretPassword: prometheus
 
+# The custom-config carrier image. Its filesystem must provide /config with
+# the deployment configuration to seed; the idm filesystem-init treats that
+# content as a WHOLESALE CONFIG REPLACEMENT: everything under /config is
+# copied over the conf and the CONFIG_PROFILE (cdk-base) overlay is
+# suppressed ("deployer-provided configuration wins" — the pristine-zip
+# marker is dropped so the image's apply-config-profile never runs). Ship
+# the complete conf or nothing: a partial custom config (e.g. one extra
+# file) leaves IDM on the pristine zip conf, whose repo.ds.json points at
+# localhost, and IDM crash-loops unable to reach its repository. To add to
+# the profile configuration instead, bake the complete cdk-base conf plus
+# your additions into the carrier image.
 idm_custom:
   image:
     repository: busybox
