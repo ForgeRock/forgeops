@@ -889,9 +889,12 @@ admin_ui:
     type: ClusterIP
     port: 8080
 
-# Canonical spelling of the end-user-ui component key. (The product, image
-# and registry name are "enduser-ui"; the old "end_user_ui" spelling was
-# born from the same dash/underscore mixup.) The legacy key is STILL FULLY
+# Canonical spelling of the end-user-ui component key. (The product name is
+# "enduser-ui" — the alpine CI publishes images under that name; the base
+# lineage registries publish it as "end-user-ui", the historical spelling
+# the chart's default name follows per platform.imageMode. The old
+# "end_user_ui" VALUES KEY spelling was born from the same dash/underscore
+# mixup.) The legacy key is STILL FULLY
 # SUPPORTED: the templates deep-merge end_user_ui OVER enduser_ui, so
 # existing values files keep byte-identical semantics — when both keys are
 # set, the legacy key wins on conflicts (the conservative deprecation
@@ -908,9 +911,11 @@ enduser_ui:
     # the platform.imageRef helper). An explicit repository here always
     # wins.
     repository: ""
-    # Empty = the platform default name "enduser-ui" (composed with
-    # platform.imageRepository — the name the CI publishes). Override to
-    # pull a differently-named image from the same repository.
+    # Empty = the image name follows platform.imageMode (see the
+    # platform.endUserUiName helper): "enduser-ui" with imageMode=forgeops
+    # (the alpine CI's name), "end-user-ui" with the default imageMode=base
+    # (the name the base-lineage registries publish). Override to pull a
+    # differently-named image from the same repository.
     name: ""
     tag: latest
     pullPolicy: IfNotPresent

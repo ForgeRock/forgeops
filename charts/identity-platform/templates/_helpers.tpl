@@ -210,6 +210,21 @@ replaces the default 11111 with 9031; any runAsUser a deployer sets explicitly
 {{- $merged | toYaml -}}
 {{- end -}}
 
+{{/* Default image NAME for the end-user-ui component: the alpine line
+     (platform.imageMode=forgeops) publishes "enduser-ui" (the product's
+     spelling — the only name the alpine CI pushes), while the base lineage
+     registries publish the historical "end-user-ui" (images/end-user-ui,
+     images-base/end-user-ui). Composed with platform.imageRepository by
+     platform.imageRef; an explicit .image.name/.repository in the component
+     values still wins. */}}
+{{- define "platform.endUserUiName" -}}
+{{- if eq (.Values.platform.imageMode | default "base") "forgeops" -}}
+{{- printf "enduser-ui" -}}
+{{- else -}}
+{{- printf "end-user-ui" -}}
+{{- end -}}
+{{- end -}}
+
 {{/* Tomcat install directory: the Debian images put it at
      /usr/local/tomcat; the alpine pingbase-tomcat images use
      /opt/tomcat (CATALINA_HOME). */}}
@@ -254,7 +269,8 @@ The repository resolves per component as:
 and the name (the image's basename inside that repository) as:
   1. component .image.name (an explicit deployer override) - when set
   2. the platform default name (arg 2: ds, am, idm, amster, admin-ui,
-     end-user-ui, login-ui, idm-admin-ui)
+     platform.endUserUiName (mode-derived: enduser-ui for the forgeops
+     imageMode, end-user-ui for base), login-ui, idm-admin-ui)
 Both platform values compose: platform.imageRepository + "/" + name. The
 tag resolves as component .image.tag | default AppVersion (arg 3), exactly
 as the templates resolved it before this helper existed. A tag of the form

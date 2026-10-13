@@ -56,7 +56,7 @@ spec:
           emptyDir: {}
       initContainers:
         - name: filesystem-init
-          image: {{ include "platform.imageRef" (list . (list $eui.image "enduser-ui" .Chart.AppVersion)) | quote }}
+          image: {{ include "platform.imageRef" (list . (list $eui.image (include "platform.endUserUiName" .) .Chart.AppVersion)) | quote }}
           imagePullPolicy: IfNotPresent
           volumeMounts:
             - mountPath: /scripts
@@ -68,7 +68,7 @@ spec:
         - name: end-user-ui
           securityContext:
             {{- toYaml $eui.securityContext | nindent 12 }}
-          image: {{ include "platform.imageRef" (list . (list $eui.image "enduser-ui" .Chart.AppVersion)) | quote }}
+          image: {{ include "platform.imageRef" (list . (list $eui.image (include "platform.endUserUiName" .) .Chart.AppVersion)) | quote }}
           imagePullPolicy: {{ $eui.image.pullPolicy }}
           lifecycle:
             preStop:
