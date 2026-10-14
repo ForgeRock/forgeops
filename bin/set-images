@@ -41,6 +41,8 @@ UI_CONF_KEYNAME = ('imageNameAdmin', 'imageNameEnduser', 'imageNameLogin')
 MSC_PRODUCTS = ()
 # Product kustomize images
 KUSTOMIZE_PRODUCTS = ('admin-ui', 'end-user-ui', 'login-ui')
+# Default docker base directory containing the product Dockerfiles.
+# Override at runtime with --docker-base (e.g. docker-alpine).
 PLATFORM_DOCKER_BASE = '../../docker'
 CLI_PRODUCTS = ('am', 'amster', 'ig', 'idm', 'ds', 'ui') + MSC_PRODUCTS
 PLATFORM_KUSTOMIZE_BASE = '../../kustomize/base'
@@ -68,6 +70,10 @@ $ ./bin/set-images -e my-env --config-path /tmp/mychange --products am
 
 # Update the dockerfile for PingAM to use the same repo and image but the tag of "sometagname"
 $ ./bin/set-images -e my-env --inplace --products am --update-tag sometagname
+
+# Update Dockerfiles from the Alpine docker base (docker-alpine/) instead of
+# the default docker/
+$ ./bin/set-images -e my-env --docker-base docker-alpine
 
 # Change all the repo names, leaves docker image name (leaves the last part as is) to match the value
 # Changes tags to match platform-images repository
@@ -178,6 +184,17 @@ def func_args():
                               'the image. Like skaffold --default-repo'))
     parser.add_argument('--update-tag',
                         help=('Update the tags of proucts to be <value>'))
+
+    # Docker base directory containing the product Dockerfiles.
+    # The value is either a relative path from the script location
+    # (e.g. ../../docker) or a base directory name relative to the repo root
+    # (e.g. docker-alpine).
+    parser.add_argument('--docker-base',
+                        help=('Docker base directory containing the product '
+                              'Dockerfiles. Given as a name relative to the '
+                              'repo root (e.g. docker-alpine) or a path '
+                              f'relative to the script (default: '
+                              f'{PLATFORM_DOCKER_BASE}).'),)
 
     # Limit changes to these products
     parser.add_argument('--products',
@@ -415,8 +432,20 @@ def update_kustomize(products, kustomize_path, update_repo=None, update_tag=None
 
 
 def update_dockerfiles(products, dockerpath, update_repo=None, update_tag=None):
-    # Track files changed.
-    docker_files = dockerpath.rglob('**/Dockerfile')
+    # Product dirs are matched on the base directory name (e.g. 'docker' or
+    # 'docker-alpine') plus the product, so alternate bases such as
+    # docker-alpine are updated too.
+    docker_base_name = Path(dockerpath).name
+    # Only open the Dockerfiles of the selected products. Other files under
+    # dockerpath must be left untouched: rewriting their FROM lines would
+    # bake their ARG placeholders in as literal values.
+    docker_files = [p for p in dockerpath.rglob('**/Dockerfile')
+                    if any(f'{docker_base_name}/{product}/' in str(p)
+                           for product in products)]
+    if not docker_files:
+        log.warning('No Dockerfiles found for products '
+                    f'{", ".join(products)} under {dockerpath}')
+        return
     # This makes an iterator that we just loop over and it handles all the file
     # opening and closing for us.
     # Anything "printed" to stdout is written to the file!
@@ -425,6 +454,10 @@ def update_dockerfiles(products, dockerpath, update_repo=None, update_tag=None):
         tag = None
         # Read each line of the file
         for line in f:
+            if f.isfirstline():
+                # ARG values collected below do not carry between files.
+                repo = None
+                tag = None
             before = ''
             image = ''
             after = ''
@@ -461,7 +494,7 @@ def update_dockerfiles(products, dockerpath, update_repo=None, update_tag=None):
             is_from_line = False
             # Is the repo in repo to platform map?
             for product in products:
-                if f'docker/{product}/' in str(f.filename()):
+                if f'{docker_base_name}/{product}/' in str(f.filename()):
                     # If its not in the list of products - we can skip it
                     if update_repo is not None or update_tag is not None:
                         repo = k if update_repo is None else update_repo
@@ -479,6 +512,28 @@ def update_dockerfiles(products, dockerpath, update_repo=None, update_tag=None):
                 continue
 
             print(line, end='')
+
+
+def resolve_docker_base(base):
+    """
+    Resolve the --docker-base value to the directory holding the product
+    Dockerfiles. Accepts an absolute path, a name relative to the repo root
+    (e.g. docker-alpine), or a path relative to the script location
+    (e.g. ../../docker).
+    """
+    if base is None:
+        return PLATFORM_DOCKER_PATH
+    candidate = Path(base)
+    if candidate.is_absolute():
+        path = candidate.resolve()
+    elif root_path.joinpath(candidate).is_dir():
+        path = root_path.joinpath(candidate).resolve()
+    else:
+        path = SCRIPT_DIR.joinpath(candidate).resolve()
+    if not path.is_dir():
+        log.error(f'Docker base {base} not found at {path}')
+        sys.exit(1)
+    return path
 
 
 def build_github_repo_url(repo_url):
@@ -615,7 +670,7 @@ def run_from_args(args):
                        for k in args.products if k in DOCKER_PRODUCTS}
     if len(cli_only_docker) > 0:
         update_dockerfiles(cli_only_docker,
-                           PLATFORM_DOCKER_PATH,
+                           resolve_docker_base(args.docker_base),
                            args.update_repo,
                            args.update_tag)
 
@@ -625,7 +680,7 @@ def run_from_files(args):
                                                            args.products)
     log.info('Updating products {}'.format(' '.join(args.products)))
     update_dockerfiles(docker_images,
-                       PLATFORM_DOCKER_PATH,
+                       resolve_docker_base(args.docker_base),
                        args.update_repo,
                        args.update_tag)
     if getattr(args, 'env_name', None):
