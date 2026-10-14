@@ -20,3 +20,7 @@ configuration files.
 
 * [Top-level forgeops README.md](../README.md)
 * [PingDS server image customization](ds/README.md)
+* [Alpine PingDS child image](../docker-alpine/ds/README.md) — the Alpine
+  two-step: same shape as `docker/ds`, deriving from the DS team's Alpine
+  base (tag dimension on `images-base/ds`) and re-applying the ForgeOps
+  skeleton the upstream image does not carry.
