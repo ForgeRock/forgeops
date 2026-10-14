@@ -102,9 +102,11 @@ _test_image_names = [
      'gcr.io',
      'busybox',
      '@sha256:7cc4b5aefd1d0cadf8d97d4350462ba51c694ebca145b08d7d41b41acc8db5aa',),
+    # parse_repo_tag splits on the last '/', so the image name here is the
+    # final path element 'pit1' and everything before it is the repo.
     ('gcr.io/forgerock/am/pit1@sha256:7cc4b5aefd1d0cadf8d97d4350462ba51c694ebca145b08d7d41b41acc8db5aa',
-     'gcr.io/forgerock',
-     'am',
+     'gcr.io/forgerock/am',
+     'pit1',
      '@sha256:7cc4b5aefd1d0cadf8d97d4350462ba51c694ebca145b08d7d41b41acc8db5aa',),
 ]
 
@@ -186,15 +188,14 @@ def func_args():
                         help=('Update the tags of proucts to be <value>'))
 
     # Docker base directory containing the product Dockerfiles.
-    # The value is either a relative path from the script location
-    # (e.g. ../../docker) or a base directory name relative to the repo root
-    # (e.g. docker-alpine).
+    # The value is either an absolute path or a path relative to the
+    # forgeops repo root (e.g. docker-alpine). Relative values that resolve
+    # outside the repo are rejected.
     parser.add_argument('--docker-base',
                         help=('Docker base directory containing the product '
-                              'Dockerfiles. Given as a name relative to the '
-                              'repo root (e.g. docker-alpine) or a path '
-                              f'relative to the script (default: '
-                              f'{PLATFORM_DOCKER_BASE}).'),)
+                              'Dockerfiles. Given as an absolute path or a '
+                              'path relative to the forgeops repo root '
+                              f'(default: {PLATFORM_DOCKER_BASE}).'),)
 
     # Limit changes to these products
     parser.add_argument('--products',
@@ -225,6 +226,15 @@ def func_args():
     if args.branch_name or args.commit:
         log.warning('Commit/Branch options now deprecated use --ref instead')
         args.ref = args.commit if args.commit else args.branch_name
+    # Resolve --docker-base once, here, so a bad value fails before any
+    # work (e.g. the platform-images clone) is done. Only --inplace and the
+    # default run-from-files path touch Dockerfiles; --run-tests and
+    # --clean never do, so for those the flag is a no-op.
+    touches_dockerfiles = args.inplace or not (args.run_tests or args.clean)
+    if touches_dockerfiles:
+        args.docker_path = resolve_docker_base(args.docker_base)
+    elif args.docker_base is not None:
+        log.warning('--docker-base is ignored with --run-tests/--clean')
     if args.inplace:
         log.info('Updating files inplace. Not using any configuration')
         func = run_from_args
@@ -432,19 +442,27 @@ def update_kustomize(products, kustomize_path, update_repo=None, update_tag=None
 
 
 def update_dockerfiles(products, dockerpath, update_repo=None, update_tag=None):
-    # Product dirs are matched on the base directory name (e.g. 'docker' or
-    # 'docker-alpine') plus the product, so alternate bases such as
-    # docker-alpine are updated too.
-    docker_base_name = Path(dockerpath).name
-    # Only open the Dockerfiles of the selected products. Other files under
-    # dockerpath must be left untouched: rewriting their FROM lines would
-    # bake their ARG placeholders in as literal values.
-    docker_files = [p for p in dockerpath.rglob('**/Dockerfile')
-                    if any(f'{docker_base_name}/{product}/' in str(p)
-                           for product in products)]
+    # Only open the Dockerfiles of the selected products, found under
+    # <dockerpath>/<product>/. Matching is anchored on the resolved base so
+    # that neither a workspace path elsewhere containing '<base>/<product>/'
+    # (false positive) nor a base name that is a substring of another path
+    # (false negative) selects the wrong files. Files outside the selected
+    # product directories must be left untouched: rewriting their FROM lines
+    # would bake their ARG placeholders in as literal values.
+    product_prefixes = {}
+    docker_files = []
+    for product, product_config in products.items():
+        product_dir = dockerpath / product
+        product_prefixes[str(product_dir) + os.sep] = product_config
+        if product_dir.is_dir():
+            found = sorted(product_dir.rglob('Dockerfile'))
+        else:
+            found = []
+        if not found:
+            log.warning(f'No Dockerfiles found for product {product} '
+                        f'under {product_dir}')
+        docker_files.extend(found)
     if not docker_files:
-        log.warning('No Dockerfiles found for products '
-                    f'{", ".join(products)} under {dockerpath}')
         return
     # This makes an iterator that we just loop over and it handles all the file
     # opening and closing for us.
@@ -492,21 +510,23 @@ def update_dockerfiles(products, dockerpath, update_repo=None, update_tag=None):
 
             k = f'{current_repo}/{name}'
             is_from_line = False
-            # Is the repo in repo to platform map?
-            for product in products:
-                if f'{docker_base_name}/{product}/' in str(f.filename()):
-                    # If its not in the list of products - we can skip it
-                    if update_repo is not None or update_tag is not None:
-                        repo = k if update_repo is None else update_repo
-                        tag = current_tag if update_tag is None else f':{update_tag}'
-                        new_image = f'{repo}{tag}'
-                    else:
-                        product_config = products[product]
-                        new_image = f'{product_config["imageName"]}:{product_config["imageTag"]}'
-                    log.info(f'Updating {f.filename()} to use {new_image.strip()}')
-                    print(f'{before} {new_image}{after}')
-                    is_from_line = True
+            # Which selected product does this file belong to, if any?
+            filename = str(f.filename())
+            product_config = None
+            for prefix, config in product_prefixes.items():
+                if filename.startswith(prefix):
+                    product_config = config
                     break
+            if product_config is not None:
+                if update_repo is not None or update_tag is not None:
+                    repo = k if update_repo is None else update_repo
+                    tag = current_tag if update_tag is None else f':{update_tag}'
+                    new_image = f'{repo}{tag}'
+                else:
+                    new_image = f'{product_config["imageName"]}:{product_config["imageTag"]}'
+                log.info(f'Updating {f.filename()} to use {new_image.strip()}')
+                print(f'{before} {new_image}{after}')
+                is_from_line = True
 
             if is_from_line:
                 continue
@@ -517,19 +537,27 @@ def update_dockerfiles(products, dockerpath, update_repo=None, update_tag=None):
 def resolve_docker_base(base):
     """
     Resolve the --docker-base value to the directory holding the product
-    Dockerfiles. Accepts an absolute path, a name relative to the repo root
-    (e.g. docker-alpine), or a path relative to the script location
-    (e.g. ../../docker).
+    Dockerfiles. Accepts an absolute path, or a path relative to the forgeops
+    repo root (e.g. docker-alpine).
+    Relative paths are constrained to stay inside the repo: anything that
+    resolves outside root_path is rejected, since update_dockerfiles rewrites
+    the files it finds in place.
     """
     if base is None:
         return PLATFORM_DOCKER_PATH
     candidate = Path(base)
     if candidate.is_absolute():
         path = candidate.resolve()
-    elif root_path.joinpath(candidate).is_dir():
-        path = root_path.joinpath(candidate).resolve()
     else:
-        path = SCRIPT_DIR.joinpath(candidate).resolve()
+        # Resolve root_path too: it may contain symlinks (e.g. macOS /tmp),
+        # and the containment check below compares resolved forms.
+        repo_root = Path(root_path).resolve()
+        path = repo_root.joinpath(candidate).resolve()
+        if not path.is_relative_to(repo_root):
+            log.error(f'Docker base {base} resolves to {path}, which is '
+                      'outside the forgeops repo. Use a path relative to '
+                      'the repo root, or an absolute path.')
+            sys.exit(1)
     if not path.is_dir():
         log.error(f'Docker base {base} not found at {path}')
         sys.exit(1)
@@ -670,7 +698,7 @@ def run_from_args(args):
                        for k in args.products if k in DOCKER_PRODUCTS}
     if len(cli_only_docker) > 0:
         update_dockerfiles(cli_only_docker,
-                           resolve_docker_base(args.docker_base),
+                           args.docker_path,
                            args.update_repo,
                            args.update_tag)
 
@@ -680,7 +708,7 @@ def run_from_files(args):
                                                            args.products)
     log.info('Updating products {}'.format(' '.join(args.products)))
     update_dockerfiles(docker_images,
-                       resolve_docker_base(args.docker_base),
+                       args.docker_path,
                        args.update_repo,
                        args.update_tag)
     if getattr(args, 'env_name', None):
@@ -707,4 +735,5 @@ def main():
     sys.exit(0)
 
 
-main()
+if __name__ == '__main__':
+    main()
