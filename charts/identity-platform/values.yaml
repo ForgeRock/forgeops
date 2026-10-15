@@ -444,8 +444,15 @@ ds_set_passwords:
 
   # Defaults to the ds_idrepo image (which itself resolves
   # platform.imageRepository + the "ds" name). Uncomment to override;
-  # keys left empty/absent fall back per key (repository/name resolve via
-  # the platform chain, tag via AppVersion, pullPolicy via ds_idrepo).
+  # keys left empty/absent follow ds_idrepo per key (repository, name and
+  # tag), so a partial override (e.g. pullPolicy only) keeps the job on
+  # the image the DS statefulsets run. Caveat: when ds_idrepo.image
+  # pins a repository (as `forgeops build --push-to` does), an explicit
+  # name here is ignored -- a pinned repository is used verbatim, the
+  # image basename comes from the pin. imagePullSecrets follow the job
+  # template's own branching: they are inherited from ds_idrepo unless
+  # the override sets its own or pins a repository (see the job
+  # template).
   # image:
   #   repository: ""
   #   name: ""
