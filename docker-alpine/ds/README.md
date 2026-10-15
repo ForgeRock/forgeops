@@ -82,7 +82,9 @@ are relaxed, the AM/IDM setup profiles are enhanced from `ldif-ext/`, and
 `-b` points the build (and `forgeops image`, for release files) at this
 directory instead of `docker/`; everything else — release files
 (`docker-alpine/ds/releases/<name>`), the image-defaulter update, the helm
-values update — works exactly as for the Debian child.
+values update — works exactly as for the Debian child. To resolve this
+directory from scripts, use
+`bin/forgeops config path docker-alpine ds`.
 
 ## Keeping copies in sync
 

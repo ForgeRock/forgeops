@@ -36,7 +36,7 @@ Sort configuration json alphanumerically. This will lead to a large initial
 """
 HELP_EXPORT_CMD_AM_NO_UPGRADE = "Do not run PingAM upgrader rules when exporting configuration."
 HELP_EXPORT_AM_UPG_RULES = "Directory of rules to pass to upgrade-am-config"
-HELP_PATH_CMD_TOOL_NAME = "Directory of tool configuration files e.g. docker, kustomize"
+HELP_PATH_CMD_TOOL_NAME = "Directory of tool configuration files e.g. docker, docker-alpine, kustomize"
 HELP_PATH_CMD_DESCRIPTION = "Resolve an absolute path to a location in the forgeops directory tree."
 
 HELP_NAMESPACE = "Kubernetes namespace to target"
@@ -92,6 +92,9 @@ examples:
 
   # Path to the directory containing PingGateway Dockerfile
   $ ./bin/forgeops config path docker ig
+
+  # Path to the Alpine PingDS child image build directory
+  $ ./bin/forgeops config path docker-alpine ds
 """
 
 HELP_BUILD_EXAMPLES = """
@@ -429,6 +432,12 @@ def run_path(args, overrides):
     elif args.tool == 'docker' and args.component == 'ds':
         profile = args.config_profile if args.config_profile != '' else ''
         print(overrides['build_path'].joinpath(args.component, profile))
+    elif args.tool == 'docker-alpine' and args.component != 'ds':
+        profile = f'config-profiles/{args.config_profile}' if args.config_profile != '' else ''
+        print(overrides['forgeops_data'].joinpath('docker-alpine', args.component, profile))
+    elif args.tool == 'docker-alpine' and args.component == 'ds':
+        profile = args.config_profile if args.config_profile != '' else ''
+        print(overrides['forgeops_data'].joinpath('docker-alpine', args.component, profile))
     elif args.tool == 'kustomize':
         print(overrides['kustomize_path'].joinpath(args.layer, args.kustomization, args.sub_kustomization))
     elif args.tool == 'helm':
@@ -524,6 +533,20 @@ def setup_args(common_args):
                                     help=HELP_PATH_DOCKER_PROFILE_NAME,
                                     nargs='?',
                                     default='')
+
+    # docker-alpine paths
+    path_docker_alpine_parser = path_sub_cmd_parser.add_parser(
+        'docker-alpine',
+        epilog=textwrap.dedent(HELP_PATH_EXAMPLES),
+        formatter_class=argparse.RawTextHelpFormatter,
+        description=HELP_PATH_CMD_DESCRIPTION)
+    path_docker_alpine_parser.add_argument('component',
+                                           help=HELP_CMD_COMPONENTS,
+                                           choices=PLATFORM_COMPONENTS.keys())
+    path_docker_alpine_parser.add_argument('config_profile',
+                                           help=HELP_PATH_DOCKER_PROFILE_NAME,
+                                           nargs='?',
+                                           default='')
 
     # helm paths
     path_helm_parser = path_sub_cmd_parser.add_parser('helm',
