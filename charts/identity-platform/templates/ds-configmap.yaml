@@ -12,8 +12,15 @@ data:
 {{- end }}
 {{- /* The chart's ds entrypoint is canonical in BOTH image modes since
      FORGEOPS-6971 (one POSIX script tree): the statefulsets mount it over
-     the image's baked copy everywhere, so an entrypoint fix ships with the
-     chart instead of waiting on a debian image rebuild. */}}
+     the image's baked copy everywhere. COUPLING (explicit contract): a
+     base-mode deployment now runs the entrypoint of the CHART version it
+     pins, not of the ds image — a chart/image version mismatch means the
+     chart's script semantics win. The chart's entrypoint assumes the
+     forgeops DS layout (runtime-scripts ConfigMaps, data.tar.gz priming,
+     /opt/opendj/env.sh); pin a ds image that ships that layout. subPath
+     ConfigMap mounts do NOT live-update: an entrypoint change reaches pods
+     on their next rollout (no checksum annotation here by design — every
+     entrypoint edit should not roll DS). */}}
 {{- if or .Values.ds_cts.enabled .Values.ds_idrepo.enabled }}
 ---
 apiVersion: v1

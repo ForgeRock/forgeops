@@ -131,6 +131,15 @@ spec:
         - name: filesystem-init
           image: {{ include "platform.imageRef" (list . (list .Values.am.image "am" .Chart.AppVersion)) | quote }}
           imagePullPolicy: {{ .Values.am.image.pullPolicy }}
+          env:
+          {{- /* The init script derives its destinations from these rather
+               than probing the image, so the chart (which also mounts the
+               writeable subPaths) and the script cannot disagree about the
+               layout when the pinned image and imageMode differ. */}}
+          - name: AM_HOME
+            value: {{ include "platform.amHome" . }}/openam
+          - name: AM_CATALINA_HOME
+            value: {{ include "platform.amCatalina" . }}
           volumeMounts:
           - mountPath: /fbc
             name: fbc

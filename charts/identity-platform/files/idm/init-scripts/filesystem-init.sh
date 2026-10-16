@@ -14,7 +14,9 @@ elif [ -d /custom/config ]; then
   # content does not look like a complete configuration; the profile
   # suppression below is still by design and untouched.
   rm -f /fbc/conf/.pristine-zip-conf
-  cp -av /custom/config/* /fbc/
+  # -dR not -a: -a implies -p (preserve ownership), which busybox cp cannot
+  # honor as a non-root uid and warns per file; see the -dR note below.
+  cp -dRv /custom/config/* /fbc/
   if [ ! -f /fbc/conf/repo.ds.json ]; then
     echo "WARNING: the custom config does not include repo.ds.json, so this" >&2
     echo "WARNING: does not look like a complete IDM configuration. The" >&2
@@ -180,8 +182,10 @@ echo "Creating tmp"
 mkdir -p /writeable/tmp
 echo "Copying /opt/openidm"
 mkdir -p /writeable/opt
-# Copy with `cp -rv` (NOT -a): some image files may be root-owned, and
-# busybox cp -a exits 1 when it cannot preserve ownership (GNU cp only
-# warns). The init runs as the product uid, so plain -r ownership (files
-# owned by the runner) is exactly right for the writeable volume.
-cp -rv /opt/openidm/ /writeable/opt/openidm
+# `cp -dRv` (NOT -a): -a implies -p (preserve mode/ownership), which busybox
+# cp cannot honor as the init's non-root uid and warns per file ("can't
+# preserve ownership") — noise on every boot. -d/-P (preserve symlinks) is
+# already busybox's default with -R, but stating it keeps GNU cp — where the
+# default depends on build config — behaving identically. -R recurses; both
+# busybox cp and GNU cp support the -dR pair.
+cp -dRv /opt/openidm/ /writeable/opt/openidm

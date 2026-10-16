@@ -65,9 +65,13 @@ AZ_PARAMS="--storageProperty az.accountName.env.var:AZURE_STORAGE_ACCOUNT_NAME  
 GCP_PARAMS="--storageProperty gs.credentials.path:${GCP_CREDENTIAL_PATH}"
 EXTRA_PARAMS=""
 
-# Split the comma separated value in $DSBACKUP_HOSTS into a space separated
-# list (busybox ash has no arrays; word splitting in "for" does the rest)
-HOSTS=$(echo "${DSBACKUP_HOSTS}" | awk '{split($0,arr,",")} {for (i in arr) {print arr[i]}}')
+# Split the comma separated value in $DSBACKUP_HOSTS into a SPACE separated
+# single-line list (busybox ash has no arrays; word splitting in "for" does
+# the rest, and the space-joined form is also what the membership test below
+# requires: a NEWLINE-joined list would never match " ${HOSTNAME} " because
+# the separators are newlines, not spaces — the bash original's array
+# expansion was space-joined, and tr preserves that).
+HOSTS=$(echo "${DSBACKUP_HOSTS}" | tr ',' ' ')
 
 
 case "$DSBACKUP_DIRECTORY" in
@@ -98,14 +102,18 @@ for host in ${HOSTS}; do
 
         echo "Attempting to verify backup from: ${BACKUP_LOCATION}"
         # If this host owns a backup task, restore the `tasks` backend. Else, skip the `tasks` backend.
-        # POSIX replacement for the bash membership test: [[ " $HOSTS " =~ " $HOSTNAME " ]]
-        if case " ${HOSTS} " in *" ${HOSTNAME} "*) true ;; *) false ;; esac; then
-        BACKEND_NAMES=$(dsbackup list --last --verify --noPropertiesFile --backupLocation ${BACKUP_LOCATION} ${EXTRA_PARAMS} |
-            grep -i "backend name" | awk '{printf "%s %s ","--backendName", $3}')
-        else
-        BACKEND_NAMES=$(dsbackup list --last --verify --noPropertiesFile --backupLocation ${BACKUP_LOCATION} ${EXTRA_PARAMS} |
-            grep -i "backend name" | grep -v "tasks" | awk '{printf "%s %s ","--backendName", $3}')
-        fi
+        # POSIX replacement for the bash membership test: [[ " $HOSTS " =~ " $HOSTNAME " ]].
+        # (HOSTS is space-joined by the tr above, so the delimiters match.)
+        case " ${HOSTS} " in
+            *" ${HOSTNAME} "*)
+                BACKEND_NAMES=$(dsbackup list --last --verify --noPropertiesFile --backupLocation ${BACKUP_LOCATION} ${EXTRA_PARAMS} |
+                    grep -i "backend name" | awk '{printf "%s %s ","--backendName", $3}')
+                ;;
+            *)
+                BACKEND_NAMES=$(dsbackup list --last --verify --noPropertiesFile --backupLocation ${BACKUP_LOCATION} ${EXTRA_PARAMS} |
+                    grep -i "backend name" | grep -v "tasks" | awk '{printf "%s %s ","--backendName", $3}')
+                ;;
+        esac
         if [ ! -z "${BACKEND_NAMES}" ]; then
             # Verification complete, we will use $BACKUP_LOCATION for restore
             break
@@ -133,12 +141,13 @@ if [ ! -z "${BACKEND_NAMES}" ]; then
         echo
         echo "Running disaster recovery with version: ${DISASTER_RECOVERY_ID}"
         # BACKEND_NAMES is a "--backendName <name> --backendName <name> ..." list.
-        # Walk it pairwise with a while-read: name=the --backendName marker,
-        # next line = the backend name itself (busybox ash has no arrays).
-        # Piped, not staged through a /tmp file: the loop runs in a subshell
-        # but only reads variables, and /tmp may not be writable when
-        # readOnlyRootFilesystem is set without a /tmp mount.
-        printf '%s\n' ${BACKEND_NAMES} | awk 'NR % 2 == 0' | while IFS= read -r backend; do
+        # Walk it pairwise (name=the --backendName marker, next token = the
+        # backend name itself; busybox ash has no arrays). A `for` over
+        # word-split output, NOT a piped while-read: the pipe would run the
+        # loop in a subshell AND leave dsconfig/dsrepl reading the list on
+        # stdin — any stdin read inside the loop would consume entries.
+        # Backend names contain no whitespace, so word splitting is safe.
+        for backend in $(printf '%s\n' ${BACKEND_NAMES} | awk 'NR % 2 == 0'); do
             [ -z "$backend" ] && continue
             if ! [ "${backend}" = "schema" ]; then
                 basedns=$(dsconfig get-backend-prop --offline --script-friendly --no-prompt --backend-name ${backend} --property base-dn | awk '{print $2}')

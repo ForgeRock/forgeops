@@ -22,7 +22,7 @@ fi
 [ -z "$DS_SNAPSHOT_CLASS" ] && DS_SNAPSHOT_CLASS="ds-snapshot-class"
 
 # To use the pod name for the snap - instead of a fixed name
-SNAP_NAME=$DS_SNAPSHOT_NAME-$(date +%Y%m%d-%H%M --utc)
+SNAP_NAME=$DS_SNAPSHOT_NAME-$(date -u +%Y%m%d-%H%M)
 
 JOB_NAME="${DS_SNAPSHOT_NAME}-job"
 
@@ -32,15 +32,21 @@ JOB_NAME="${DS_SNAPSHOT_NAME}-job"
 # of those forms, so on busybox the common relative expressions are parsed
 # here instead; anything else fails loudly rather than purging everything.
 if date -d "last day" +%s >/dev/null 2>&1; then
-  purgeTime=$(date -d "$PURGE_DELAY" --utc +%s)
+  purgeTime=$(date -u -d "$PURGE_DELAY" +%s)
 else
   case "$PURGE_DELAY" in
     *"last day"*)   OFFSET=$((24*3600)) ;;
     *"last hour"*)  OFFSET=3600 ;;
     *"last week"*)  OFFSET=$((7*24*3600)) ;;
-    [0-9]*" min")   OFFSET=$(( ${PURGE_DELAY%% min*} * 60 )) ;;
-    [0-9]*" hour"*) OFFSET=$(( ${PURGE_DELAY%% hour*} * 3600 )) ;;
-    [0-9]*" day"*)  OFFSET=$(( ${PURGE_DELAY%% day*} * 86400 )) ;;
+    # "-3 day" (the chart default) and "3 day" both land here: strip the
+    # sign and the unit separately (${var#- * } only removes "-3 " when the
+    # value has no trailing unit, so cut the unit first, then the sign).
+    -[0-9]*" min")   N=${PURGE_DELAY%% min*}; OFFSET=$(( ${N#-} * 60 )) ;;
+    [0-9]*" min")    OFFSET=$(( ${PURGE_DELAY%% min*} * 60 )) ;;
+    -[0-9]*" hour"*) N=${PURGE_DELAY%% hour*}; OFFSET=$(( ${N#-} * 3600 )) ;;
+    [0-9]*" hour"*)  OFFSET=$(( ${PURGE_DELAY%% hour*} * 3600 )) ;;
+    -[0-9]*" day"*)  N=${PURGE_DELAY%% day*}; OFFSET=$(( ${N#-} * 86400 )) ;;
+    [0-9]*" day"*)   OFFSET=$(( ${PURGE_DELAY%% day*} * 86400 )) ;;
     "") echo "PURGE_DELAY is not set; not purging old snapshots" >&2; OFFSET="" ;;
     *) echo "Cannot parse PURGE_DELAY='$PURGE_DELAY' with busybox date; not purging" >&2; OFFSET="" ;;
   esac
@@ -91,7 +97,7 @@ spec:
 EOF
 
 
-if [ $? == 0 ] ; then
+if [ $? -eq 0 ] ; then
   echo "Job finished. Job logs"
   kubectl --namespace $NAMESPACE wait -l app="${DS_SNAPSHOT_NAME}-job" --for=condition=Ready pod
   kubectl --namespace $NAMESPACE  --all-containers=true logs -l app="${DS_SNAPSHOT_NAME}-job"

@@ -51,8 +51,11 @@ upgradeDataAndRebuildDegradedIndexes() {
     echo "Upgrading configuration and data..."
      ./upgrade --acceptLicense --force --ignoreErrors --no-prompt
 
-    # Rebuild any corrupt/missing indexes.
-    printf '%s\n' "$BASE_DNS" | while IFS= read -r baseDn; do
+    # Rebuild any corrupt/missing indexes. A `for` over word-split output
+    # (base DNs contain no whitespace), NOT a piped while-read: the pipe
+    # would run the loop in a subshell AND put rebuild-index's stdin on the
+    # list — any stdin read inside the loop would consume list entries.
+    for baseDn in ${BASE_DNS}; do
         [ -z "$baseDn" ] && continue
         echo "Rebuilding degraded indexes for base DN \"${baseDn}\"..."
         rebuild-index --offline --noPropertiesFile --rebuildDegraded --baseDn "${baseDn}" > /dev/null
@@ -61,7 +64,9 @@ upgradeDataAndRebuildDegradedIndexes() {
 
 
 waitUntilSigTerm() {
-    trap 'echo "Caught SIGTERM"' SIGTERM
+    # POSIX trap names drop the "SIG" prefix: dash and busybox ash both
+    # reject `trap ... SIGTERM` ("bad trap").
+    trap 'echo "Caught SIGTERM"' TERM
     while :
     do
        sleep infinity &
@@ -182,10 +187,17 @@ doInit() {
         exit 0;
     fi
     # Else - no data is present, we need to run setup.
-    # busybox tar has no --no-overwrite-dir; extraction happens into an empty
-    # PVC, so plain tar is safe.
+    # GNU tar's --no-overwrite-dir keeps it from rewriting the metadata of
+    # the extraction root (the PVC mount root; its mode/owner is kubelet/
+    # fsGroup-managed); busybox tar rejects the flag outright. Probe for it
+    # instead of choosing per image line, and keep -v so the init log shows
+    # what the prime actually unpacked.
     echo "Untaring protoype setup to $DS_DATA_DIR"
-    tar -C $DS_DATA_DIR -xzf data.tar.gz
+    if tar --no-overwrite-dir --version >/dev/null 2>&1; then
+        tar --no-overwrite-dir -C $DS_DATA_DIR -xvzf data.tar.gz
+    else
+        tar -C $DS_DATA_DIR -xvzf data.tar.gz
+    fi
     copyKeys
     runRuntimeScript setup
     init

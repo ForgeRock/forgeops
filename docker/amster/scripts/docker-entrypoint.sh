@@ -1,12 +1,13 @@
-#!/usr/bin/env bash
+#!/bin/sh
 #
-# Copyright 2016-2024 Ping Identity Corporation. All Rights Reserved
-# 
-# This code is to be used exclusively in connection with Ping Identity 
+# Copyright 2024 Ping Identity Corporation. All Rights Reserved
+# This code is to be used exclusively in connection with Ping Identity
 # Corporation software or services. Ping Identity Corporation only offers
-# such software or services to legal entities who have entered into a 
+# such software or services to legal entities who have entered into a
 # binding license agreement with Ping Identity Corporation.
 #
+# Shared by the Debian and Alpine amster image lines: POSIX sh only (the
+# alpine images have no bash).
 set -e
 
 # If a command arg is not passed, default to import
@@ -15,7 +16,7 @@ ACTION="${1:-import}"
 echo "amster action is $ACTION"
 
 # Default is to connect via the internal http service name
-# Note we use AMSTER_AM_URL so we don't collide with the platform AM_URL - which might be external
+# Note we use AMSTER_AM_URL so we dont collide with the platform AM_URL - which might be external
 export AMSTER_AM_URL=${AMSTER_AM_URL:-http://am:80/am}
 
 pause() {
@@ -29,13 +30,20 @@ pause() {
     done
 }
 
-
-# Extract amster version for commons parameter to modify configs
+# Extract amster version for commons parameter to modify configs.
+# No bash BASH_REMATCH: pull the first version-looking token with grep.
+# The first match wins (amster prints e.g. "9.0.0" or "9.0.0-SNAPSHOT"
+# with a build id on the same or a later line). Unlike the bash original
+# (where a non-matching [[ =~ ]] failed under set -e), a grep that finds
+# nothing exits 0 through the head pipeline — check explicitly.
 echo "Extracting amster version"
 VER=$(./amster --version)
 echo "Amster version output is: '${VER}'"
-[[ "$VER" =~ ([0-9].[0-9].[0-9](\.[0-9]*)?-([a-zA-Z0-9]+|([-a-zA-Z0-9]+)?SNAPSHOT|RC[0-9]+|M[0-9]+)|[0-9].[0-9].[0-9](\.[0-9]*)?) ]]
-VERSION=${BASH_REMATCH[1]}
+VERSION=$(printf '%s' "$VER" | grep -oE '[0-9]+\.[0-9]+\.[0-9]+(\.[0-9]+)?(-([a-zA-Z0-9]+|[-a-zA-Z0-9]+SNAPSHOT|RC[0-9]+|M[0-9]+))?' | head -n 1)
+if [ -z "${VERSION:-}" ]; then
+    echo "ERROR: could not parse an amster version from the --version output" >&2
+    exit 1
+fi
 echo "Amster version is: '${VERSION}'"
 export VERSION
 

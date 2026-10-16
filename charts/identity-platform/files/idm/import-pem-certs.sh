@@ -1,9 +1,9 @@
 #!/bin/sh
 # The IDM PEM truststore import, shared by the Debian and Alpine image
-# lines. The system CA bundle path differs per image line, but the chart
+# lines. The system CA bundle path differs per image line, and the chart
 # always sets IDM_PEM_TRUSTSTORE explicitly per mode (see the
-# truststore-init env in idm-deployment.yaml), so the default below is a
-# last-resort fallback only.
+# truststore-init env in idm-deployment.yaml) — there is deliberately NO
+# default in this script.
 # This script copies the default cacerts to $TRUSTSTORE_PATH
 # and imports all the certs contained in the $IDM_PEM_TRUSTSTORE if it exists
 
@@ -24,10 +24,13 @@
 set -e
 
 IDM_DEFAULT_TRUSTSTORE=${IDM_DEFAULT_TRUSTSTORE:-$JAVA_HOME/lib/security/cacerts}
-# Debian images keep the system CA bundle at /usr/lib/ssl/cert.pem; Alpine
-# images at /etc/ssl/certs/ca-certificates.crt (see the chart's
-# truststore-init env, which always sets this explicitly).
-IDM_PEM_TRUSTSTORE=${IDM_PEM_TRUSTSTORE:-/etc/ssl/certs/ca-certificates.crt}
+# NO default for IDM_PEM_TRUSTSTORE: the chart's truststore-init env always
+# sets it explicitly per image line (Debian /usr/lib/ssl/cert.pem, Alpine
+# /etc/ssl/certs/ca-certificates.crt). A fallback default would be wrong on
+# one of the two lines by construction — and since Debian also ships the
+# alpine path, a default would turn a misconfigured invocation (unset env)
+# into a silent whole-system-CA import instead of the loud "Nothing was
+# imported" diagnostic below.
 # If a $IDM_PEM_TRUSTSTORE is provided, import it into the truststore. Otherwise, do nothing
 if [ -f "$IDM_DEFAULT_TRUSTSTORE" ] && { [ -f "$IDM_PEM_TRUSTSTORE" ] || [ -f "$IDM_PEM_TRUSTSTORE_DS" ] || [ -f "$IDM_PEM_TRUSTSTORE_EXTRA" ] ; }; then
     TRUSTSTORE_PATH="${TRUSTSTORE_PATH:-/opt/openidm/idmtruststore}"

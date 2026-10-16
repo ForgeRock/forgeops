@@ -7,11 +7,13 @@ echo "Creating tmp"
 mkdir -p /writeable/tmp
 echo "Copying /home/forgerock"
 mkdir -p /writeable/home
-# Copy with `cp -rv` (NOT -a): some image files may be root-owned, and
-# busybox cp -a exits 1 when it cannot preserve ownership (GNU cp only
-# warns). The init runs as the product uid, so plain -r ownership (files
-# owned by the runner) is exactly right for the writeable volume.
-cp -rv /home/forgerock/ /writeable/home/forgerock/
+# `cp -dRv` (NOT -a): -a implies -p (preserve mode/ownership), which busybox
+# cp cannot honor as the init's non-root uid and warns per file ("can't
+# preserve ownership") — noise on every boot. -d/-P (preserve symlinks) is
+# already busybox's default with -R, but stating it keeps GNU cp — where the
+# default depends on build config — behaving identically. -R recurses; both
+# busybox cp and GNU cp support the -dR pair.
+cp -dRv /home/forgerock/ /writeable/home/forgerock/
 echo "Copying /opt/opendj"
 mkdir -p /writeable/opt
-cp -rv /opt/opendj/ /writeable/opt/opendj/
+cp -dRv /opt/opendj/ /writeable/opt/opendj/

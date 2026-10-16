@@ -33,8 +33,11 @@ setup-profile --profile ${CONFIG} \
                   --set ds-proxied-server/proxyUserDn:uid=proxy \
                   --set ds-proxied-server/proxyUserCertificateSubjectDn:CN=ds,O=ForgeRock.com
 
-# Copy custom schema files into db after setup-profiles have been imported
-cp -a /opt/opendj/custom-schema/*.ldif /opt/opendj/data/db/schema
+# Copy custom schema files into db after setup-profiles have been imported.
+# -d not -a: -a implies -p (preserve ownership), which busybox cp cannot
+# honor as a non-root uid and warns per file. -d is a no-op here (the glob
+# never yields a symlink) but keeps one cp idiom across the tree.
+cp -d /opt/opendj/custom-schema/*.ldif /opt/opendj/data/db/schema
 rm -rf /opt/opendj/custom-schema
 
 # The default in 7.x is to use PBKDF2 password hashing - which is many order of magnitude slower than

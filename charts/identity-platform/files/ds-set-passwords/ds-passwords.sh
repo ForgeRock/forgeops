@@ -1,7 +1,7 @@
 #!/bin/sh
 # The DS password-set script, shared by the Debian and Alpine image lines.
-# "local" is supported by busybox ash; [[ ]] and bash-only constructs are not
-# used here.
+# `local` is used for function scoping (supported by dash and busybox ash
+# alike); [[ ]] and other bash-only constructs are not used here.
 
 PS4='+ $(date "+%H:%M:%S")\011 '
 # NO pipefail: the merged tree runs under dash (/bin/sh) on the Debian
@@ -10,12 +10,14 @@ PS4='+ $(date "+%H:%M:%S")\011 '
 set -e
 
 chgPass () {
-    HOST=$1
-    ADMIN_PASS=$2
-    USER_DN=$3
-    USER_UID=$4
-    USER_PASS=$5
-    FULL_USER_DN="${USER_UID},${USER_DN}"
+    # `local` is not POSIX-specified but is supported by every /bin/sh this
+    # tree can run under (dash, busybox ash, bash) — keep the scoping.
+    local HOST=$1
+    local ADMIN_PASS=$2
+    local USER_DN=$3
+    local USER_UID=$4
+    local USER_PASS=$5
+    local FULL_USER_DN="${USER_UID},${USER_DN}"
     echo "Checking ${HOST} for ${USER_UID},${USER_DN}"
     CXN="-h ${HOST} -p 1636 --useSsl --trustAll"
     ldapsearch ${CXN} -D "uid=admin" -w "${ADMIN_PASS}" -b ${USER_DN} "${USER_UID}"
