@@ -15,15 +15,16 @@ serviceAccount:
 
 platform:
   # Selects the runtime contract AND the image lineage this chart deploys:
-  # "forgeops" = the Alpine pingbase-built product images (ping*), the
-  # busybox-safe scripts in files-alpine/, the ping uid/home layout, PEM
-  # certs and the DS PVC-priming contract; the runtime IMAGE_MODE=forgeops
-  # env is passed to the product containers. "base" = the Debian upstream
-  # images and files/ scripts (legacy lineage). Note the product images are
-  # single-mode builds since the runtime-IMAGE_MODE rework: IMAGE_MODE only
-  # selects runtime behavior there, never image content, so this value no
-  # longer changes what is baked - only which script trees, uid and paths
-  # the chart uses, and the runtime env.
+  # "forgeops" = the Alpine pingbase-built product images (ping*), the ping
+  # uid/home layout, PEM certs and the DS PVC-priming contract; the runtime
+  # IMAGE_MODE=forgeops env is passed to the product containers. "base" =
+  # the Debian upstream images (legacy lineage). The runtime scripts are ONE
+  # POSIX tree (files/) shared by both image lines since FORGEOPS-6971, so
+  # this value no longer selects a script tree: it still controls uid/home/
+  # tomcat paths, the per-mode CA-bundle env, the IMAGE_MODE env and the
+  # enduser-ui image name. The product images are single-mode builds since
+  # the runtime-IMAGE_MODE rework: IMAGE_MODE only selects runtime behavior
+  # there, never image content.
   imageMode: base
   # Chart-wide default REPOSITORY for the product images. The full image
   # ref composes <imageRepository>/<image name> (see the platform.imageRef

@@ -1,15 +1,21 @@
-#!/bin/bash
+#!/bin/sh
+# The DS password-set script, shared by the Debian and Alpine image lines.
+# "local" is supported by busybox ash; [[ ]] and bash-only constructs are not
+# used here.
 
 PS4='+ $(date "+%H:%M:%S")\011 '
-set -eo pipefail
+# NO pipefail: the merged tree runs under dash (/bin/sh) on the Debian
+# images and dash rejects `set -o pipefail` outright. This script runs no
+# pipelines, so pipefail would be a no-op anyway.
+set -e
 
 chgPass () {
-    local HOST=$1
-    local ADMIN_PASS=$2
-    local USER_DN=$3
-    local USER_UID=$4
-    local USER_PASS=$5
-    local FULL_USER_DN="${USER_UID},${USER_DN}"
+    HOST=$1
+    ADMIN_PASS=$2
+    USER_DN=$3
+    USER_UID=$4
+    USER_PASS=$5
+    FULL_USER_DN="${USER_UID},${USER_DN}"
     echo "Checking ${HOST} for ${USER_UID},${USER_DN}"
     CXN="-h ${HOST} -p 1636 --useSsl --trustAll"
     ldapsearch ${CXN} -D "uid=admin" -w "${ADMIN_PASS}" -b ${USER_DN} "${USER_UID}"
@@ -43,7 +49,7 @@ AM_STORES_USER_PASSWORD_REAL="userPassword: $AM_STORES_USER_PASSWORD"
 AM_STORES_APPLICATION_PASSWORD_REAL="userPassword: $AM_STORES_APPLICATION_PASSWORD"
 AM_STORES_CTS_PASSWORD_REAL="userPassword: $AM_STORES_CTS_PASSWORD"
 
-if [ -n "$OLD_AM_STORES_USER_PASSWORD" ] ; then
+if [ -n "${OLD_AM_STORES_USER_PASSWORD:-}" ] ; then
   AM_STORES_USER_PASSWORD_REAL=$(cat<<EOM
 userPassword: $AM_STORES_USER_PASSWORD
 userPassword: $OLD_AM_STORES_USER_PASSWORD
@@ -51,7 +57,7 @@ EOM
 )
 fi
 
-if [ -n "$OLD_AM_STORES_APPLICATION_PASSWORD" ] ; then
+if [ -n "${OLD_AM_STORES_APPLICATION_PASSWORD:-}" ] ; then
   AM_STORES_APPLICATION_PASSWORD_REAL=$(cat<<EOM
 userPassword: $AM_STORES_APPLICATION_PASSWORD
 userPassword: $OLD_AM_STORES_APPLICATION_PASSWORD
@@ -59,7 +65,7 @@ EOM
 )
 fi
 
-if [ -n "$OLD_AM_STORES_CTS_PASSWORD" ] ; then
+if [ -n "${OLD_AM_STORES_CTS_PASSWORD:-}" ] ; then
   AM_STORES_CTS_PASSWORD_REAL=$(cat<<EOM
 userPassword: $AM_STORES_CTS_PASSWORD
 userPassword: $OLD_AM_STORES_CTS_PASSWORD

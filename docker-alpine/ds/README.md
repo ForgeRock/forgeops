@@ -68,8 +68,9 @@ are relaxed, the AM/IDM setup profiles are enhanced from `ldif-ext/`, and
   `init-and-restore.sh`, ...) are NOT baked — same as the fork image. They
   are delivered at deploy time by the identity-platform chart's
   `ds-runtime-scripts` / `ds-<statefulset>-runtime-scripts` ConfigMaps
-  (POSIX variants under `files-alpine/ds/runtime-scripts/`), mounted at
-  `/opt/opendj/runtime-scripts`.
+  (one POSIX tree shared with the Debian image line under
+  `charts/identity-platform/files/ds/runtime-scripts/` since
+  FORGEOPS-6971), mounted at `/opt/opendj/runtime-scripts`.
 * **Debug tooling** — the Debian child installs `ncat`/`dnsutils`; the
   Alpine child installs nothing (busybox + wget cover the scripts). If you
   need extras, add an `apk --no-cache --update add ...` layer or an

@@ -6,11 +6,39 @@ elif [ -d /custom/config ]; then
   echo "Found config in custom volume."
   cd /opt/openidm
   cp -rv ui conf script /fbc
+  # Deployer-provided configuration wins: drop the pristine-conf marker so
+  # the image's apply-config-profile.sh never overlays the profile on top.
+  # The custom content is a WHOLESALE config replacement — a partial config
+  # (one stray file) leaves the conf as the pristine maven-build zip conf,
+  # whose repo.ds.json points at localhost. Warn loudly when the custom
+  # content does not look like a complete configuration; the profile
+  # suppression below is still by design and untouched.
+  rm -f /fbc/conf/.pristine-zip-conf
   cp -av /custom/config/* /fbc/
+  if [ ! -f /fbc/conf/repo.ds.json ]; then
+    echo "WARNING: the custom config does not include repo.ds.json, so this" >&2
+    echo "WARNING: does not look like a complete IDM configuration. The" >&2
+    echo "WARNING: CONFIG_PROFILE (cdk-base) overlay is suppressed for custom" >&2
+    echo "WARNING: configs by design; IDM may fail to reach its repository." >&2
+  fi
 else
   echo "Copying docker image configuration files to the shared volume"
   cd /opt/openidm
   cp -rv ui conf script /fbc
+fi
+
+# Single-image runtime mode: when the deployment runs the image in forgeops
+# mode, apply the CONFIG_PROFILE deployment conf over the conf the main
+# container will read (the fbc volume). Pass /fbc as the home so the overlay
+# lands in /fbc/conf; the helper is a no-op unless IMAGE_MODE=forgeops and
+# the conf is still the pristine maven-build conf. The standalone (no fbc
+# volume) path is covered by the image entrypoint calling the same helper
+# with the default home. The helper ships only in the alpine pingidm image
+# (the Debian image has no CONFIG_PROFILE machinery), so guard on it being
+# present+executable — the || true alone would leave a "not found" on the
+# Debian path's stderr.
+if [ -d /fbc ] && [ -x /opt/openidm/bin/apply-config-profile.sh ]; then
+  /opt/openidm/bin/apply-config-profile.sh /fbc || true
 fi
 
 # Out-of-the-box Remote Connector Server (RCS) wiring: when the platform.rcs
@@ -136,7 +164,7 @@ if [ "${RCS_CONNECTOR_SERVER_ENABLED:-false}" = "true" ] \
 else
   # A stale registration file would keep pointing IDM at a (possibly
   # removed/rotated) RCS: remove it when the wiring is disabled or the
-  # secret is gone. Only touch the files this script writes — a deployer
+  # secret is gone. Only touch the files this script writes - a deployer
   # who ships their own connectorinfoprovider.json in /custom/config just
   # had it copied to /fbc/conf, and must not lose it to our cleanup.
   if [ ! -e /custom/config/org.forgerock.openidm.provisioner.openicf.connectorinfoprovider.json ]; then
@@ -152,4 +180,8 @@ echo "Creating tmp"
 mkdir -p /writeable/tmp
 echo "Copying /opt/openidm"
 mkdir -p /writeable/opt
-cp -av /opt/openidm/ /writeable/opt/openidm
+# Copy with `cp -rv` (NOT -a): some image files may be root-owned, and
+# busybox cp -a exits 1 when it cannot preserve ownership (GNU cp only
+# warns). The init runs as the product uid, so plain -r ownership (files
+# owned by the runner) is exactly right for the writeable volume.
+cp -rv /opt/openidm/ /writeable/opt/openidm

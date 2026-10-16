@@ -1,6 +1,12 @@
-#!/usr/bin/env bash
+#!/bin/sh
 # Simple script to automatically restore DS from backups
 # Note: This script assumes it runs in a k8s init-container with the proper volumes and environment variables attached.
+# Shared by the Debian and Alpine image lines: POSIX sh only —
+#   - busybox ls has no GNU "-I pattern" flag: filter lost+found with grep
+#   - no arrays: DSBACKUP_HOSTS handled via word-splitting and a "case" membership test
+#   - the disaster-recovery backend list is walked with while-read instead of
+#     a bash array with arithmetic indexing
+#   - no "exit -1" (busybox rejects negative exit codes); no GNU-only flags
 
 # Required environment variables:
 # AUTORESTORE_FROM_DSBACKUP: Set to true to restore from backup. Defaults to false
@@ -14,10 +20,10 @@ printf %s "$GOOGLE_CREDENTIALS_JSON" > ${GCP_CREDENTIAL_PATH}
 
 set -e
 
-if [ -n "$(ls -A /opt/opendj/data -I lost+found)" ]; then
+if [ -n "$(ls -A /opt/opendj/data | grep -v '^lost+found$')" ]; then
   echo "Found data present in /opt/opendj/data before PingDS initialization"
   DATA_PRESENT_BEFORE_INIT="true"
-  ls -A /opt/opendj/data -I lost+found
+  ls -A /opt/opendj/data | grep -v '^lost+found$'
 fi
 
 # Initialize PingDS regardless of dsbackup restore settings
@@ -34,7 +40,7 @@ fi
 if [ -z "${DSBACKUP_DIRECTORY}" ]; then
     echo "If AUTORESTORE_FROM_DSBACKUP is enabled, DSBACKUP_DIRECTORY must be specified. "
     echo "DSBACKUP_DIRECTORY can be set to: /local/path | s3://bucket/path | az://container/path | gs://bucket/path "
-    exit -1
+    exit 1
 else
     echo "DSBACKUP_DIRECTORY is set to $DSBACKUP_DIRECTORY"
 fi
@@ -42,7 +48,7 @@ fi
 if [ -z "${DSBACKUP_HOSTS}" ]; then
     echo "If AUTORESTORE_FROM_DSBACKUP is enabled, DSBACKUP_HOSTS must be specified. "
     echo "DSBACKUP_HOSTS should contain the pod names. Example: 'ds-cts-0,ds-idrepo-0'"
-    exit -1
+    exit 1
 else
     echo "DSBACKUP_HOSTS is set to $DSBACKUP_HOSTS"
 fi
@@ -59,8 +65,9 @@ AZ_PARAMS="--storageProperty az.accountName.env.var:AZURE_STORAGE_ACCOUNT_NAME  
 GCP_PARAMS="--storageProperty gs.credentials.path:${GCP_CREDENTIAL_PATH}"
 EXTRA_PARAMS=""
 
-# Let's convert the comma separated value in $DSBACKUP_HOSTS to an array
-HOSTS=($(echo "${DSBACKUP_HOSTS}" | awk '{split($0,arr,",")} {for (i in arr) {print arr[i]}}'))
+# Split the comma separated value in $DSBACKUP_HOSTS into a space separated
+# list (busybox ash has no arrays; word splitting in "for" does the rest)
+HOSTS=$(echo "${DSBACKUP_HOSTS}" | awk '{split($0,arr,",")} {for (i in arr) {print arr[i]}}')
 
 
 case "$DSBACKUP_DIRECTORY" in
@@ -82,16 +89,17 @@ gs://* )
     ;;
 esac
 # Recover from the first available backup that passes verification checks.
-for host in "${HOSTS[@]}"; do
+for host in ${HOSTS}; do
     # Remove the pod idx and compare. ex. ds-idrepo-2 => ds-idrepo-
     # if ds-idrepo- = ds-idrepo-, then attemp to restore from that $host backup
-    if [ "$(printf ${HOSTNAME} | sed 's/[0-9]\+$//')" = "$(printf ${host} | sed 's/[0-9]\+$//')" ]; then
+    if [ "$(printf %s "${HOSTNAME}" | sed 's/[0-9]\+$//')" = "$(printf %s "${host}" | sed 's/[0-9]\+$//')" ]; then
         BACKUP_NAME="${host}"
         BACKUP_LOCATION="${DSBACKUP_DIRECTORY}/${BACKUP_NAME}"
 
         echo "Attempting to verify backup from: ${BACKUP_LOCATION}"
-        # If this host owns a backup task, restore the `tasks` backend. Else, skip the `tasks` backend
-        if [[ " ${HOSTS[@]} " =~ " ${HOSTNAME} " ]]; then
+        # If this host owns a backup task, restore the `tasks` backend. Else, skip the `tasks` backend.
+        # POSIX replacement for the bash membership test: [[ " $HOSTS " =~ " $HOSTNAME " ]]
+        if case " ${HOSTS} " in *" ${HOSTNAME} "*) true ;; *) false ;; esac; then
         BACKEND_NAMES=$(dsbackup list --last --verify --noPropertiesFile --backupLocation ${BACKUP_LOCATION} ${EXTRA_PARAMS} |
             grep -i "backend name" | awk '{printf "%s %s ","--backendName", $3}')
         else
@@ -105,7 +113,7 @@ for host in "${HOSTS[@]}"; do
     fi
 done
 
-if [ -z "${BACKUP_NAME}" ]; then
+if [ -z "${BACKUP_NAME:-}" ]; then
     echo "No suitable backup target was found for $HOSTNAME. Skipping restore"
     exit 0
 else
@@ -124,13 +132,19 @@ if [ ! -z "${BACKEND_NAMES}" ]; then
     if [ -n "${run_dr}" ]; then
         echo
         echo "Running disaster recovery with version: ${DISASTER_RECOVERY_ID}"
-        recovery_backends=(${BACKEND_NAMES})
-        for ((i = 0 ; i < ${#recovery_backends[@]} ; i+=2 )); do
-            if ! [ "${recovery_backends[$(($i+1))]}" = "schema" ]; then
-                basedns=$(dsconfig get-backend-prop --offline --script-friendly --no-prompt --backend-name ${recovery_backends[$(($i+1))]} --property base-dn | awk '{print $2}')
+        # BACKEND_NAMES is a "--backendName <name> --backendName <name> ..." list.
+        # Walk it pairwise with a while-read: name=the --backendName marker,
+        # next line = the backend name itself (busybox ash has no arrays).
+        # Piped, not staged through a /tmp file: the loop runs in a subshell
+        # but only reads variables, and /tmp may not be writable when
+        # readOnlyRootFilesystem is set without a /tmp mount.
+        printf '%s\n' ${BACKEND_NAMES} | awk 'NR % 2 == 0' | while IFS= read -r backend; do
+            [ -z "$backend" ] && continue
+            if ! [ "${backend}" = "schema" ]; then
+                basedns=$(dsconfig get-backend-prop --offline --script-friendly --no-prompt --backend-name ${backend} --property base-dn | awk '{print $2}')
             fi
-            for basedn in ${basedns}; do
-                echo "Running disaster recovery on basedn ${basedn} for backend ${recovery_backends[$(($i+1))]}"
+            for basedn in ${basedns:-}; do
+                echo "Running disaster recovery on basedn ${basedn} for backend ${backend}"
                 dsrepl disaster-recovery --no-prompt --user-generated-id ${DISASTER_RECOVERY_ID} --baseDn "${basedn}"
             done
         done
@@ -143,4 +157,3 @@ else
     echo "No Backup found in ${BACKUP_LOCATION}. There's nothing to restore"
 fi
 echo
-

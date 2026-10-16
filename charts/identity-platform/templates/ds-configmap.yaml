@@ -10,11 +10,11 @@ metadata:
 data:
   {{ (.Files.Glob (printf "%s/ds/init-scripts/**.sh" (include "platform.filesDir" .))).AsConfig | nindent 2 }}
 {{- end }}
-{{- /* The entrypoint override is only consumed by the forgeops-mode mounts
-     (the debian ds image carries the identical script baked in); skip
-     creating the ConfigMap in base mode. */}}
-{{- if and (or .Values.ds_cts.enabled .Values.ds_idrepo.enabled)
-    (eq (.Values.platform.imageMode | default "base") "forgeops") }}
+{{- /* The chart's ds entrypoint is canonical in BOTH image modes since
+     FORGEOPS-6971 (one POSIX script tree): the statefulsets mount it over
+     the image's baked copy everywhere, so an entrypoint fix ships with the
+     chart instead of waiting on a debian image rebuild. */}}
+{{- if or .Values.ds_cts.enabled .Values.ds_idrepo.enabled }}
 ---
 apiVersion: v1
 kind: ConfigMap

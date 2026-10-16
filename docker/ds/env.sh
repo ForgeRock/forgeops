@@ -81,7 +81,10 @@ export DS_ADVERTISED_LISTEN_ADDRESS=${DS_ADVERTISED_LISTEN_ADDRESS:-$(hostname -
 
 # If you do not set the Bootstrap servers, the default is calculated below. This works for a single
 # cluster deployment.
-if [[ "${DS_ADVERTISED_LISTEN_ADDRESS}" =~ [^.]+-[0-9]+\..+ ]]; then
+# POSIX sh (dash/busybox): no [[ =~ ]] — evaluate the pod-hostname regex
+# with grep -E (same as the alpine image's env.sh; the chart's POSIX
+# entrypoint sources this file under /bin/sh since FORGEOPS-6971).
+if printf '%s' "${DS_ADVERTISED_LISTEN_ADDRESS}" | grep -qE '[^.]+-[0-9]+\..+'; then
     # Domain is everything after the first dot
     podDomain=${DS_ADVERTISED_LISTEN_ADDRESS#*.}
     # Name is everything up to the first dot

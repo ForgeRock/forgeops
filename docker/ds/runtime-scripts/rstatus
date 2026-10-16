@@ -1,5 +1,5 @@
- #!/usr/bin/env bash
-source /opt/opendj/env.sh
+#!/bin/sh
+. /opt/opendj/env.sh
 
 
 echo "DS Status"

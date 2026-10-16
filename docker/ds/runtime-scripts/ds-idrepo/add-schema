@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 # Adds extra schema on new and existing deployments
 
 set -e

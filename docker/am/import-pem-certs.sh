@@ -1,4 +1,5 @@
-#!/usr/bin/env bash
+#!/bin/sh
+# The AM PEM truststore import, shared by the Debian and Alpine image lines.
 # This script copies the default cacerts to $TRUSTSTORE_PATH
 # and imports all the certs contained in the $AM_PEM_TRUSTSTORE if it exists
 
@@ -11,13 +12,20 @@
 # binding license agreement with Ping Identity Corporation.
 #
 
+# POSIX sh with NO `set -o pipefail`: the merged tree runs under dash
+# (/bin/sh) on the Debian images, and dash rejects pipefail outright
+# ("Illegal option"). The keytool pipeline ends in || /bin/true, so
+# pipefail adds nothing here.
 set -e
-set -o pipefail
 
 AM_DEFAULT_TRUSTSTORE=${AM_DEFAULT_TRUSTSTORE:-$JAVA_HOME/lib/security/cacerts}
 # If a $AM_PEM_TRUSTSTORE is provided, import it into the truststore. Otherwise, do nothing
 if [ -f "$AM_DEFAULT_TRUSTSTORE" ] && { [ -f "$AM_PEM_TRUSTSTORE" ] || [ -f "$AM_PEM_TRUSTSTORE_DS" ] || [ -f "$AM_PEM_TRUSTSTORE_EXTRA" ] ; }; then
-    TRUSTSTORE_PATH="${TRUSTSTORE_PATH:-/home/forgerock/amtruststore}"
+    # The alpine pingbase images bake FORGEROCK_HOME=/home/ping; the Debian
+    # images set nothing -> /home/forgerock. The chart sets TRUSTSTORE_PATH
+    # explicitly for the truststore-init container, so this default is a
+    # fallback only.
+    TRUSTSTORE_PATH="${TRUSTSTORE_PATH:-${FORGEROCK_HOME:-/home/forgerock}/amtruststore}"
     TRUSTSTORE_PASSWORD="${TRUSTSTORE_PASSWORD:-changeit}"
     echo "Copying ${AM_DEFAULT_TRUSTSTORE} to ${TRUSTSTORE_PATH}"
     cp ${AM_DEFAULT_TRUSTSTORE} ${TRUSTSTORE_PATH}
@@ -42,5 +50,5 @@ if [ -f "$AM_DEFAULT_TRUSTSTORE" ] && { [ -f "$AM_PEM_TRUSTSTORE" ] || [ -f "$AM
     echo "Import complete!"
 else
     echo "Nothing was imported to the truststore. Check ENVs AM_DEFAULT_TRUSTSTORE and AM_PEM_TRUSTSTORE"
-    exit -1
+    exit 1
 fi

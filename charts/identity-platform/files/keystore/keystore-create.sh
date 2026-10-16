@@ -1,4 +1,8 @@
-#!/bin/bash
+#!/bin/sh
+#
+# Shared by the Debian and Alpine image lines: POSIX sh only. The job
+# template runs this script on the platform image the deployer selected.
+# keytool and jq are on PATH in both image lines.
 
 set -e
 
@@ -82,4 +86,3 @@ echo "Listing keystore entries..."
 keytool -list -storepass "$STOREPASS" -storetype $KEYSTORE_TYPE -keystore $KEYSTORE
 
 exit 0
-

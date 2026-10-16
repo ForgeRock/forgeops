@@ -1,5 +1,8 @@
-#!/usr/bin/env bash
+#!/bin/sh
 # Export dynamic config.
+#
+# Shared by the Debian and Alpine amster image lines: POSIX sh only
+# (no [[ ]]).
 
 # Alive check
 ALIVE="${AMSTER_AM_URL}/json/health/ready"
@@ -31,7 +34,7 @@ EXPORT_DIR="${EXPORT_DIR:-/var/tmp/amster}"
 mkdir -p $EXPORT_DIR
 
 # List of realm entities to export.
-if [[ "$1" == "full" ]]; then
+if [ "$1" = "full" ]; then
     realmEntities=""
 else
     realmEntities="--realmEntities 'OAuth2Clients IdentityGatewayAgents J2eeAgents WebAgents Policies CircleOfTrust Saml2Entity Applications'"

@@ -1,5 +1,8 @@
-#!/usr/bin/env bash
+#!/bin/sh
 # Import dynamic config.
+#
+# Shared by the Debian and Alpine amster image lines: POSIX sh only
+# (no [[ ]]; the argument test is an explicit -n).
 
 # Alive check
 ALIVE="${AMSTER_AM_URL}/json/health/ready"
@@ -29,14 +32,14 @@ import() {
    echo "Executing script $1"
 
    # Execute Amster if the configuration is found.
-   if [  ${1} ]; then
+   if [ -n "${1}" ]; then
       if [ ! -r /var/run/secrets/amster/id_rsa ]; then
          echo "ERROR: Can not find the Amster private key"
          exit 1
       fi
 
       if [ -f /opt/amster/config/amster-import.tar.gz ]; then
-         # Unzip amster-import.tar.gz
+         # Unzip amster-import.tar.gz
          cd /opt/amster/config
          tar -xzf amster-import.tar.gz
          cd /opt/amster
@@ -71,6 +74,6 @@ EOF
 wait_for_am
 
 # If there is no arg - just import any files found in config/
-if [[ -z "$1" ]]; then
+if [ -z "${1:-}" ]; then
    import "/tmp/import.amster"
 fi

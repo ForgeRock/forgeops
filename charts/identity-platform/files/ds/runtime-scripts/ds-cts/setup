@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 #
 # Default setup script
 # Setup the directory server for the cts backend.

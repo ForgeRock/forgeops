@@ -1,4 +1,9 @@
-#!/usr/bin/env bash
+#!/bin/sh
+# The AM entrypoint wrapper, shared by the Debian and Alpine image lines.
+# The alpine pingbase images bake FORGEROCK_HOME=/home/ping; the Debian
+# images set nothing, so the default below resolves to /home/forgerock
+# there. Runs via the chart's platform.amShell (sh in both modes), so the
+# shebang is informational only.
 
 # Base64 encode secret generate provisioned secrets if enabled
 if [ -n "${SECRET_GENERATOR_AM_ENV_SECRETS}" ] ; then
@@ -10,8 +15,7 @@ if [ -n "${SECRET_GENERATOR_AM_ENV_SECRETS}" ] ; then
 fi
 
 # Copy in the default boot.json to ensure container starts up correctly after a container restart
-cp /home/forgerock/openam/default-boot.json /home/forgerock/openam/config/boot.json
+cp "${FORGEROCK_HOME:-/home/forgerock}/openam/default-boot.json" "${FORGEROCK_HOME:-/home/forgerock}/openam/config/boot.json"
 
 # Run upstream docker-entrypoint.sh
-/home/forgerock/docker-entrypoint.sh
-
+"${FORGEROCK_HOME:-/home/forgerock}/docker-entrypoint.sh"

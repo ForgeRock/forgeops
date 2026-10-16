@@ -1,4 +1,9 @@
-#!/usr/bin/env bash
+#!/bin/sh
+# The IDM PEM truststore import, shared by the Debian and Alpine image
+# lines. The system CA bundle path differs per image line, but the chart
+# always sets IDM_PEM_TRUSTSTORE explicitly per mode (see the
+# truststore-init env in idm-deployment.yaml), so the default below is a
+# last-resort fallback only.
 # This script copies the default cacerts to $TRUSTSTORE_PATH
 # and imports all the certs contained in the $IDM_PEM_TRUSTSTORE if it exists
 
@@ -11,17 +16,30 @@
 # binding license agreement with Ping Identity Corporation.
 #
 
+# POSIX sh with NO `set -o pipefail`: the merged tree runs under dash
+# (/bin/sh) on the Debian images, and dash rejects pipefail outright
+# ("Illegal option"). The one pipeline whose middle segment could fail
+# (grep | wc) has its result range-checked; the keytool pipeline ends in
+# || /bin/true, so pipefail adds nothing here.
 set -e
-set -o pipefail
 
 IDM_DEFAULT_TRUSTSTORE=${IDM_DEFAULT_TRUSTSTORE:-$JAVA_HOME/lib/security/cacerts}
+# Debian images keep the system CA bundle at /usr/lib/ssl/cert.pem; Alpine
+# images at /etc/ssl/certs/ca-certificates.crt (see the chart's
+# truststore-init env, which always sets this explicitly).
+IDM_PEM_TRUSTSTORE=${IDM_PEM_TRUSTSTORE:-/etc/ssl/certs/ca-certificates.crt}
 # If a $IDM_PEM_TRUSTSTORE is provided, import it into the truststore. Otherwise, do nothing
 if [ -f "$IDM_DEFAULT_TRUSTSTORE" ] && { [ -f "$IDM_PEM_TRUSTSTORE" ] || [ -f "$IDM_PEM_TRUSTSTORE_DS" ] || [ -f "$IDM_PEM_TRUSTSTORE_EXTRA" ] ; }; then
     TRUSTSTORE_PATH="${TRUSTSTORE_PATH:-/opt/openidm/idmtruststore}"
     TRUSTSTORE_PASSWORD="${TRUSTSTORE_PASSWORD:-changeit}"
     echo "Copying ${IDM_DEFAULT_TRUSTSTORE} to ${TRUSTSTORE_PATH}"
     cp ${IDM_DEFAULT_TRUSTSTORE} ${TRUSTSTORE_PATH}
-    # Combine certs in a single file
+    # Combine certs in a single file. Use a temp dir: the working directory
+    # may not be writable when the init container runs as a non-owner uid
+    # (the Debian image's CWD happened to be writable; an Alpine image's
+    # /opt/openidm is owned by a different uid).
+    WORKDIR_TMP=$(mktemp -d)
+    cd "$WORKDIR_TMP"
     touch idm_combined_truststore
     [ -f "$IDM_PEM_TRUSTSTORE" ] && cat $IDM_PEM_TRUSTSTORE >> idm_combined_truststore
     [ -f "$IDM_PEM_TRUSTSTORE_DS" ] && cat $IDM_PEM_TRUSTSTORE_DS >> idm_combined_truststore
@@ -40,7 +58,9 @@ if [ -f "$IDM_DEFAULT_TRUSTSTORE" ] && { [ -f "$IDM_PEM_TRUSTSTORE" ] || [ -f "$
                     -storepass "${TRUSTSTORE_PASSWORD}" || /bin/true
     done
     echo "Import complete!"
+    cd /
+    rm -rf "$WORKDIR_TMP"
 else
     echo "Nothing was imported to the truststore. Check ENVs IDM_DEFAULT_TRUSTSTORE and IDM_PEM_TRUSTSTORE"
-    exit -1
+    exit 1
 fi

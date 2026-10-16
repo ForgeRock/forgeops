@@ -1,5 +1,7 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
+# The DS scheduled-backup task script, shared by the Debian and Alpine image
+# lines.
 cd /opt/opendj
 INCREMENTAL_CRON=${BACKUP_SCHEDULE:-0 * * * *}
 
@@ -7,7 +9,8 @@ INCREMENTAL_CRON=${BACKUP_SCHEDULE:-0 * * * *}
 if [ -z "${BACKUP_DIRECTORY}" ]; then
     echo "BACKUP_DIRECTORY must be specified. "
     echo "BACKUP_DIRECTORY can be set to: /local/path | s3://bucket/path | az://container/path | gs://bucket/path "
-    exit -1
+    # (not "exit -1": busybox ash rejects negative exit codes)
+    exit 1
 else
     echo "BACKUP_DIRECTORY is set to $BACKUP_DIRECTORY"
 fi
@@ -25,7 +28,7 @@ manage-tasks --cancel "${TASK_NAME}" --hostname "localhost" \
 echo "Cancelling task operation complete"
 
 # Exit if request was to cancel task
-if [[ "$CANCEL" ]]; then
+if [ -n "${CANCEL:-}" ]; then
     exit 0
 fi
 
@@ -57,12 +60,14 @@ esac
 
 # Add optional backends to dsbackup command
 if [ -n "${BACKENDS}" ]; then
-    backends=($(echo "$BACKENDS" | awk '{split($0,arr,",")} {for (i in arr) {print arr[i]}}'))
-    # Loop through pods and carry out dsbackup task
-    for backend in "${backends[@]}"
+    # busybox ash has no arrays: split BACKENDS by comma into a
+    # space-separated list and word-split it in the for loop.
+    backends=$(echo "$BACKENDS" | awk '{split($0,arr,",")} {for (i in arr) {print arr[i]}}')
+    # Loop through backends and carry out dsbackup task
+    for backend in ${backends}
     do
         EXTRA_PARAMS="${EXTRA_PARAMS} --backendName ${backend}"
-    done 
+    done
 fi
 
 echo "Storing backups in ${BACKUP_LOCATION}"
