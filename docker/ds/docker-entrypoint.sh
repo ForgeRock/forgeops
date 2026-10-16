@@ -51,12 +51,16 @@ upgradeDataAndRebuildDegradedIndexes() {
     echo "Upgrading configuration and data..."
      ./upgrade --acceptLicense --force --ignoreErrors --no-prompt
 
-    # Rebuild any corrupt/missing indexes. Iterate with a here-doc
+    # Rebuild any corrupt/missing indexes. Iterate with an unquoted here-doc
     # while-read (NOT a `for`: word splitting would break base DNs that
-    # contain spaces, which are legal; NOT a piped while-read: the pipe
-    # would run the loop in a subshell AND put rebuild-index's stdin on
-    # the list). The inner command gets </dev/null so it cannot read the
-    # here-doc.
+    # contain spaces, which are legal). The delimiter stays UNQUOTED on
+    # purpose: a quoted delimiter would suppress the ${BASE_DNS} expansion,
+    # feeding the loop the literal string. Backslash safety is unaffected —
+    # parameter-expansion OUTPUT through a here-doc is not re-processed for
+    # escapes (verified in dash + busybox: a DN value containing
+    # `ou=People\,Inc` passes through intact); only literal backslashes in
+    # the script body would be, and there are none. The inner command gets
+    # </dev/null so it cannot read the here-doc.
     while IFS= read -r baseDn; do
         [ -z "$baseDn" ] && continue
         echo "Rebuilding degraded indexes for base DN \"${baseDn}\"..."
@@ -143,13 +147,18 @@ copyKeys() {
 
     # Copy the SSL certs. We also copy the ssl ca.crt to be used as the trustore in the case that
     # a seperate truststore is not provided.
-    [ -d $SSL_CERT_DIR ] && cat $SSL_CERT_DIR/tls.crt $SSL_CERT_DIR/tls.key  >$PEM_KEYS_DIRECTORY/ssl-key-pair && \
-        cp $SSL_CERT_DIR/ca.crt $PEM_TRUSTSTORE_DIRECTORY/trust.pem
+    # Quote the expansions: with the variable UNSET, [ -d $VAR ] collapses to
+    # the one-argument test [ -d ], which POSIX defines as true (-d is not
+    # null) — the guard would run and write a zero-byte PEM pair instead of
+    # skipping. Quoted, [ -d "" ] is false, matching the bash [[ ]] semantics
+    # the original had.
+    [ -d "$SSL_CERT_DIR" ] && cat "$SSL_CERT_DIR/tls.crt" "$SSL_CERT_DIR/tls.key"  >"$PEM_KEYS_DIRECTORY/ssl-key-pair" && \
+        cp "$SSL_CERT_DIR/ca.crt" "$PEM_TRUSTSTORE_DIRECTORY/trust.pem"
 
-    [ -d $MASTER_CERT_DIR ] && cat $MASTER_CERT_DIR/tls.key $MASTER_CERT_DIR/tls.crt $MASTER_CERT_DIR/ca.crt > $PEM_KEYS_DIRECTORY/master-key
+    [ -d "$MASTER_CERT_DIR" ] && cat "$MASTER_CERT_DIR/tls.key" "$MASTER_CERT_DIR/tls.crt" "$MASTER_CERT_DIR/ca.crt" > "$PEM_KEYS_DIRECTORY/master-key"
 
     # If the user provides a truststore then use it.
-    [ -d $TRUSTSTORE_DIR ] && cp $TRUSTSTORE_DIR/ca.crt $PEM_TRUSTSTORE_DIRECTORY/trust.pem
+    [ -d "$TRUSTSTORE_DIR" ] && cp "$TRUSTSTORE_DIR/ca.crt" "$PEM_TRUSTSTORE_DIRECTORY/trust.pem"
 }
 
 # POD_STATEFULSET is the statefulset name part of the pod name
@@ -194,8 +203,9 @@ doInit() {
     # GNU tar's --no-overwrite-dir keeps it from rewriting the metadata of
     # the extraction root (the PVC mount root; its mode/owner is kubelet/
     # fsGroup-managed); busybox tar rejects the flag outright. Probe for it
-    # instead of choosing per image line, and keep -v so the init log shows
-    # what the prime actually unpacked.
+    # instead of choosing per image line. -v on BOTH branches is deliberate
+    # (an alpine-line behavior change: its extract was silent before): the
+    # first-boot init log is the only record of what the prime unpacked.
     echo "Untaring protoype setup to $DS_DATA_DIR"
     if tar --no-overwrite-dir --version >/dev/null 2>&1; then
         tar --no-overwrite-dir -C $DS_DATA_DIR -xvzf data.tar.gz

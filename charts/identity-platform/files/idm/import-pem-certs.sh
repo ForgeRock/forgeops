@@ -42,6 +42,9 @@ if [ -f "$IDM_DEFAULT_TRUSTSTORE" ] && { [ -f "$IDM_PEM_TRUSTSTORE" ] || [ -f "$
     # (the Debian image's CWD happened to be writable; an Alpine image's
     # /opt/openidm is owned by a different uid).
     WORKDIR_TMP=$(mktemp -d)
+    # Unconditional cleanup: under set -e a mid-import failure (keytool,
+    # malformed PEM) must not strand the temp dir.
+    trap 'cd /; rm -rf "$WORKDIR_TMP"' EXIT
     cd "$WORKDIR_TMP"
     touch idm_combined_truststore
     [ -f "$IDM_PEM_TRUSTSTORE" ] && cat $IDM_PEM_TRUSTSTORE >> idm_combined_truststore
@@ -61,8 +64,6 @@ if [ -f "$IDM_DEFAULT_TRUSTSTORE" ] && { [ -f "$IDM_PEM_TRUSTSTORE" ] || [ -f "$
                     -storepass "${TRUSTSTORE_PASSWORD}" || /bin/true
     done
     echo "Import complete!"
-    cd /
-    rm -rf "$WORKDIR_TMP"
 else
     echo "Nothing was imported to the truststore. Check ENVs IDM_DEFAULT_TRUSTSTORE and IDM_PEM_TRUSTSTORE"
     exit 1

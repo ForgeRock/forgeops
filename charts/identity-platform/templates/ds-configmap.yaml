@@ -18,13 +18,17 @@ data:
      and under dash a bash-only `[[ =~ ]]` fails as a silent command error
      (not a syntax error), mis-deriving DS_BOOTSTRAP_REPLICATION_SERVERS
      to point every pod at itself. Shipping env.sh from the chart closes
-     that skew: the sourced file is the chart's POSIX copy, verified
-     compatible with both image lines' layouts (it honors IMAGE_MODE like
-     the alpine image's; the chart always sets the password-file envs, so
-     the branches are inert in chart deployments). subPath ConfigMap
-     mounts do NOT live-update: an entrypoint/env.sh change reaches pods
-     on their next rollout (no checksum annotation here by design — every
-     entrypoint edit should not roll DS). */}}
+     that skew: the sourced file is the chart's POSIX copy. env.sh's
+     IMAGE_MODE branches default per-mode values for the password-file and
+     PEM-cert-dir paths; the statefulsets set ALL of those envs explicitly
+     (DS_SET_UID_ADMIN_AND_MONITOR_PASSWORDS + both password files, and
+     SSL_CERT_DIR/MASTER_CERT_DIR/TRUSTSTORE_DIR at the PEM secrets the
+     statefulsets mount in both modes), so in a chart deployment the
+     env.sh defaults never apply in either branch. The branching remains
+     meaningful only for standalone (non-chart) image runs. subPath
+     ConfigMap mounts do NOT live-update: an entrypoint/env.sh change
+     reaches pods on their next rollout (no checksum annotation here by
+     design — every entrypoint edit should not roll DS). */}}
 {{- if or .Values.ds_cts.enabled .Values.ds_idrepo.enabled }}
 ---
 apiVersion: v1

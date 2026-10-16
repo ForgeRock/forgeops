@@ -35,6 +35,9 @@ if [ -f "$AM_DEFAULT_TRUSTSTORE" ] && { [ -f "$AM_PEM_TRUSTSTORE" ] || [ -f "$AM
     # owned by 11111, so the forgeops-mode uid 9031 cannot touch files
     # there — the same hazard the IDM twin documents).
     WORKDIR_TMP=$(mktemp -d)
+    # Unconditional cleanup: under set -e a mid-import failure (keytool,
+    # malformed PEM) must not strand the temp dir.
+    trap 'cd /; rm -rf "$WORKDIR_TMP"' EXIT
     cd "$WORKDIR_TMP"
     touch am_combined_truststore
     [ -f "$AM_PEM_TRUSTSTORE" ] && cat $AM_PEM_TRUSTSTORE >> am_combined_truststore
@@ -54,8 +57,6 @@ if [ -f "$AM_DEFAULT_TRUSTSTORE" ] && { [ -f "$AM_PEM_TRUSTSTORE" ] || [ -f "$AM
                     -storepass "${TRUSTSTORE_PASSWORD}" || /bin/true
     done
     echo "Import complete!"
-    cd /
-    rm -rf "$WORKDIR_TMP"
 else
     echo "Nothing was imported to the truststore. Check ENVs AM_DEFAULT_TRUSTSTORE and AM_PEM_TRUSTSTORE"
     exit 1

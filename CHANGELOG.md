@@ -13,6 +13,21 @@ Expected removal: 12 months after 2026.3.2 release
 
 ## New Features/Updated functionality
 
+### One POSIX script tree for the Debian and Alpine image lines (FORGEOPS-6971)
+
+`charts/identity-platform/files/` is now the single script tree for both image lines; `files-alpine/` is deleted.
+Every script runs under dash (Debian `/bin/sh`) and busybox ash (Alpine) alike, and `docker/ds`, `docker/am`,
+`docker/idm`, and `docker/amster` vendor byte-identical copies of their chart scripts. The chart now ships the DS
+`env.sh` alongside the entrypoint (mounted over the image's copy in both image modes), and the DS statefulsets set
+the password-file and PEM-cert-dir environment variables explicitly — an older pinned DS image can no longer
+change DS runtime behavior through a divergent baked `env.sh`.
+
+As part of this, the DS JVM defaults are unified on the PingDS upstream values (`MaxGCPauseMillis` 300ms,
+`MaxRAMPercentage` 65%, new `InitialRAMPercentage` 65%) in **both** image modes; a `base`-mode deployment that
+bumped from the previous defaults (`MaxGCPauseMillis` 200ms, `MaxRAMPercentage` 75%, no `InitialRAMPercentage`)
+gets ~10% less max heap unless it sets `DS_JAVA_MAX_RAM_PERCENTAGE`. All three values remain overridable through
+their `DS_JAVA_*` environment variables.
+
 ### Alpine-based platform images selectable with platform.imageMode
 
 The platform components (AM, amster, DS, IDM, and IG) and UIs (admin-ui, end-user-ui, and login-ui) can now run the

@@ -172,6 +172,18 @@ spec:
           {{- end }}
           - name: DS_SET_UID_ADMIN_AND_MONITOR_PASSWORDS
             value: "true"
+          {{- /* The PEM cert dirs env.sh would otherwise default per IMAGE_MODE
+               (its base branch points SSL_CERT_DIR at /opt/opendj/secrets and
+               leaves the others unset — a contract no chart deployment
+               follows). The statefulsets mount the cert-manager PEM secrets
+               at these paths in BOTH image modes, so the chart pins them
+               here and env.sh's ${VAR:-} defaults never apply. */}}
+          - name: SSL_CERT_DIR
+            value: /var/run/secrets/ds-ssl-keypair
+          - name: MASTER_CERT_DIR
+            value: /var/run/secrets/ds-master-keypair
+          - name: TRUSTSTORE_DIR
+            value: /var/run/secrets/truststore
           - name: DS_UID_MONITOR_PASSWORD_FILE
             value: /var/run/secrets/monitor/monitor.pw
           - name: DS_UID_ADMIN_PASSWORD_FILE
@@ -232,6 +244,18 @@ spec:
           {{- end }}
           - name: DS_SET_UID_ADMIN_AND_MONITOR_PASSWORDS
             value: "true"
+          {{- /* The PEM cert dirs env.sh would otherwise default per IMAGE_MODE
+               (its base branch points SSL_CERT_DIR at /opt/opendj/secrets and
+               leaves the others unset — a contract no chart deployment
+               follows). The statefulsets mount the cert-manager PEM secrets
+               at these paths in BOTH image modes, so the chart pins them
+               here and env.sh's ${VAR:-} defaults never apply. */}}
+          - name: SSL_CERT_DIR
+            value: /var/run/secrets/ds-ssl-keypair
+          - name: MASTER_CERT_DIR
+            value: /var/run/secrets/ds-master-keypair
+          - name: TRUSTSTORE_DIR
+            value: /var/run/secrets/truststore
           - name: DS_UID_MONITOR_PASSWORD_FILE
             value: /var/run/secrets/monitor/monitor.pw
           - name: DS_UID_ADMIN_PASSWORD_FILE

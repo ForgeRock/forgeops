@@ -129,3 +129,11 @@ else
     # by the entrypoint).
     export SSL_CERT_DIR="${SSL_CERT_DIR:-/opt/opendj/secrets}"
 fi
+
+echo
+echo "Server configured with:"
+echo "    Group ID                        : $DS_GROUP_ID"
+echo "    Server ID                       : $DS_SERVER_ID"
+echo "    Advertised listen address       : $DS_ADVERTISED_LISTEN_ADDRESS"
+echo "    Bootstrap replication server(s) : $DS_BOOTSTRAP_REPLICATION_SERVERS"
+echo

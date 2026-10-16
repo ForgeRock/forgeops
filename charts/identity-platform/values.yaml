@@ -26,10 +26,17 @@ platform:
   # the runtime-IMAGE_MODE rework: IMAGE_MODE only selects runtime behavior
   # there, never image content. Since FORGEOPS-6971 the chart's ds
   # entrypoint ConfigMap mounts over the image's baked copy in BOTH modes —
-  # the entrypoint a deployment runs belongs to the CHART version pinned
-  # here, and the chart's entrypoint assumes the forgeops DS layout
-  # (runtime-scripts ConfigMaps, data.tar.gz priming), so pin a ds image
-  # that ships that layout.
+  # the entrypoint (and env.sh) a deployment runs belongs to the CHART
+  # version pinned here, and the chart's entrypoint assumes the forgeops DS
+  # layout (runtime-scripts ConfigMaps, data.tar.gz priming), so pin a ds
+  # image that ships that layout. The statefulsets set the DS password-file
+  # and PEM-cert-dir envs explicitly (matching the secrets they mount in
+  # both modes), so env.sh's per-IMAGE_MODE defaults never apply to chart
+  # deployments. One documented default change: the DS JVM G1 tunables are
+  # unified on the PingDS upstream values in BOTH modes (pause target 300ms,
+  # max heap 65%, initial heap 65% — previously base mode ran 200ms/75% with
+  # no initial-heap pin). Override with DS_JAVA_GC_PAUSE_TARGET /
+  # DS_JAVA_INITIAL_RAM_PERCENTAGE / DS_JAVA_MAX_RAM_PERCENTAGE.
   imageMode: base
   # Chart-wide default REPOSITORY for the product images. The full image
   # ref composes <imageRepository>/<image name> (see the platform.imageRef
