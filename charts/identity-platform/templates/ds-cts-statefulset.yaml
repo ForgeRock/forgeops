@@ -151,6 +151,12 @@ spec:
             mountPath: /opt/opendj/runtime-scripts
           - name: ds-cts-runtime-scripts
             mountPath: /opt/opendj/runtime-scripts/ds-cts
+          - name: ds-entrypoint
+            mountPath: /opt/opendj/docker-entrypoint.sh
+            subPath: docker-entrypoint.sh
+          - name: ds-entrypoint
+            mountPath: /opt/opendj/env.sh
+            subPath: env.sh
           command:
           - sh
           - -c
@@ -305,6 +311,9 @@ spec:
           - name: ds-entrypoint
             mountPath: /opt/opendj/docker-entrypoint.sh
             subPath: docker-entrypoint.sh
+          - name: ds-entrypoint
+            mountPath: /opt/opendj/env.sh
+            subPath: env.sh
       {{- with .Values.ds_cts.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

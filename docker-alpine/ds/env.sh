@@ -34,8 +34,6 @@ export OPENDJ_JAVA_ARGS=${DS_JAVA_ARGS}
 
 MODE=${IMAGE_MODE:-base}
 
-MODE=${IMAGE_MODE:-base}
-
 # By default the admin and monitor passwords are provided as plain-text.
 # Set this to true if the passwords have been pre-encoded externally.
 export DS_USE_PRE_ENCODED_PASSWORDS=${DS_USE_PRE_ENCODED_PASSWORDS:-false}

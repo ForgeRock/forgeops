@@ -51,15 +51,19 @@ upgradeDataAndRebuildDegradedIndexes() {
     echo "Upgrading configuration and data..."
      ./upgrade --acceptLicense --force --ignoreErrors --no-prompt
 
-    # Rebuild any corrupt/missing indexes. A `for` over word-split output
-    # (base DNs contain no whitespace), NOT a piped while-read: the pipe
-    # would run the loop in a subshell AND put rebuild-index's stdin on the
-    # list — any stdin read inside the loop would consume list entries.
-    for baseDn in ${BASE_DNS}; do
+    # Rebuild any corrupt/missing indexes. Iterate with a here-doc
+    # while-read (NOT a `for`: word splitting would break base DNs that
+    # contain spaces, which are legal; NOT a piped while-read: the pipe
+    # would run the loop in a subshell AND put rebuild-index's stdin on
+    # the list). The inner command gets </dev/null so it cannot read the
+    # here-doc.
+    while IFS= read -r baseDn; do
         [ -z "$baseDn" ] && continue
         echo "Rebuilding degraded indexes for base DN \"${baseDn}\"..."
-        rebuild-index --offline --noPropertiesFile --rebuildDegraded --baseDn "${baseDn}" > /dev/null
-    done
+        rebuild-index --offline --noPropertiesFile --rebuildDegraded --baseDn "${baseDn}" > /dev/null < /dev/null
+    done <<EOF2
+${BASE_DNS}
+EOF2
 }
 
 

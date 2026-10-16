@@ -29,7 +29,13 @@ if [ -f "$AM_DEFAULT_TRUSTSTORE" ] && { [ -f "$AM_PEM_TRUSTSTORE" ] || [ -f "$AM
     TRUSTSTORE_PASSWORD="${TRUSTSTORE_PASSWORD:-changeit}"
     echo "Copying ${AM_DEFAULT_TRUSTSTORE} to ${TRUSTSTORE_PATH}"
     cp ${AM_DEFAULT_TRUSTSTORE} ${TRUSTSTORE_PATH}
-    # Combine certs in a single file
+    # Combine certs in a single file. Use a temp dir: the working directory
+    # may not be writable when the init container runs as a non-owner uid
+    # (measured: the alpine pingam image's WORKDIR /usr/local/tomcat is
+    # owned by 11111, so the forgeops-mode uid 9031 cannot touch files
+    # there — the same hazard the IDM twin documents).
+    WORKDIR_TMP=$(mktemp -d)
+    cd "$WORKDIR_TMP"
     touch am_combined_truststore
     [ -f "$AM_PEM_TRUSTSTORE" ] && cat $AM_PEM_TRUSTSTORE >> am_combined_truststore
     [ -f "$AM_PEM_TRUSTSTORE_DS" ] && cat $AM_PEM_TRUSTSTORE_DS >> am_combined_truststore
@@ -48,6 +54,8 @@ if [ -f "$AM_DEFAULT_TRUSTSTORE" ] && { [ -f "$AM_PEM_TRUSTSTORE" ] || [ -f "$AM
                     -storepass "${TRUSTSTORE_PASSWORD}" || /bin/true
     done
     echo "Import complete!"
+    cd /
+    rm -rf "$WORKDIR_TMP"
 else
     echo "Nothing was imported to the truststore. Check ENVs AM_DEFAULT_TRUSTSTORE and AM_PEM_TRUSTSTORE"
     exit 1

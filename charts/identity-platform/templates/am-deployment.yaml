@@ -135,7 +135,12 @@ spec:
           {{- /* The init script derives its destinations from these rather
                than probing the image, so the chart (which also mounts the
                writeable subPaths) and the script cannot disagree about the
-               layout when the pinned image and imageMode differ. */}}
+               layout when the pinned image and imageMode differ. FORGEROCK_HOME
+               is passed directly (not derived by stripping /openam off
+               AM_HOME) so the writeable-home destination and its basename
+               come from the same value the writeable subPath uses. */}}
+          - name: FORGEROCK_HOME
+            value: {{ include "platform.amHome" . }}
           - name: AM_HOME
             value: {{ include "platform.amHome" . }}/openam
           - name: AM_CATALINA_HOME

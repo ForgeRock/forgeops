@@ -12,13 +12,17 @@ data:
 {{- end }}
 {{- /* The chart's ds entrypoint is canonical in BOTH image modes since
      FORGEOPS-6971 (one POSIX script tree): the statefulsets mount it over
-     the image's baked copy everywhere. COUPLING (explicit contract): a
-     base-mode deployment now runs the entrypoint of the CHART version it
-     pins, not of the ds image — a chart/image version mismatch means the
-     chart's script semantics win. The chart's entrypoint assumes the
-     forgeops DS layout (runtime-scripts ConfigMaps, data.tar.gz priming,
-     /opt/opendj/env.sh); pin a ds image that ships that layout. subPath
-     ConfigMap mounts do NOT live-update: an entrypoint change reaches pods
+     the image's baked copy everywhere. env.sh ships WITH it (same
+     ConfigMap, mounted over the image's copy) because the entrypoint
+     sources /opt/opendj/env.sh: an older ds image may bake a BASH env.sh,
+     and under dash a bash-only `[[ =~ ]]` fails as a silent command error
+     (not a syntax error), mis-deriving DS_BOOTSTRAP_REPLICATION_SERVERS
+     to point every pod at itself. Shipping env.sh from the chart closes
+     that skew: the sourced file is the chart's POSIX copy, verified
+     compatible with both image lines' layouts (it honors IMAGE_MODE like
+     the alpine image's; the chart always sets the password-file envs, so
+     the branches are inert in chart deployments). subPath ConfigMap
+     mounts do NOT live-update: an entrypoint/env.sh change reaches pods
      on their next rollout (no checksum annotation here by design — every
      entrypoint edit should not roll DS). */}}
 {{- if or .Values.ds_cts.enabled .Values.ds_idrepo.enabled }}
@@ -30,5 +34,5 @@ metadata:
   labels:
     {{- include "identity-platform.labels" . | nindent 4 }}
 data:
-  {{ (.Files.Glob (printf "%s/ds/docker-entrypoint.sh" (include "platform.filesDir" .))).AsConfig | nindent 2 }}
+  {{ (.Files.Glob (printf "%s/ds/{docker-entrypoint.sh,env.sh}" (include "platform.filesDir" .))).AsConfig | nindent 2 }}
 {{- end }}

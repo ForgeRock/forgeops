@@ -1,51 +1,72 @@
 # Source this file to set the environment variables for the Docker container.
+#
+# Two modes are supported via IMAGE_MODE (default "base"):
+#   base      - upstream samples/docker contract: keystore-based runtime,
+#               admin/monitor password files under secrets/, bootstrap
+#               replication servers derived from the pod hostname for both
+#               replicas (ds0, ds1), G1 GC defaults with the DS_JAVA_ARGS
+#               tunables (DS_JAVA_GC_LOGFILE, DS_JAVA_GC_PAUSE_TARGET,
+#               DS_JAVA_INITIAL_RAM_PERCENTAGE, DS_JAVA_MAX_RAM_PERCENTAGE).
+#   forgeops  - forgeops deployment contract: password files under
+#               /var/run/secrets/opendj-passwords/, server id suffixed with
+#               the group id, and the same G1 defaults. SSL/MASTER/TRUSTSTORE
+#               cert directories match the PEM managers created by
+#               ds-setup.sh (forgeops mode only).
+#
+# busybox ash notes (alpine): no bash-only features are used here; the
+# k8s-pod-hostname regex is evaluated with grep -E instead of [[ =~ ]].
 
-# As of JDK17 the G1 garbage collector is within a few percentage points of parallel GC in terms of throughput for
-# small heaps, while providing better determinism and scaling for very large heaps. It also exhibits much less
-# off-heap memory overhead compared with JDK11 (less than 10% compared with 20% previously), so it is safer to use it
-# in constrained memory environments such as containers.
-
-# The /dev/urandom device is up to 4 times faster for crypto operations in some VM environments
-# where the Linux kernel runs low on entropy. This settting does not negatively impact random number security
-# and is recommended as the default.
-
+# DS_JAVA_ARGS is the primary env var for DS 8.x+. OPENDJ_JAVA_ARGS is
+# deprecated but still exported for DS 7.4/7.5 backward compatibility.
 DEFAULT_DS_JAVA_ARGS="
 -XX:+UseG1GC
 -XX:+ExitOnOutOfMemoryError
 -Djava.security.egd=file:/dev/urandom
--Xlog:gc:${DS_JAVA_GC_LOGFILE:-/opt/opendj/data/gc.log}:time,uptime:filecount=5,filesize=50M
--XX:MaxGCPauseMillis=${DS_JAVA_GC_PAUSE_TARGET:-200}
--XX:MaxRAMPercentage=${DS_JAVA_MAX_RAM_PERCENTAGE:-75}
+-Xlog:gc:${DS_JAVA_GC_LOGFILE:-/opt/opendj/data/gc.log}:time,uptime:filecount=${DS_JAVA_GC_FILE_COUNT:-5},filesize=${DS_JAVA_GC_FILE_SIZE:-50M}
+-XX:MaxGCPauseMillis=${DS_JAVA_GC_PAUSE_TARGET:-300}
+-XX:InitialRAMPercentage=${DS_JAVA_INITIAL_RAM_PERCENTAGE:-65}
+-XX:MaxRAMPercentage=${DS_JAVA_MAX_RAM_PERCENTAGE:-65}
 -XX:MaxTenuringThreshold=${DS_JAVA_MAX_TENURING_THRESHOLD:-1}
 ${DS_JAVA_ADDITIONAL_ARGS:-}
 "
-
-# DS_JAVA_ARGS is the primary env var for DS 8.x+.
-# OPENDJ_JAVA_ARGS is deprecated but still exported for DS 7.4/7.5 backward compatibility.
 export DS_JAVA_ARGS=${DS_JAVA_ARGS:-${DEFAULT_DS_JAVA_ARGS}}
 export OPENDJ_JAVA_ARGS=${DS_JAVA_ARGS}
 
-# Assume the directory admin and monitor passwords are available at the paths below.
-export DS_SET_UID_ADMIN_AND_MONITOR_PASSWORDS=${DS_SET_UID_ADMIN_AND_MONITOR_PASSWORDS:-"true"}
-export DS_UID_MONITOR_PASSWORD_FILE=${DS_UID_MONITOR_PASSWORD_FILE:-"/var/run/secrets/opendj-passwords/monitor.pw"}
-export DS_UID_ADMIN_PASSWORD_FILE=${DS_UID_ADMIN_PASSWORD_FILE:-"/var/run/secrets/opendj-passwords/dirmanager.pw"}
+MODE=${IMAGE_MODE:-base}
 
+# By default the admin and monitor passwords are provided as plain-text.
+# Set this to true if the passwords have been pre-encoded externally.
+export DS_USE_PRE_ENCODED_PASSWORDS=${DS_USE_PRE_ENCODED_PASSWORDS:-false}
 
-# Group Id is important in multi-cluster (multi-region) deployments to localize replication.
-# For single cluster deployment, using default is fine.
+if [ "$MODE" = "forgeops" ]; then
+    # forgeops deployments provision passwords via k8s secrets at these paths
+    # and expect them to be set unconditionally at startup (upstream forgeops
+    # env.sh defaults).
+    export DS_SET_UID_ADMIN_AND_MONITOR_PASSWORDS=${DS_SET_UID_ADMIN_AND_MONITOR_PASSWORDS:-true}
+    export DS_UID_ADMIN_PASSWORD_FILE="${DS_UID_ADMIN_PASSWORD_FILE:-/var/run/secrets/opendj-passwords/dirmanager.pw}"
+    export DS_UID_MONITOR_PASSWORD_FILE="${DS_UID_MONITOR_PASSWORD_FILE:-/var/run/secrets/opendj-passwords/monitor.pw}"
+else
+    # base mode (upstream samples/docker contract): password setting is
+    # opt-in, defaults are relative to the instance secrets/ directory.
+    export DS_SET_UID_ADMIN_AND_MONITOR_PASSWORDS=${DS_SET_UID_ADMIN_AND_MONITOR_PASSWORDS:-false}
+    export DS_UID_ADMIN_PASSWORD_FILE=${DS_UID_ADMIN_PASSWORD_FILE:-secrets/admin.pwd}
+    export DS_UID_MONITOR_PASSWORD_FILE=${DS_UID_MONITOR_PASSWORD_FILE:-secrets/monitor.pwd}
+fi
+
+# Group Id is important in multi-cluster (multi-region) deployments to
+# localize replication. For single cluster deployment, using default is fine.
 export DS_GROUP_ID=${DS_GROUP_ID:-default}
 # Concat the hostname and group id to make a unique server id. For example
 # if ds-idrep-0 is deployed both in groupid=us-west and group-id=us-east, this
 # serves to differentiate the two servers.
 HID="$(hostname)-$DS_GROUP_ID"
 export DS_SERVER_ID=${DS_SERVER_ID:-${HID}}
-# By default we advertise to listen on the default hostname
+# By default we advertise to listen on the default hostname.
 export DS_ADVERTISED_LISTEN_ADDRESS=${DS_ADVERTISED_LISTEN_ADDRESS:-$(hostname -f)}
 
-
-
-# If the advertised listen address looks like a Kubernetes pod host name of the form
-# <statefulset-name>-<ordinal>.<domain-name> then derived the default bootstrap servers names as
+# If the advertised listen address looks like a Kubernetes pod host name of
+# the form <statefulset-name>-<ordinal>.<domain-name> then derive the default
+# bootstrap servers names as
 # <statefulset-name>-0.<domain-name>,<statefulset-name>-1.<domain-name>.
 #
 # Sample hostnames from Kubernetes include:
@@ -55,8 +76,8 @@ export DS_ADVERTISED_LISTEN_ADDRESS=${DS_ADVERTISED_LISTEN_ADDRESS:-$(hostname -
 #     userstore-1.userstore.jnkns-pndj-bld-pr-4958-1.svc.cluster.local
 #     ds-userstore-1.userstore.jnkns-pndj-bld-pr-4958-1.svc.cluster.local
 #
-# PingDS currently supports various multi-cluster solutions. To deploy in a multi-cluster scenario
-# explicitly set the DS_BOOTSTRAP_REPLICATION_SERVERS per your topology. Examples below:
+# To deploy in a multi-cluster scenario explicitly set the
+# DS_BOOTSTRAP_REPLICATION_SERVERS per your topology. Examples below:
 # **Cloud DNS for GKE**
 # FQDN:              ds-cts-1.ds-cts.<namespace>.svc.eu
 # Results in:
@@ -71,20 +92,15 @@ export DS_ADVERTISED_LISTEN_ADDRESS=${DS_ADVERTISED_LISTEN_ADDRESS:-$(hostname -
 # Group ID:          eu
 # Bootstrap servers: ds-cts-0.ds-cts-eu.<namespace>.svc.cluster.local,ds-cts-0.ds-cts-us.<namespace>.svc.cluster.local
 #
-# **GKE multi-cluster Services(MCS) **
+# **GKE multi-cluster Services (MCS)**
 # FQDN:              ds-cts-1.ds-cts-eu.eu.<namespace>.svc.cluster.local
 # Results in:
 # Server ID:         ds-cts-1_eu
 # Group ID:          eu
 # Bootstrap servers: ds-cts-0.ds-cts-eu.eu.<namespace>.svc.cluster.local,ds-cts-0.ds-cts-us.us.<namespace>.svc.cluster.local
-#
 
-# If you do not set the Bootstrap servers, the default is calculated below. This works for a single
-# cluster deployment.
-# POSIX sh (dash/busybox): no [[ =~ ]] — evaluate the pod-hostname regex
-# with grep -E (same as the alpine image's env.sh; the chart's POSIX
-# entrypoint sources this file under /bin/sh since FORGEOPS-6971).
-if printf '%s' "${DS_ADVERTISED_LISTEN_ADDRESS}" | grep -qE '[^.]+-[0-9]+\..+'; then
+# busybox ash has no =~ regex; use grep -qE for the pod-hostname test.
+if printf '%s' "$DS_ADVERTISED_LISTEN_ADDRESS" | grep -qE '[^.]+-[0-9]+\..+'; then
     # Domain is everything after the first dot
     podDomain=${DS_ADVERTISED_LISTEN_ADDRESS#*.}
     # Name is everything up to the first dot
@@ -99,18 +115,17 @@ else
     export DS_BOOTSTRAP_REPLICATION_SERVERS=${DS_BOOTSTRAP_REPLICATION_SERVERS:-${DS_ADVERTISED_LISTEN_ADDRESS}:8989}
 fi
 
-
-# These are the default locations of cert-manager generated PEM files are mounted.
-# These files must be copied to appropriate location and format expected by the PingDS PEM manager
-# TO change these location you must also change the ds-setup.sh script.
-export SSL_CERT_DIR="/var/run/secrets/ds-ssl-keypair"
-export MASTER_CERT_DIR="/var/run/secrets/ds-master-keypair"
-export TRUSTSTORE_DIR="/var/run/secrets/truststore"
-
-echo
-echo "Server configured with:"
-echo "    Group ID                        : $DS_GROUP_ID"
-echo "    Server ID                       : $DS_SERVER_ID"
-echo "    Advertised listen address       : $DS_ADVERTISED_LISTEN_ADDRESS"
-echo "    Bootstrap replication server(s) : $DS_BOOTSTRAP_REPLICATION_SERVERS"
-echo
+if [ "$MODE" = "forgeops" ]; then
+    # These are the default locations where cert-manager-generated PEM files
+    # are mounted. These files must be copied to the appropriate location and
+    # format expected by the DS PEM manager. To change these locations you
+    # must also change the ds-setup.sh script.
+    export SSL_CERT_DIR="${SSL_CERT_DIR:-/var/run/secrets/ds-ssl-keypair}"
+    export MASTER_CERT_DIR="${MASTER_CERT_DIR:-/var/run/secrets/ds-master-keypair}"
+    export TRUSTSTORE_DIR="${TRUSTSTORE_DIR:-/var/run/secrets/truststore}"
+else
+    # base mode: upstream keystore contract - the keystore and PIN are
+    # provided at runtime in the secrets directory (mounted or copied there
+    # by the entrypoint).
+    export SSL_CERT_DIR="${SSL_CERT_DIR:-/opt/opendj/secrets}"
+fi

@@ -7,6 +7,9 @@ USER root
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV APT_OPTS="--no-install-recommends --yes"
+# inotify-tools was installed for the old import.sh upload-wait mode
+# (wait_config_file_upload); the scripts no longer use inotifywait, so the
+# package is dropped. (FORGEOPS-6971 script-tree merge, 2026-10.)
 RUN apt-get update \
         && apt-get install -y openldap-utils jq wget \
         && apt-get clean \

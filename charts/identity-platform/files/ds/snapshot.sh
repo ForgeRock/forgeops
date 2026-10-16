@@ -41,8 +41,8 @@ else
     # "-3 day" (the chart default) and "3 day" both land here: strip the
     # sign and the unit separately (${var#- * } only removes "-3 " when the
     # value has no trailing unit, so cut the unit first, then the sign).
-    -[0-9]*" min")   N=${PURGE_DELAY%% min*}; OFFSET=$(( ${N#-} * 60 )) ;;
-    [0-9]*" min")    OFFSET=$(( ${PURGE_DELAY%% min*} * 60 )) ;;
+    -[0-9]*" min"*)  N=${PURGE_DELAY%% min*}; OFFSET=$(( ${N#-} * 60 )) ;;
+    [0-9]*" min"*)   OFFSET=$(( ${PURGE_DELAY%% min*} * 60 )) ;;
     -[0-9]*" hour"*) N=${PURGE_DELAY%% hour*}; OFFSET=$(( ${N#-} * 3600 )) ;;
     [0-9]*" hour"*)  OFFSET=$(( ${PURGE_DELAY%% hour*} * 3600 )) ;;
     -[0-9]*" day"*)  N=${PURGE_DELAY%% day*}; OFFSET=$(( ${N#-} * 86400 )) ;;

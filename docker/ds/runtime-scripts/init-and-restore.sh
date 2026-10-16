@@ -149,6 +149,10 @@ if [ ! -z "${BACKEND_NAMES}" ]; then
         # Backend names contain no whitespace, so word splitting is safe.
         for backend in $(printf '%s\n' ${BACKEND_NAMES} | awk 'NR % 2 == 0'); do
             [ -z "$backend" ] && continue
+            # Clear per iteration: a `schema` backend (which skips the
+            # dsconfig lookup) must not inherit the PREVIOUS backend's base
+            # DNs and re-run disaster recovery on them.
+            basedns=""
             if ! [ "${backend}" = "schema" ]; then
                 basedns=$(dsconfig get-backend-prop --offline --script-friendly --no-prompt --backend-name ${backend} --property base-dn | awk '{print $2}')
             fi
