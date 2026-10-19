@@ -8,18 +8,21 @@
 # mounts THIS file over the image's baked copy — customize through the
 # environment, not by editing the image's env.sh.
 #
-# Two modes are supported via IMAGE_MODE (default "base"):
+# Two modes are supported via IMAGE_MODE (default "forgeops"):
+#   forgeops  - forgeops deployment contract: password files under
+#               /var/run/secrets/opendj-passwords/ (opt-in setting, on by
+#               default), SSL/MASTER/TRUSTSTORE cert directories matching
+#               the PEM managers created by ds-setup.sh, server id suffixed
+#               with the group id. This is the contract the forgeops images
+#               have always shipped; bare-image runs (kustomize manifests,
+#               plain docker run) get it when IMAGE_MODE is unset.
 #   base      - upstream samples/docker contract: keystore-based runtime,
 #               admin/monitor password files under secrets/, bootstrap
 #               replication servers derived from the pod hostname for both
-#               replicas (ds0, ds1), G1 GC defaults with the DS_JAVA_ARGS
-#               tunables (DS_JAVA_GC_LOGFILE, DS_JAVA_GC_PAUSE_TARGET,
-#               DS_JAVA_INITIAL_RAM_PERCENTAGE, DS_JAVA_MAX_RAM_PERCENTAGE).
-#   forgeops  - forgeops deployment contract: password files under
-#               /var/run/secrets/opendj-passwords/, server id suffixed with
-#               the group id, and the same G1 defaults. SSL/MASTER/TRUSTSTORE
-#               cert directories match the PEM managers created by
-#               ds-setup.sh (forgeops mode only).
+#               replicas (ds0, ds1). Opt-in via IMAGE_MODE=base.
+# Both branches share the G1 GC defaults with the DS_JAVA_ARGS tunables
+# (DS_JAVA_GC_LOGFILE, DS_JAVA_GC_PAUSE_TARGET, DS_JAVA_INITIAL_RAM_PERCENTAGE,
+# DS_JAVA_MAX_RAM_PERCENTAGE).
 #
 # busybox ash notes (alpine): no bash-only features are used here; the
 # k8s-pod-hostname regex is evaluated with grep -E instead of [[ =~ ]].
@@ -40,7 +43,7 @@ ${DS_JAVA_ADDITIONAL_ARGS:-}
 export DS_JAVA_ARGS=${DS_JAVA_ARGS:-${DEFAULT_DS_JAVA_ARGS}}
 export OPENDJ_JAVA_ARGS=${DS_JAVA_ARGS}
 
-MODE=${IMAGE_MODE:-base}
+MODE=${IMAGE_MODE:-forgeops}
 
 # By default the admin and monitor passwords are provided as plain-text.
 # Set this to true if the passwords have been pre-encoded externally.
@@ -54,8 +57,9 @@ if [ "$MODE" = "forgeops" ]; then
     export DS_UID_ADMIN_PASSWORD_FILE="${DS_UID_ADMIN_PASSWORD_FILE:-/var/run/secrets/opendj-passwords/dirmanager.pw}"
     export DS_UID_MONITOR_PASSWORD_FILE="${DS_UID_MONITOR_PASSWORD_FILE:-/var/run/secrets/opendj-passwords/monitor.pw}"
 else
-    # base mode (upstream samples/docker contract): password setting is
-    # opt-in, defaults are relative to the instance secrets/ directory.
+    # base mode (upstream samples/docker contract, IMAGE_MODE=base): password
+    # setting is opt-in, defaults are relative to the instance secrets/
+    # directory.
     export DS_SET_UID_ADMIN_AND_MONITOR_PASSWORDS=${DS_SET_UID_ADMIN_AND_MONITOR_PASSWORDS:-false}
     export DS_UID_ADMIN_PASSWORD_FILE=${DS_UID_ADMIN_PASSWORD_FILE:-secrets/admin.pwd}
     export DS_UID_MONITOR_PASSWORD_FILE=${DS_UID_MONITOR_PASSWORD_FILE:-secrets/monitor.pwd}
@@ -132,9 +136,9 @@ if [ "$MODE" = "forgeops" ]; then
     export MASTER_CERT_DIR="${MASTER_CERT_DIR:-/var/run/secrets/ds-master-keypair}"
     export TRUSTSTORE_DIR="${TRUSTSTORE_DIR:-/var/run/secrets/truststore}"
 else
-    # base mode: upstream keystore contract - the keystore and PIN are
-    # provided at runtime in the secrets directory (mounted or copied there
-    # by the entrypoint).
+    # base mode (IMAGE_MODE=base): upstream keystore contract - the keystore
+    # and PIN are provided at runtime in the secrets directory (mounted or
+    # copied there by the entrypoint).
     export SSL_CERT_DIR="${SSL_CERT_DIR:-/opt/opendj/secrets}"
 fi
 
