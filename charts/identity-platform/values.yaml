@@ -1134,8 +1134,22 @@ ds_idrepo:
     imagePullSecrets: []
 
   env: []
-    #- name: "IDREPO_ENV_1"
-    #  value: "idrepo_value"
+    # The DS environment is defined by the chart-shipped env.sh (mounted
+    # over the image's copy). To customize DS JVM or replication settings,
+    # set the corresponding DS_* environment variable here — env.sh reads
+    # every tunable with ${VAR:-default}, so an entry here overrides it.
+    # Key tunables (full list in the chart's files/ds/env.sh):
+    #   DS_JAVA_GC_PAUSE_TARGET, DS_JAVA_INITIAL_RAM_PERCENTAGE,
+    #   DS_JAVA_MAX_RAM_PERCENTAGE, DS_JAVA_GC_LOGFILE, DS_JAVA_ADDITIONAL_ARGS
+    #   (or replace the whole list with DS_JAVA_ARGS),
+    #   DS_GROUP_ID, DS_SERVER_ID, DS_BOOTSTRAP_REPLICATION_SERVERS,
+    #   DS_USE_PRE_ENCODED_PASSWORDS.
+    # The password-file and PEM-cert-dir paths (DS_UID_*_PASSWORD_FILE,
+    # SSL_CERT_DIR, MASTER_CERT_DIR, TRUSTSTORE_DIR) are set by the
+    # statefulsets to match the secrets they mount and should not be
+    # changed here.
+    #- name: "DS_JAVA_MAX_RAM_PERCENTAGE"
+    #  value: "75"
   envFrom: []
     #- secretRef:
     #    name: "my_idrepo_secret"
@@ -1267,6 +1281,9 @@ ds_cts:
     imagePullSecrets: []
 
   env: []
+    # Same DS_* tunable surface as ds_idrepo.env (see there).
+    #- name: "DS_JAVA_MAX_RAM_PERCENTAGE"
+    #  value: "75"
     #- name: "CTS_ENV_1"
     #  value: "cts_value"
   envFrom: []

@@ -15,7 +15,7 @@ Expected removal: 12 months after 2026.3.2 release
 
 ### One POSIX script tree for the Debian and Alpine image lines (FORGEOPS-6971)
 
-`charts/identity-platform/files/` is now the single script tree for both image lines; `files-alpine/` is deleted.
+`charts/identity-platform/files/` is now the single script tree for both image lines.
 Every script runs under dash (Debian `/bin/sh`) and busybox ash (Alpine) alike, and `docker/ds`, `docker/am`,
 `docker/idm`, and `docker/amster` vendor byte-identical copies of their chart scripts. The chart now ships the DS
 `env.sh` alongside the entrypoint (mounted over the image's copy in both image modes), and the DS statefulsets set
@@ -25,8 +25,11 @@ change DS runtime behavior through a divergent baked `env.sh`.
 As part of this, the DS JVM defaults are unified on the PingDS upstream values (`MaxGCPauseMillis` 300ms,
 `MaxRAMPercentage` 65%, new `InitialRAMPercentage` 65%) in **both** image modes; a `base`-mode deployment that
 bumped from the previous defaults (`MaxGCPauseMillis` 200ms, `MaxRAMPercentage` 75%, no `InitialRAMPercentage`)
-gets ~10% less max heap unless it sets `DS_JAVA_MAX_RAM_PERCENTAGE`. All three values remain overridable through
-their `DS_JAVA_*` environment variables.
+gets ~10% less max heap. To restore the old behavior or tune the JVM differently, set the corresponding
+`DS_JAVA_GC_PAUSE_TARGET` / `DS_JAVA_INITIAL_RAM_PERCENTAGE` / `DS_JAVA_MAX_RAM_PERCENTAGE` environment
+variables — `env.sh` reads them with `${VAR:-default}`, so any value set through the `ds_idrepo.env` /
+`ds_cts.env` (or `platform.env`) chart values overrides the defaults; the whole argument list can be replaced
+with `DS_JAVA_ARGS` (see `files/ds/env.sh` for the full list of tunables it consumes).
 
 ### Alpine-based platform images selectable with platform.imageMode
 

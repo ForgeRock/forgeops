@@ -29,11 +29,8 @@ if [ -f "$AM_DEFAULT_TRUSTSTORE" ] && { [ -f "$AM_PEM_TRUSTSTORE" ] || [ -f "$AM
     TRUSTSTORE_PASSWORD="${TRUSTSTORE_PASSWORD:-changeit}"
     echo "Copying ${AM_DEFAULT_TRUSTSTORE} to ${TRUSTSTORE_PATH}"
     cp ${AM_DEFAULT_TRUSTSTORE} ${TRUSTSTORE_PATH}
-    # Combine certs in a single file. Use a temp dir: the working directory
-    # may not be writable when the init container runs as a non-owner uid
-    # (measured: the alpine pingam image's WORKDIR /usr/local/tomcat is
-    # owned by 11111, so the forgeops-mode uid 9031 cannot touch files
-    # there — the same hazard the IDM twin documents).
+    # Combine certs in a single file. Use a temp dir: the image's working
+    # directory may not be writable by the init container's uid.
     WORKDIR_TMP=$(mktemp -d)
     # Unconditional cleanup: under set -e a mid-import failure (keytool,
     # malformed PEM) must not strand the temp dir.

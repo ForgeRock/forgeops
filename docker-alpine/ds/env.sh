@@ -1,5 +1,13 @@
 # Source this file to set the environment variables for the Docker container.
 #
+# Customizing: every setting below is read as ${VAR:-default}, so set the
+# corresponding environment variable to override it. In a chart deployment,
+# set DS_* variables through the ds_idrepo.env / ds_cts.env / platform.env
+# chart values (or envFrom secrets); in a standalone image run, set them in
+# the container environment (or bake them into the image). Note the chart
+# mounts THIS file over the image's baked copy — customize through the
+# environment, not by editing the image's env.sh.
+#
 # Two modes are supported via IMAGE_MODE (default "base"):
 #   base      - upstream samples/docker contract: keystore-based runtime,
 #               admin/monitor password files under secrets/, bootstrap

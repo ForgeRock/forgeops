@@ -24,8 +24,10 @@ data:
      (DS_SET_UID_ADMIN_AND_MONITOR_PASSWORDS + both password files, and
      SSL_CERT_DIR/MASTER_CERT_DIR/TRUSTSTORE_DIR at the PEM secrets the
      statefulsets mount in both modes), so in a chart deployment the
-     env.sh defaults never apply in either branch. The branching remains
-     meaningful only for standalone (non-chart) image runs. subPath
+     env.sh defaults never apply in either branch. Customize through the
+     ds_idrepo.env / ds_cts.env values (see values.yaml) — not by editing
+     the image's env.sh, which this ConfigMap mounts over. The branching
+     remains meaningful only for standalone (non-chart) image runs. subPath
      ConfigMap mounts do NOT live-update: an entrypoint/env.sh change
      reaches pods on their next rollout (no checksum annotation here by
      design — every entrypoint edit should not roll DS). */}}

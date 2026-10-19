@@ -38,9 +38,7 @@ if [ -f "$IDM_DEFAULT_TRUSTSTORE" ] && { [ -f "$IDM_PEM_TRUSTSTORE" ] || [ -f "$
     echo "Copying ${IDM_DEFAULT_TRUSTSTORE} to ${TRUSTSTORE_PATH}"
     cp ${IDM_DEFAULT_TRUSTSTORE} ${TRUSTSTORE_PATH}
     # Combine certs in a single file. Use a temp dir: the working directory
-    # may not be writable when the init container runs as a non-owner uid
-    # (the Debian image's CWD happened to be writable; an Alpine image's
-    # /opt/openidm is owned by a different uid).
+    # may not be writable by the init container's uid.
     WORKDIR_TMP=$(mktemp -d)
     # Unconditional cleanup: under set -e a mid-import failure (keytool,
     # malformed PEM) must not strand the temp dir.
