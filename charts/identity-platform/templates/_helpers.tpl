@@ -167,34 +167,13 @@ Define a variable that determines if we should enable the ssh_keygen job.
 {{- end }}
 {{- end }}
 
-{{/*
-The uid the product pods run as. The Debian product images expect the
-historic 11111 (forgerock) uid - the podSecurityContext default, passed as the
-single argument. The alpine pingbase-built images (platform.imageMode=forgeops)
-bake their file ownership for the pingbase uid (ping, 9031), so forgeops mode
-replaces the default 11111 with 9031; any runAsUser a deployer sets explicitly
-(anything other than the 11111 default) is left untouched in every mode.
-*/}}
-{{- define "platform.runAsUser" -}}
-{{- $current := int (index . 0) -}}
-{{- $root := index . 1 -}}
-{{- if and (eq ($root.Values.platform.imageMode | default "base") "forgeops") (eq $current 11111) -}}
-{{- printf "9031" -}}
-{{- else -}}
-{{- printf "%d" $current -}}
-{{- end -}}
-{{- end -}}
-
-{{/* Home directory of the product images: the Debian images run the
-     forgerock user (/home/forgerock); the alpine pingbase images run ping
-     (/home/ping = $PING_HOME = $FORGEROCK_HOME baked into the alpine
-     images). Branches every path that overlays the image's home. */}}
+{{/* Home directory of the product images: both image lines run the forgerock
+     account (uid 11111) — the Debian images bake it, and the alpine CI line
+     bakes the same account (pingbase builds with PING_USER=forgerock /
+     PING_UID=11111, so PING_HOME = FORGEROCK_HOME = /home/forgerock).
+     Kept as a helper so the call sites do not change. */}}
 {{- define "platform.amHome" -}}
-{{- if eq (.Values.platform.imageMode | default "base") "forgeops" -}}
-{{- printf "/home/ping" -}}
-{{- else -}}
 {{- printf "/home/forgerock" -}}
-{{- end -}}
 {{- end -}}
 
 {{/* end-user-ui values alias. The component's values key was historically

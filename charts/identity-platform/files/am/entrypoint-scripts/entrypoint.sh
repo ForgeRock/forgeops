@@ -1,9 +1,9 @@
 #!/bin/sh
 # The AM entrypoint wrapper, shared by the Debian and Alpine image lines.
-# The alpine pingbase images bake FORGEROCK_HOME=/home/ping; the Debian
-# images set nothing, so the default below resolves to /home/forgerock
-# there. Runs via the chart's platform.amShell (sh in both modes), so the
-# shebang is informational only.
+# Both image lines resolve FORGEROCK_HOME to /home/forgerock (the alpine
+# images bake it; the Debian images set nothing, so the default below
+# applies there). Runs via the chart's platform.amShell (sh in both modes),
+# so the shebang is informational only.
 
 # Base64 encode secret generate provisioned secrets if enabled
 if [ -n "${SECRET_GENERATOR_AM_ENV_SECRETS}" ] ; then

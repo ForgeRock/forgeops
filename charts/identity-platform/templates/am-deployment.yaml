@@ -42,18 +42,7 @@ spec:
       {{- end }}
       serviceAccountName: {{ include "identity-platform.serviceAccountName" . }}
       securityContext:
-        {{- $psc := dict }}
-        {{- range $k, $v := (.Values.am.podSecurityContext | default dict) }}
-          {{- if eq $k "runAsUser" }}
-            {{- $_ := set $psc $k (int (include "platform.runAsUser" (list $v $))) }}
-          {{- else }}
-            {{- $_ := set $psc $k $v }}
-          {{- end }}
-        {{- end }}
-        {{/* platform.runAsUser swaps the Debian uid (11111) for the pingbase
-             alpine uid (9031) in forgeops mode — the alpine pingam image
-             runs as 9031 (ping) and owns /home/ping. */}}
-        {{- toYaml $psc | nindent 8 }}
+        {{- toYaml .Values.am.podSecurityContext | nindent 8 }}
       volumes:
         - name: custom
           emptyDir: {}

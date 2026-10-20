@@ -15,8 +15,8 @@ serviceAccount:
 
 platform:
   # Selects the runtime contract AND the image lineage this chart deploys:
-  # "forgeops" = the Alpine pingbase-built product images (ping*), the ping
-  # uid/home layout, PEM certs and the DS PVC-priming contract; the runtime
+  # "forgeops" = the Alpine pingbase-built product images (ping*), PEM certs
+  # and the DS PVC-priming contract; the runtime
   # IMAGE_MODE=forgeops env is passed to the product containers. "base" =
   # the Debian upstream images (legacy lineage). The runtime scripts are ONE
   # POSIX tree (files/) shared by both image lines since FORGEOPS-6971, so
@@ -345,9 +345,8 @@ am:
 
   podSecurityContext:
     fsGroup: 0
-    # 11111 = the forgerock uid of the Debian images. The alpine pingbase
-    # images use uid 9031; when platform.imageMode=forgeops the templates
-    # override runAsUser to match (see _helpers.tpl "platform.runAsUser").
+    # 11111 = the forgerock uid both image lines run as (the alpine CI line
+    # bakes the same account: PING_USER=forgerock, PING_UID=11111).
     runAsUser: 11111
 
   securityContext: {}
@@ -577,9 +576,8 @@ idm:
     app: idm
 
   podSecurityContext:
-    # 11111 = the forgerock uid of the Debian images. The alpine pingbase
-    # images use uid 9031; when platform.imageMode=forgeops the templates
-    # override runAsUser to match (see _helpers.tpl "platform.runAsUser").
+    # 11111 = the forgerock uid both image lines run as (the alpine CI line
+    # bakes the same account: PING_USER=forgerock, PING_UID=11111).
     runAsUser: 11111
 
   securityContext: {}
@@ -1221,9 +1219,8 @@ ds_idrepo:
 
   podSecurityContext:
     fsGroup: 0
-    # 11111 = the forgerock uid of the Debian images. The alpine pingbase
-    # images use uid 9031; when platform.imageMode=forgeops the templates
-    # override runAsUser to match (see _helpers.tpl "platform.runAsUser").
+    # 11111 = the forgerock uid both image lines run as (the alpine CI line
+    # bakes the same account: PING_USER=forgerock, PING_UID=11111).
     runAsUser: 11111
 
   securityContext: {}
@@ -1357,9 +1354,8 @@ ds_cts:
 
   podSecurityContext:
     fsGroup: 0
-    # 11111 = the forgerock uid of the Debian images. The alpine pingbase
-    # images use uid 9031; when platform.imageMode=forgeops the templates
-    # override runAsUser to match (see _helpers.tpl "platform.runAsUser").
+    # 11111 = the forgerock uid both image lines run as (the alpine CI line
+    # bakes the same account: PING_USER=forgerock, PING_UID=11111).
     runAsUser: 11111
 
   securityContext: {}
