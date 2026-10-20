@@ -282,8 +282,9 @@ def export_ig(ig_conf, pod_name, dryrun=False):
     profile_path(ig_conf)
 
     # Get IG_INSTANCE_DIR environment variable from the container to know where the config is located
+    # sh, not bash: the Alpine IG image ships busybox ash only.
     dir_env_var = f"""
-    exec {pod_name} -- bash -c 'echo $IG_INSTANCE_DIR'
+    exec {pod_name} -- sh -c 'echo $IG_INSTANCE_DIR'
     """.strip()
     _, out, _ = utils.run(KUBECTL, dir_env_var,
                                   cstdout=True, cstderr=True)

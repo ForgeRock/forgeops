@@ -62,13 +62,16 @@ pods=($(echo "$HOSTS" | awk '{split($0,arr,",")} {for (i in arr) {print arr[i]}}
 
 if [ -z "${pods}" ]; then
     echo "No PingDS hosts provided. No backups were scheduled."
-    exit -1
+    exit 1
 fi
 echo "Targeting pods: ${pods[@]}"
 
 echo "Verifying the correct runtime script directory"
 RUNTIME_SCRIPT_DIR="/opt/opendj/runtime-scripts/schedule-backup.sh"
-kubectl exec ds-idrepo-0 -- bash -c "test -d /opt/opendj/default-scripts"
+# Run the probe under the pod's /bin/sh, not bash: the Alpine DS image ships
+# busybox ash only (bash was deliberately dropped from the pingbase chain),
+# and `kubectl exec -- bash -c` fails with "bash: not found" there.
+kubectl exec ds-idrepo-0 -- sh -c "test -d /opt/opendj/default-scripts"
 
 if [[ $? -eq 0 ]]; then
     echo "Different runtime script directory found. Changing directory."
@@ -98,10 +101,12 @@ do
         BACKENDS="${BACKENDS_CTS}"
     fi
 
-    case $1 in 
+    case $1 in
         create )
             echo "scheduling backup schedule $BACKUP_SCHEDULE for pod: $pod"
-            kubectl exec $pod -- bash -c "BACKUP_SCHEDULE='${BACKUP_SCHEDULE}' \
+            # sh -c, not bash -c: the Alpine DS image has no bash (see the
+            # probe above); the env-assignment form is POSIX.
+            kubectl exec $pod -- sh -c "BACKUP_SCHEDULE='${BACKUP_SCHEDULE}' \
                                                         TASK_NAME='${TASK_NAME}' \
                                                         BACKUP_DIRECTORY='${BACKUP_DIRECTORY}' \
                                                         BACKENDS='${BACKENDS}' \
@@ -109,7 +114,7 @@ do
             ;;
         cancel )
             echo "Cancelling backup schedule: ${TASK_NAME} "
-            kubectl exec $pod -- bash -c "BACKUP_SCHEDULE='${BACKUP_SCHEDULE}' \
+            kubectl exec $pod -- sh -c "BACKUP_SCHEDULE='${BACKUP_SCHEDULE}' \
                                                         TASK_NAME='${TASK_NAME}' \
                                                         BACKUP_DIRECTORY='${BACKUP_DIRECTORY}' \
                                                         CANCEL=TRUE \
