@@ -168,9 +168,8 @@ Define a variable that determines if we should enable the ssh_keygen job.
 {{- end }}
 
 {{/* Home directory of the product images: both image lines run the forgerock
-     account (uid 11111) — the Debian images bake it, and the alpine CI line
-     bakes the same account (pingbase builds with PING_USER=forgerock /
-     PING_UID=11111, so PING_HOME = FORGEROCK_HOME = /home/forgerock).
+     account (uid 11111) with the home at /home/forgerock — the Debian images
+     bake it, and the Alpine images bake the same account and home.
      Kept as a helper so the call sites do not change. */}}
 {{- define "platform.amHome" -}}
 {{- printf "/home/forgerock" -}}
@@ -191,7 +190,7 @@ Define a variable that determines if we should enable the ssh_keygen job.
 
 {{/* Default image NAME for the end-user-ui component: the alpine line
      (platform.imageMode=forgeops) publishes "enduser-ui" (the product's
-     spelling — the only name the alpine CI pushes), while the base lineage
+     spelling), while the base lineage
      registries publish the historical "end-user-ui" (images/end-user-ui,
      images-base/end-user-ui). Composed with platform.imageRepository by
      platform.imageRef; an explicit .image.name/.repository in the component

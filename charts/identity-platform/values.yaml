@@ -15,16 +15,17 @@ serviceAccount:
 
 platform:
   # Selects the runtime contract AND the image lineage this chart deploys:
-  # "forgeops" = the Alpine pingbase-built product images (ping*), PEM certs
-  # and the DS PVC-priming contract; the runtime
-  # IMAGE_MODE=forgeops env is passed to the product containers. "base" =
-  # the Debian upstream images (legacy lineage). The runtime scripts are ONE
-  # POSIX tree (files/) shared by both image lines since FORGEOPS-6971, so
-  # this value no longer selects a script tree: it still controls uid/home/
-  # tomcat paths, the per-mode CA-bundle env, the IMAGE_MODE env and the
-  # enduser-ui image name. The product images are single-mode builds since
-  # the runtime-IMAGE_MODE rework: IMAGE_MODE only selects runtime behavior
-  # there, never image content. Since FORGEOPS-6971 the chart's ds
+  # "forgeops" = the Alpine product images (ping*), PEM certs and the DS
+  # PVC-priming contract; the runtime IMAGE_MODE=forgeops env is passed to
+  # the product containers. "base" = the Debian upstream images (legacy
+  # lineage). The runtime scripts are ONE POSIX tree (files/) shared by both
+  # image lines since FORGEOPS-6971, so this value no longer selects a
+  # script tree, and both lines run the same forgerock account (11111,
+  # /home/forgerock): it controls the tomcat paths, the per-mode CA-bundle
+  # env, the IMAGE_MODE env and the enduser-ui image name. The product
+  # images are single-mode builds since the runtime-IMAGE_MODE rework:
+  # IMAGE_MODE only selects runtime behavior there, never image content.
+  # Since FORGEOPS-6971 the chart's ds
   # entrypoint ConfigMap mounts over the image's baked copy in BOTH modes —
   # the entrypoint (and env.sh) a deployment runs belongs to the CHART
   # version pinned here, and the chart's entrypoint assumes the forgeops DS
@@ -42,7 +43,7 @@ platform:
   # ref composes <imageRepository>/<image name> (see the platform.imageRef
   # helper in _helpers.tpl): e.g. with the defaults below, ds_idrepo pulls
   # us-docker.pkg.dev/forgeops-public/images/ds. Switch every product to the
-  # alpine CI line by setting imageRepository to
+  # Alpine image line by setting imageRepository to
   # us-docker.pkg.dev/forgeops-public/images/alpine. Precedence per
   # component: an explicit .image.repository pin (set in a deployer's
   # values.yaml) always wins; the tag resolution (component .image.tag |
@@ -345,8 +346,7 @@ am:
 
   podSecurityContext:
     fsGroup: 0
-    # 11111 = the forgerock uid both image lines run as (the alpine CI line
-    # bakes the same account: PING_USER=forgerock, PING_UID=11111).
+    # 11111 = the forgerock uid both image lines run as.
     runAsUser: 11111
 
   securityContext: {}
@@ -576,8 +576,7 @@ idm:
     app: idm
 
   podSecurityContext:
-    # 11111 = the forgerock uid both image lines run as (the alpine CI line
-    # bakes the same account: PING_USER=forgerock, PING_UID=11111).
+    # 11111 = the forgerock uid both image lines run as.
     runAsUser: 11111
 
   securityContext: {}
@@ -908,9 +907,9 @@ admin_ui:
     port: 8080
 
 # Canonical spelling of the end-user-ui component key. (The product name is
-# "enduser-ui" — the alpine CI publishes images under that name; the base
-# lineage registries publish it as "end-user-ui", the historical spelling
-# the chart's default name follows per platform.imageMode. The old
+# "enduser-ui" — the Alpine image line publishes images under that name; the
+# base lineage registries publish it as "end-user-ui", the historical
+# spelling the chart's default name follows per platform.imageMode. The old
 # "end_user_ui" VALUES KEY spelling was born from the same dash/underscore
 # mixup.) The legacy key is STILL FULLY
 # SUPPORTED: the templates deep-merge end_user_ui OVER enduser_ui, so
@@ -931,7 +930,7 @@ enduser_ui:
     repository: ""
     # Empty = the image name follows platform.imageMode (see the
     # platform.endUserUiName helper): "enduser-ui" with imageMode=forgeops
-    # (the alpine CI's name), "end-user-ui" with the default imageMode=base
+    # (the Alpine line's name), "end-user-ui" with the default imageMode=base
     # (the name the base-lineage registries publish). Override to pull a
     # differently-named image from the same repository.
     name: ""
@@ -1219,8 +1218,7 @@ ds_idrepo:
 
   podSecurityContext:
     fsGroup: 0
-    # 11111 = the forgerock uid both image lines run as (the alpine CI line
-    # bakes the same account: PING_USER=forgerock, PING_UID=11111).
+    # 11111 = the forgerock uid both image lines run as.
     runAsUser: 11111
 
   securityContext: {}
@@ -1354,8 +1352,7 @@ ds_cts:
 
   podSecurityContext:
     fsGroup: 0
-    # 11111 = the forgerock uid both image lines run as (the alpine CI line
-    # bakes the same account: PING_USER=forgerock, PING_UID=11111).
+    # 11111 = the forgerock uid both image lines run as.
     runAsUser: 11111
 
   securityContext: {}
