@@ -19,12 +19,12 @@ platform:
   # PVC-priming contract; the runtime IMAGE_MODE=forgeops env is passed to
   # the product containers. "base" = the Debian upstream images (legacy
   # lineage). The runtime scripts are ONE POSIX tree (files/) shared by both
-  # image lines since FORGEOPS-6971, so this value no longer selects a
+  # image lines, so this value no longer selects a
   # script tree: it controls the tomcat paths, the per-mode CA-bundle
   # env, the IMAGE_MODE env and the enduser-ui image name. The product
   # images are single-mode builds since the runtime-IMAGE_MODE rework:
   # IMAGE_MODE only selects runtime behavior there, never image content.
-  # Since FORGEOPS-6971 the chart's ds
+  # The chart's ds
   # entrypoint ConfigMap mounts over the image's baked copy in BOTH modes —
   # the entrypoint (and env.sh) a deployment runs belongs to the CHART
   # version pinned here, and the chart's entrypoint assumes the forgeops DS

@@ -10,8 +10,8 @@ metadata:
 data:
   {{ (.Files.Glob (printf "%s/ds/init-scripts/**.sh" (include "platform.filesDir" .))).AsConfig | nindent 2 }}
 {{- end }}
-{{- /* The chart's ds entrypoint is canonical in BOTH image modes since
-     FORGEOPS-6971 (one POSIX script tree): the statefulsets mount it over
+{{- /* The chart's ds entrypoint is canonical in BOTH image modes (one
+     POSIX script tree): the statefulsets mount it over
      the image's baked copy everywhere. env.sh ships WITH it (same
      ConfigMap, mounted over the image's copy) because the entrypoint
      sources /opt/opendj/env.sh: an older ds image may bake a BASH env.sh,

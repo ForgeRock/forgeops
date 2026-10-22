@@ -76,8 +76,8 @@ spec:
           configMap:
             name: ds-idrepo-runtime-scripts
             defaultMode: 0755
-        {{- /* The chart's entrypoint is canonical in both image modes since
-             FORGEOPS-6971 (one POSIX script tree shared by the debian and
+        {{- /* The chart's entrypoint is canonical in both image modes (one
+             POSIX script tree shared by the debian and
              alpine image lines): mount it over the image's baked copy so an
              entrypoint fix ships with the chart. */}}
         - name: ds-entrypoint

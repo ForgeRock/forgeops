@@ -213,7 +213,7 @@ Define a variable that determines if we should enable the ssh_keygen job.
 {{- end -}}
 
 {{/* Shell to run the am entrypoint wrapper with. The runtime scripts are
-     one POSIX tree shared by both image lines (FORGEOPS-6971), and both the
+     one POSIX tree shared by both image lines, and both the
      Debian (/bin/sh = dash) and Alpine (busybox ash) images provide a POSIX
      sh — so this is always "sh". Kept as a helper so template call sites do
      not change. */}}
@@ -223,7 +223,7 @@ Define a variable that determines if we should enable the ssh_keygen job.
 
 {{/*
 Directory under the chart that holds the runtime scripts packaged into the
-product ConfigMaps (DS and IDM). Since FORGEOPS-6971 this is ONE POSIX tree
+product ConfigMaps (DS and IDM). This is ONE POSIX tree
 (files/) shared by the Debian and Alpine image lines; the helper is kept so
 template call sites do not change.
 */}}
