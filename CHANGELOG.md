@@ -35,12 +35,7 @@ with `DS_JAVA_ARGS` (see `files/ds/env.sh` for the full list of tunables it cons
 
 The platform components (AM, amster, DS, IDM, and IG) and UIs (admin-ui, end-user-ui, and login-ui) can now run the
 Alpine-based images. Setting `platform.imageMode: forgeops` in the identity-platform chart values switches every
-product at once; both image modes run the same forgerock account (uid 11111, home `/home/forgerock`).
-
-Compatibility note: Alpine images built before this change ran the ping account (uid 9031, home `/home/ping`).
-They are NOT compatible with chart versions that carry this change: the chart renders `runAsUser: 11111` (a plain
-values default, overridable) and provides no input that points the product home at `/home/ping`, so a mismatch
-cannot be corrected from values — pair the chart with images from the same build era.
+product at once. The default mode (`base`) is unchanged.
 
 Every product image is now resolved through a single chart helper: `platform.imageRepository`
 plus a per-component image name, with optional per-component `repository`, `name`, and `tag`

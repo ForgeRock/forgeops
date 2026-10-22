@@ -167,10 +167,8 @@ Define a variable that determines if we should enable the ssh_keygen job.
 {{- end }}
 {{- end }}
 
-{{/* Home directory of the product images: both image lines run the forgerock
-     account (uid 11111) with the home at /home/forgerock — the Debian images
-     bake it, and the Alpine images bake the same account and home.
-     Kept as a helper so the call sites do not change. */}}
+{{/* Home directory of the product images — /home/forgerock on both image
+     lines. Kept as a helper so the call sites do not change. */}}
 {{- define "platform.amHome" -}}
 {{- printf "/home/forgerock" -}}
 {{- end -}}

@@ -20,8 +20,7 @@ platform:
   # the product containers. "base" = the Debian upstream images (legacy
   # lineage). The runtime scripts are ONE POSIX tree (files/) shared by both
   # image lines since FORGEOPS-6971, so this value no longer selects a
-  # script tree, and both lines run the same forgerock account (11111,
-  # /home/forgerock): it controls the tomcat paths, the per-mode CA-bundle
+  # script tree: it controls the tomcat paths, the per-mode CA-bundle
   # env, the IMAGE_MODE env and the enduser-ui image name. The product
   # images are single-mode builds since the runtime-IMAGE_MODE rework:
   # IMAGE_MODE only selects runtime behavior there, never image content.
@@ -346,7 +345,6 @@ am:
 
   podSecurityContext:
     fsGroup: 0
-    # 11111 = the forgerock uid both image lines run as.
     runAsUser: 11111
 
   securityContext: {}
@@ -576,7 +574,6 @@ idm:
     app: idm
 
   podSecurityContext:
-    # 11111 = the forgerock uid both image lines run as.
     runAsUser: 11111
 
   securityContext: {}
@@ -1218,7 +1215,6 @@ ds_idrepo:
 
   podSecurityContext:
     fsGroup: 0
-    # 11111 = the forgerock uid both image lines run as.
     runAsUser: 11111
 
   securityContext: {}
@@ -1352,7 +1348,6 @@ ds_cts:
 
   podSecurityContext:
     fsGroup: 0
-    # 11111 = the forgerock uid both image lines run as.
     runAsUser: 11111
 
   securityContext: {}
