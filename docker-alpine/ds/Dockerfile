@@ -58,6 +58,9 @@ COPY --chown=${PING_USER}:${PING_GID} docker-entrypoint-help.md /opt/opendj/
 COPY --chown=${PING_USER}:${PING_GID} env.sh /opt/opendj/
 COPY --chown=${PING_USER}:${PING_GID} ds-setup.sh /opt/opendj/
 
+# Add the runtime scripts to be used if the deployer does not provide an implementation.
+COPY --chown=${PING_USER}:${PING_GID} runtime-scripts /opt/opendj/runtime-scripts
+
 # Add custom schema files (consumed by the runtime setup scripts'
 # custom-schema step; same files as the Debian child's config/schema).
 COPY --chown=${PING_USER}:${PING_GID} config/schema/*.ldif /opt/opendj/custom-schema/
