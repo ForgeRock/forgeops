@@ -1,0 +1,48 @@
+---
+# Source: identity-platform/templates (kustomize base)
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ds-cts-runtime-scripts
+  labels:
+    helm.sh/chart: identity-platform-1.0.0
+    app.kubernetes.io/name: identity-platform
+    app.kubernetes.io/part-of: identity-platform
+    app.kubernetes.io/instance: identity-platform
+    app.kubernetes.io/version: 1.0.0
+    app.kubernetes.io/managed-by: Helm
+data:
+  post-init: "#!/bin/sh\n\necho \"No new indexes to add\"\n\nexit 0\n\n## Below is\
+    \ a sample of a user supplied add-index script int the configMap\n\n# This can\
+    \ be done offline...\ndsconfig --offline --no-prompt --batch <<EOF\ncreate-backend-index\
+    \ \\\n          --backend-name amIdentityStore \\\n          --set index-type:equality\
+    \ \\\n          --index-name carLicense\nEOF\n\nrebuild-index  --offline \\\n\
+    \ --baseDN ou=identities \\\n --index carLicense\n\n# Sample commands that can\
+    \ be done online.\n\ndsconfig --hostname localhost --port 4444 \\\n    --bindDN\
+    \ uid=admin --bindPassword:file $DS_UID_ADMIN_PASSWORD_FILE \\\n    --trustAll\
+    \  --no-prompt --batch <<EOF\ncreate-backend-index \\\n          --backend-name\
+    \ amIdentityStore \\\n          --set index-type:equality \\\n          --index-name\
+    \ carLicense\nEOF\n\n\nrebuild-index --hostname localhost --port 4444 \\\n   \
+    \ --bindDN uid=admin --bindPassword:file $DS_UID_ADMIN_PASSWORD_FILE \\\n    --trustAll\
+    \   \\\n    --baseDN ou=identities \\\n    --index carLicense\n"
+  setup: "#!/bin/sh\n#\n# Default setup script\n# Setup the directory server for the\
+    \ cts backend.\n\n# This uses PingDS setup profiles. If the schema for a profile\
+    \ has not been\n# changed it may use an older version. For example, PingAM CTS\
+    \ 7.5 still uses the 6.5 schema for configuration\nset -e\n\nAM_CTS=\"am-cts:6.5\"\
+    \nDS_PROXIED_SERVER=\"ds-proxied-server:7.1\"\n\nsetup-profile --profile ${AM_CTS}\
+    \ \\\n              --set am-cts/tokenExpirationPolicy:am-sessions-only \\\n \
+    \             --set am-cts/amCtsAdminPassword:password \\\n && setup-profile --profile\
+    \ ${DS_PROXIED_SERVER} \\\n                  --set ds-proxied-server/proxyUserDn:uid=proxy\
+    \ \\\n                  --set ds-proxied-server/proxyUserCertificateSubjectDn:CN=ds,O=ForgeRock.com\n\
+    \n# Copy custom schema files into db after setup-profiles have been imported.\n\
+    # -d not -a: -a implies -p (preserve ownership), which busybox cp cannot\n# honor\
+    \ as a non-root uid and warns per file. -d is a no-op here (the glob\n# never\
+    \ yields a symlink) but keeps one cp idiom across the tree.\ncp -d /opt/opendj/custom-schema/*.ldif\
+    \ /opt/opendj/data/db/schema\nrm -rf /opt/opendj/custom-schema\n\n# The default\
+    \ in 7.x is to use PBKDF2 password hashing - which is many order of magnitude\
+    \ slower than\n# SHA-512. We recommend leaving PBKDF2 as the default as it more\
+    \ secure.\n# If you wish to revert to the less secure SHA-512, Uncomment these\
+    \ lines:\n#dsconfig --offline --no-prompt --batch <<EOF\n##    set-password-storage-scheme-prop\
+    \ --scheme-name \"Salted SHA-512\" --set enabled:true\n##    set-password-policy-prop\
+    \ --policy-name \"Default Password Policy\" --set default-password-storage-scheme:\"\
+    Salted SHA-512\"\n#EOF\n\n\necho \"Done.\""

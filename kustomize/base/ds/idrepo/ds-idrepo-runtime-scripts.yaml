@@ -1,0 +1,228 @@
+---
+# Source: identity-platform/templates (kustomize base)
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ds-idrepo-runtime-scripts
+  labels:
+    helm.sh/chart: identity-platform-1.0.0
+    app.kubernetes.io/name: identity-platform
+    app.kubernetes.io/part-of: identity-platform
+    app.kubernetes.io/instance: identity-platform
+    app.kubernetes.io/version: 1.0.0
+    app.kubernetes.io/managed-by: Helm
+data:
+  add-schema: "#!/bin/sh\n# Adds extra schema on new and existing deployments\n\n\
+    set -e\n\nver=$(dsconfig -V | awk '{ print $1 }')\nIDM_REPO_VER=${ver%.*}\n\n\
+    # Returns 0 if v1 > v2 (major.minor comparison)\nversion_gt() {\n    awk -v v1=\"\
+    $1\" -v v2=\"$2\" 'BEGIN { split(v1,a,\".\"); split(v2,b,\".\"); exit !(a[1]>b[1]\
+    \ || (a[1]==b[1] && a[2]>b[2])) }'\n}\n\nplug_exists() {\n    dsconfig --offline\
+    \ --no-prompt -s list-plugins | grep \"^${1}\" > /dev/null 2>&1\n    return $?\n\
+    }\n\nindex_exists() {\n    dsconfig --offline --no-prompt get-backend-index-prop\
+    \ \\\n        --backend-name \"$1\" --index-name \"$2\" > /dev/null 2>&1\n   \
+    \ return $?\n}\n\nPLUG_NAME=\"User Unique Attribute\"\nif  plug_exists \"$PLUG_NAME\"\
+    \ ; then\n    echo \"Found $PLUG_NAME, skipping create\"\nelse\n    echo \"Adding\
+    \ '${PLUG_NAME}'\"\n    dsconfig --offline --no-prompt --batch <<EOF\ncreate-plugin\
+    \ \\\n        --plugin-name \"${PLUG_NAME}\" \\\n        --type \"unique-attribute\"\
+    \ \\\n        --set \"type:uid\" \\\n        --set \"base-dn:ou=people,ou=identities\"\
+    \ \\\n        --set \"enabled:true\"\nEOF\nfi\n\n# The plug for unique-attribute\
+    \ of application name requires IDM repo version > 8.0.\nif version_gt \"$IDM_REPO_VER\"\
+    \ \"8.0\"; then\n    PLUG_NAME=\"Application Name Unique Attribute\"\n    if plug_exists\
+    \ \"$PLUG_NAME\" ; then\n        echo \"Found $PLUG_NAME, skipping create\"\n\
+    \    else\n        echo \"Adding '${PLUG_NAME}'\"\n        dsconfig --offline\
+    \ --no-prompt --batch <<EOF\ncreate-plugin \\\n        --plugin-name \"${PLUG_NAME}\"\
+    \ \\\n        --type \"unique-attribute\" \\\n        --set \"type:fr-idm-managed-application-name\"\
+    \ \\\n        --set \"base-dn:ou=application,ou=managed,dc=openidm,dc=forgerock,dc=io\"\
+    \ \\\n        --set \"enabled:true\"\nEOF\n    fi\nfi\n\n# Referential integrity\
+    \ for the amIdentityStore backend (OPENIDM-19324).\n#\n# When a managed object\
+    \ is deleted, this plugin removes the dangling references\n# to it from the relationship\
+    \ attributes of surviving entries under\n# ou=identities. Without it, for example,\
+    \ deleting an organization leaves stale\n# fr-idm-managed-organization-member\
+    \ values on former member entries, which IDM\n# then resolves as living members.\n\
+    #\n# The attribute list covers the managed objects that CDK stores in\n# amIdentityStore.\
+    \ Roles, assignments, applications, accounts and internal\n# users/roles live\
+    \ in the idmRepo backend (dc=openidm) in CDK -- confirmed via\n# repo.ds.json\
+    \ -- so their attributes have no entries under ou=identities and\n# are deliberately\
+    \ absent. They are covered for IDC by ForgeCloud/saas#26505.\n#\n# Every attribute-type\
+    \ listed here MUST have a nameAndJsonEqualityMatchingRule\n# extensible index\
+    \ (OID .7) on the same backend. DS validates this at startup\n# and SILENTLY DISABLES\
+    \ the whole plugin if a single index is missing, so the\n# indexes are created\
+    \ first, below, and the plugin is created afterwards.\nREFINT_ATTRS=\"fr-idm-managed-user-roles\n\
+    fr-idm-managed-user-groups\nfr-idm-managed-user-manager\nfr-idm-managed-user-task-principals\n\
+    fr-idm-managed-user-meta\nfr-idm-managed-user-notifications\nfr-idm-managed-user-authzroles-internal-role\n\
+    fr-idm-managed-user-authzroles-managed-role\nfr-idm-managed-organization-admin\n\
+    fr-idm-managed-organization-owner\nfr-idm-managed-organization-member\nfr-idm-managed-assignment-member\n\
+    fr-idm-managed-application-member\nfr-idm-managed-application-owner\nfr-idm-reference-1\n\
+    fr-idm-reference-2\nfr-idm-reference-3\nfr-idm-reference-4\nfr-idm-reference-5\"\
+    \n\n# fr-idm-reference-6 through -10 are only defined from the 8.0 idm-repo schema\n\
+    # onwards; 7.4 and 7.5 have no schema of their own and inherit 7.3's, which\n\
+    # defines fr-idm-reference-1 through -5 only. Listing an undefined one makes DS\n\
+    # reject the plugin config with an OID decode error on every tool invocation,\n\
+    # which broke the 7.4 baseline used by the Kustomize.UpgradePlatform74To75 test.\n\
+    if version_gt \"$IDM_REPO_VER\" \"7.5\"; then\n    REFINT_ATTRS=\"${REFINT_ATTRS}\n\
+    fr-idm-reference-6\nfr-idm-reference-7\nfr-idm-reference-8\nfr-idm-reference-9\n\
+    fr-idm-reference-10\"\nfi\n\n# Existing deployments never run setup, so any index\
+    \ missing there is created\n# here. rebuild-index is required for an index added\
+    \ to a populated backend:\n# without it the index is left degraded and the plugin's\
+    \ searches miss entries.\nREFINT_NEW_INDEXES=\"\"\nfor attr in $REFINT_ATTRS;\
+    \ do\n    if index_exists amIdentityStore \"$attr\"; then\n        continue\n\
+    \    fi\n    echo \"Adding extensible index for '${attr}'\"\n    dsconfig --offline\
+    \ --no-prompt --batch <<EOF\ncreate-backend-index \\\n        --backend-name amIdentityStore\
+    \ \\\n        --set index-type:extensible \\\n        --index-name ${attr} \\\n\
+    \        --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7 \\\n \
+    \       --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.9\nEOF\n\
+    \    REFINT_NEW_INDEXES=\"${REFINT_NEW_INDEXES} --index ${attr}\"\ndone\n\nif\
+    \ [ -n \"$REFINT_NEW_INDEXES\" ]; then\n    echo \"Rebuilding new referential\
+    \ integrity indexes\"\n    # shellcheck disable=SC2086\n    rebuild-index --offline\
+    \ --noPropertiesFile --baseDn ou=identities $REFINT_NEW_INDEXES > /dev/null\n\
+    fi\n\nPLUG_NAME=\"fr-am-referential-int-plugin\"\nif plug_exists \"$PLUG_NAME\"\
+    \ ; then\n    echo \"Found $PLUG_NAME, skipping create\"\nelse\n    echo \"Adding\
+    \ '${PLUG_NAME}'\"\n    {\n        printf 'create-plugin \\\\\\n'\n        printf\
+    \ '        --plugin-name \"%s\" \\\\\\n' \"$PLUG_NAME\"\n        printf '    \
+    \    --type \"referential-integrity\" \\\\\\n'\n        printf '        --set\
+    \ \"base-dn:ou=identities\" \\\\\\n'\n        for attr in $REFINT_ATTRS; do\n\
+    \            printf '        --set \"attribute-type:%s\" \\\\\\n' \"$attr\"\n\
+    \        done\n        printf '        --set \"enabled:true\"\\n'\n    } | dsconfig\
+    \ --offline --no-prompt --batch\nfi\n"
+  post-init: "#!/bin/sh\n\necho \"No new indexes to add\"\n\nexit 0\n\n## Below is\
+    \ a sample of a user supplied add-index script int the configMap\n\n# This can\
+    \ be done offline...\ndsconfig --offline --no-prompt --batch <<EOF\ncreate-backend-index\
+    \ \\\n          --backend-name amIdentityStore \\\n          --set index-type:equality\
+    \ \\\n          --index-name carLicense\nEOF\n\nrebuild-index  --offline \\\n\
+    \ --baseDN ou=identities \\\n --index carLicense\n\n# Sample commands that can\
+    \ be done online.\n\ndsconfig --hostname localhost --port 4444 \\\n    --bindDN\
+    \ uid=admin --bindPassword:file $DS_UID_ADMIN_PASSWORD_FILE \\\n    --trustAll\
+    \  --no-prompt --batch <<EOF\ncreate-backend-index \\\n          --backend-name\
+    \ amIdentityStore \\\n          --set index-type:equality \\\n          --index-name\
+    \ carLicense\nEOF\n\n\nrebuild-index --hostname localhost --port 4444 \\\n   \
+    \ --bindDN uid=admin --bindPassword:file $DS_UID_ADMIN_PASSWORD_FILE \\\n    --trustAll\
+    \   \\\n    --baseDN ou=identities \\\n    --index carLicense\n"
+  setup: "#!/bin/sh\n#\n# Shared by the Debian and Alpine image lines: POSIX sh only.\n\
+    # (no BASH_SOURCE: the entrypoint invokes this via \"sh <script>\", so $0 is\n\
+    # the script path itself)\n# Default setup script\n# Setup the directory server\
+    \ for the identity store, idm repo and config backends.\n\n# This uses PingDS\
+    \ setup profiles. If the schema for a profile has not been\n# changed it may use\
+    \ an older version. For example, PingAM 7.5 still uses the 6.5 schema for configuration\n\
+    set -e\n\nstart_dir=$(pwd)\n# Figure out the dir we live in\n# busybox ash has\
+    \ no BASH_SOURCE; the entrypoint invokes this as \"sh <script>\",\n# so $0 is\
+    \ the script path itself\nSCRIPT_DIR=$( cd \"$( dirname \"$0\" )\" && pwd )\n\
+    # Go back to where we started\ncd \"${start_dir}\"\n\nCONFIG=\"am-config:6.5\"\
+    \nAM_IDENTITY_STORE=\"am-identity-store\"\nIDM_REPO=\"idm-repo\"\nDS_PROXIED_SERVER=\"\
+    ds-proxied-server:7.1\"\n\nsetup-profile --profile ${CONFIG} \\\n            \
+    \      --set am-config/amConfigAdminPassword:password \\\n && setup-profile --profile\
+    \ ${AM_IDENTITY_STORE} \\\n                  --set am-identity-store/amIdentityStoreAdminPassword:password\
+    \ \\\n && setup-profile  --profile ${IDM_REPO} \\\n                  --set idm-repo/domain:forgerock.io\
+    \ \\\n && setup-profile --profile ${DS_PROXIED_SERVER} \\\n                  --set\
+    \ ds-proxied-server/proxyUserDn:uid=proxy \\\n                  --set ds-proxied-server/proxyUserCertificateSubjectDn:CN=ds,O=ForgeRock.com\n\
+    \n# Copy custom schema files into db after setup-profiles have been imported.\n\
+    # -d not -a: -a implies -p (preserve ownership), which busybox cp cannot\n# honor\
+    \ as a non-root uid and warns per file. -d is a no-op here (the glob\n# never\
+    \ yields a symlink) but keeps one cp idiom across the tree.\ncp -d /opt/opendj/custom-schema/*.ldif\
+    \ /opt/opendj/data/db/schema\nrm -rf /opt/opendj/custom-schema\n\n# The default\
+    \ in 7.x is to use PBKDF2 password hashing - which is many order of magnitude\
+    \ slower than\n# SHA-512. We recommend leaving PBKDF2 as the default as it more\
+    \ secure.\n# If you wish to revert to the less secure SHA-512, Uncomment these\
+    \ lines:\n#dsconfig --offline --no-prompt --batch <<EOF\n##    set-password-storage-scheme-prop\
+    \ --scheme-name \"Salted SHA-512\" --set enabled:true\n##    set-password-policy-prop\
+    \ --policy-name \"Default Password Policy\" --set default-password-storage-scheme:\"\
+    Salted SHA-512\"\n#EOF\n\n# These indexes are required for the combined PingAM/PingIDM\
+    \ repo\ndsconfig --offline --no-prompt --batch <<EOF\ncreate-backend-index \\\n\
+    \        --backend-name amIdentityStore \\\n        --set index-type:equality\
+    \ \\\n        --type generic \\\n        --index-name fr-idm-uuid\ncreate-backend-index\
+    \ \\\n        --backend-name amIdentityStore \\\n        --set index-type:equality\
+    \ \\\n        --index-name fr-idm-effectiveApplications\ncreate-backend-index\
+    \ \\\n        --backend-name amIdentityStore \\\n        --set index-type:equality\
+    \ \\\n        --index-name fr-idm-effectiveGroup\ncreate-backend-index \\\n  \
+    \      --backend-name amIdentityStore \\\n        --set index-type:presence \\\
+    \n        --index-name fr-idm-lastSync\ncreate-backend-index \\\n        --backend-name\
+    \ amIdentityStore \\\n        --set index-type:extensible \\\n        --index-name\
+    \ fr-idm-managed-user-manager \\\n        --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7\
+    \ \\\n        --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.9\n\
+    create-backend-index \\\n        --backend-name amIdentityStore \\\n        --set\
+    \ index-type:extensible \\\n        --index-name fr-idm-managed-user-meta \\\n\
+    \        --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7 \\\n \
+    \       --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.9\ncreate-backend-index\
+    \ \\\n        --backend-name amIdentityStore \\\n        --set index-type:extensible\
+    \ \\\n        --index-name fr-idm-managed-user-notifications \\\n        --set\
+    \ index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7 \\\n        --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.9\n\
+    create-backend-index \\\n        --backend-name amIdentityStore \\\n        --set\
+    \ index-type:extensible \\\n        --index-name fr-idm-managed-user-roles \\\n\
+    \        --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7 \\\n \
+    \       --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.9\ncreate-backend-index\
+    \ \\\n        --backend-name amIdentityStore \\\n        --set index-type:extensible\
+    \ \\\n        --index-name fr-idm-managed-user-authzroles-internal-role \\\n \
+    \       --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7 \\\n  \
+    \      --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.9\ncreate-backend-index\
+    \ \\\n        --backend-name amIdentityStore \\\n        --set index-type:extensible\
+    \ \\\n        --index-name fr-idm-managed-user-authzroles-managed-role \\\n  \
+    \      --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7 \\\n   \
+    \     --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.9\ncreate-backend-index\
+    \ \\\n        --backend-name amIdentityStore \\\n        --set index-type:extensible\
+    \ \\\n        --index-name fr-idm-managed-organization-owner \\\n        --set\
+    \ index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7 \\\n        --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.9\n\
+    create-backend-index \\\n        --backend-name amIdentityStore \\\n        --set\
+    \ index-type:extensible \\\n        --index-name fr-idm-managed-organization-admin\
+    \ \\\n        --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7 \\\
+    \n        --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.9\ncreate-backend-index\
+    \ \\\n        --backend-name amIdentityStore \\\n        --set index-type:extensible\
+    \ \\\n        --index-name fr-idm-managed-organization-member \\\n        --set\
+    \ index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7 \\\n        --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.9\n\
+    create-backend-index \\\n        --backend-name amIdentityStore \\\n        --set\
+    \ index-type:ordering \\\n        --type generic \\\n        --index-name fr-idm-managed-user-active-date\n\
+    create-backend-index \\\n        --backend-name amIdentityStore \\\n        --set\
+    \ index-type:ordering \\\n        --type generic \\\n        --index-name fr-idm-managed-user-inactive-date\n\
+    create-backend-index \\\n        --backend-name amIdentityStore \\\n        --set\
+    \ index-type:extensible \\\n        --index-name fr-idm-managed-user-groups \\\
+    \n        --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7 \\\n\
+    \        --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.9\ncreate-backend-vlv-index\
+    \ \\\n        --backend-name amIdentityStore \\\n        --index-name managed-group-by-cn\
+    \ \\\n        --set base-dn:ou=groups,ou=identities \\\n        --set sort-order:+cn\
+    \ \\\n        --set scope:single-level \\\n        --set filter:(&(objectClass=fr-idm-managed-group)(objectClass=groupOfURLs))\n\
+    create-backend-vlv-index \\\n        --backend-name amIdentityStore \\\n     \
+    \   --index-name managed-user-by-id \\\n        --set base-dn:ou=people,ou=identities\
+    \ \\\n        --set sort-order:+fr-idm-uuid \\\n        --set scope:single-level\
+    \ \\\n        --set filter:(&(objectClass=devicePrintProfilesContainer)(objectClass=forgerock-am-dashboard-service)(objectClass=fr-idm-managed-user-explicit)(objectClass=fr-idm-managed-user-hybrid-obj)(objectClass=iPlanetPreferences)(objectClass=inetOrgPerson)(objectClass=inetuser)(objectClass=iplanet-am-auth-configuration-service)(objectClass=iplanet-am-managed-person)(objectClass=iplanet-am-user-service)(objectClass=kbaInfoContainer)(objectClass=oathDeviceProfilesContainer)(objectClass=pushDeviceProfilesContainer)(objectClass=sunAMAuthAccountLockout)(objectClass=sunFMSAML2NameIdentifier)(objectClass=webauthnDeviceProfilesContainer))\n\
+    create-backend-index \\\n        --backend-name amIdentityStore \\\n        --set\
+    \ index-type:extensible \\\n        --index-name fr-idm-managed-assignment-member\
+    \ \\\n        --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7 \\\
+    \n        --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.9\ncreate-backend-index\
+    \ \\\n        --backend-name amIdentityStore \\\n        --set index-type:extensible\
+    \ \\\n        --index-name fr-idm-managed-application-member \\\n        --set\
+    \ index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7 \\\n        --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.9\n\
+    create-backend-index \\\n        --backend-name amIdentityStore \\\n        --set\
+    \ index-type:extensible \\\n        --index-name fr-idm-managed-application-owner\
+    \ \\\n        --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7 \\\
+    \n        --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.9\ncreate-backend-index\
+    \ \\\n        --backend-name amIdentityStore \\\n        --set index-type:extensible\
+    \ \\\n        --index-name fr-idm-managed-user-task-principals \\\n        --set\
+    \ index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7 \\\n        --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.9\n\
+    create-backend-index \\\n        --backend-name amIdentityStore \\\n        --set\
+    \ index-type:extensible \\\n        --index-name fr-idm-reference-1 \\\n     \
+    \   --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7 \\\n      \
+    \  --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.9\ncreate-backend-index\
+    \ \\\n        --backend-name amIdentityStore \\\n        --set index-type:extensible\
+    \ \\\n        --index-name fr-idm-reference-2 \\\n        --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7\
+    \ \\\n        --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.9\n\
+    create-backend-index \\\n        --backend-name amIdentityStore \\\n        --set\
+    \ index-type:extensible \\\n        --index-name fr-idm-reference-3 \\\n     \
+    \   --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7 \\\n      \
+    \  --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.9\ncreate-backend-index\
+    \ \\\n        --backend-name amIdentityStore \\\n        --set index-type:extensible\
+    \ \\\n        --index-name fr-idm-reference-4 \\\n        --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7\
+    \ \\\n        --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.9\n\
+    create-backend-index \\\n        --backend-name amIdentityStore \\\n        --set\
+    \ index-type:extensible \\\n        --index-name fr-idm-reference-5 \\\n     \
+    \   --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7 \\\n      \
+    \  --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.9\nEOF\n\n# Create\
+    \ extra application schema.\n# This also creates the amIdentityStore referential\
+    \ integrity plugin, and any of\n# its extensible indexes still missing above --\
+    \ it runs on existing deployments\n# too, where this setup script never executes.\n\
+    $SCRIPT_DIR/add-schema\n\n# Example of creating additional indexes at setup time.\n\
+    # Insert the dsconfig sub command into the batch above, as per your needs:\n#\
+    \ dsconfig --offline --no-prompt --batch <<EOF\n# create-backend-index \\\n# \
+    \          --backend-name amIdentityStore \\\n#           --set index-type:equality\
+    \ \\\n#           --index-name fr-attr-i1\n# create-backend-index \\\n#      \
+    \     --backend-name amIdentityStore \\\n#           --set index-type:equality\
+    \ \\\n#           --index-name fr-attr-i2\n# create-backend-index \\\n#      \
+    \   --backend-name amIdentityStore \\\n#         --index-name fr-attr-date1 \\\
+    \n#         --set index-type:equality\n# EOF\n\necho \"Done.\"\n"

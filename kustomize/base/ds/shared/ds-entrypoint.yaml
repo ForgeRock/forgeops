@@ -1,0 +1,214 @@
+---
+# Source: identity-platform/templates (kustomize base)
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ds-entrypoint
+  labels:
+    helm.sh/chart: identity-platform-1.0.0
+    app.kubernetes.io/name: identity-platform
+    app.kubernetes.io/part-of: identity-platform
+    app.kubernetes.io/instance: identity-platform
+    app.kubernetes.io/version: 1.0.0
+    app.kubernetes.io/managed-by: Helm
+data:
+  docker-entrypoint.sh: "#!/bin/sh\n#\n# The entrypoint script for the fully mutable\
+    \ directory deployment.\n# Read this carefully if your not deploying with the\
+    \ provided operator or Kubernetes manifests.\n#\n# This is the SHARED entrypoint\
+    \ for the Debian and Alpine image lines: POSIX\n# sh only (dash on Debian, busybox\
+    \ ash on Alpine) \u2014 no mapfile/arrays,\n# no [[ ]], no ;& case fallthrough,\
+    \ no process substitution.\n#   - no mapfile/arrays: base DNs collected in a newline-joined\
+    \ variable and\n#     iterated with a while-read\n#   - no \";&\" case fallthrough:\
+    \ initialize-only/init share doInit()\n#   - [[ ]] replaced with POSIX test\n\
+    #   - entrypoint args are preserved for the default case (bash's $@ shift works\n\
+    #     the same here, but CMD dispatch is via \"$1\" only)\n#\n# Copyright 2019-2024\
+    \ Ping Identity Corporation. All Rights Reserved\n#\n# This code is to be used\
+    \ exclusively in connection with Ping Identity\n# Corporation software or services.\
+    \ Ping Identity Corporation only offers\n# such software or services to legal\
+    \ entities who have entered into a\n# binding license agreement with Ping Identity\
+    \ Corporation.\n\n# set -x\n\n\n. /opt/opendj/env.sh\n\n# set -eu\n\n\n# If the\
+    \ pod was terminated abnormally then lock file may not have been cleaned up.\n\
+    removeLocks() {\n    rm -f $DS_DATA_DIR/locks/server.lock\n}\n\n# Make it easier\
+    \ to run tools interactively by exec'ing into the running container.\nsetOnlineToolProperties()\
+    \ {\n    mkdir -p ~/.opendj\n    [ -f config/tools.properties ] && cp config/tools.properties\
+    \ ~/.opendj\n}\n\nupgradeDataAndRebuildDegradedIndexes() {\n\n    # busybox ash\
+    \ has no mapfile/arrays: collect the pluggable backend base DNs\n    # as a newline-joined\
+    \ variable and iterate with a while-read. The \"|| true\"\n    # keeps a no-match\
+    \ grep from tripping \"set -e\" (if enabled).\n    BASE_DNS=$(./bin/ldifsearch\
+    \ -b cn=backends,cn=config -s one $DS_DATA_DIR/config/config.ldif \"(&(objectclass=ds-cfg-pluggable-backend)(ds-cfg-enabled=true))\"\
+    \ ds-cfg-base-dn | grep \"^ds-cfg-base-dn\" | cut -c17- || true)\n\n    # Upgrade\
+    \ is idempotent, so it should have no effect if there is nothing to do.\n    #\
+    \ Fail-fast if the config needs upgrading because it should have been done when\
+    \ the image was built.\n    echo \"Upgrading configuration and data...\"\n   \
+    \  ./upgrade --acceptLicense --force --ignoreErrors --no-prompt\n\n    # Rebuild\
+    \ any corrupt/missing indexes. Iterate with an unquoted here-doc\n    # while-read\
+    \ (NOT a `for`: word splitting would break base DNs that\n    # contain spaces,\
+    \ which are legal). The delimiter stays UNQUOTED \u2014 a\n    # quoted delimiter\
+    \ would suppress the ${BASE_DNS} expansion \u2014 and\n    # expansion output\
+    \ is not re-processed for backslash escapes. The inner\n    # command gets </dev/null\
+    \ so it cannot read the here-doc.\n    while IFS= read -r baseDn; do\n       \
+    \ [ -z \"$baseDn\" ] && continue\n        echo \"Rebuilding degraded indexes for\
+    \ base DN \\\"${baseDn}\\\"...\"\n        rebuild-index --offline --noPropertiesFile\
+    \ --rebuildDegraded --baseDn \"${baseDn}\" > /dev/null < /dev/null\n    done <<EOF2\n\
+    ${BASE_DNS}\nEOF2\n}\n\n\nwaitUntilSigTerm() {\n    # POSIX trap names drop the\
+    \ \"SIG\" prefix: dash and busybox ash both\n    # reject `trap ... SIGTERM` (\"\
+    bad trap\").\n    trap 'echo \"Caught SIGTERM\"' TERM\n    while :\n    do\n \
+    \      sleep infinity &\n       wait $!\n    done\n}\n\nenableMultiplePasswordValues()\
+    \ {\n    dsconfig --offline --no-prompt --batch <<EOM\nset-password-policy-prop\
+    \ --policy-name \"Default Password Policy\" --set allow-multiple-password-values:true\n\
+    set-password-policy-prop --policy-name \"Root Password Policy\" --set allow-multiple-password-values:true\n\
+    EOM\n}\n\nsetUserPasswordInLdifFile() {\n    file=$1\n    dn=$2\n    pwds=\"$3\"\
+    \n    pwd_str=\"\"\n\n    echo \"Updating the \\\"${dn}\\\" password\"\n\n   \
+    \ for pw in $pwds ; do\n        # Set the JVM args to avoid blowing up the container\
+    \ memory.\n        jvm_args=\"-Xmx256m -Djava.security.egd=file:/dev/./urandom\"\
+    \n        enc_pwd=$(DS_JAVA_ARGS=\"$jvm_args\" OPENDJ_JAVA_ARGS=\"$jvm_args\"\
+    \ encode-password -s \"PBKDF2-HMAC-SHA256\" -c \"${pw}\")\n        if [ \"$pwd_str\"\
+    \ = \"\" ] ; then\n            pwd_str=\"userPassword: ${enc_pwd}\"\n        else\n\
+    \            pwd_str=$(cat <<EOM\n${pwd_str}\nuserPassword: ${enc_pwd}\nEOM\n\
+    )\n        fi\n    done\n\n    ldifmodify \"${file}\" > \"${file}.tmp\" << EOF\n\
+    dn: ${dn}\nchangetype: modify\nreplace: userPassword\n${pwd_str}\nEOF\n    rm\
+    \ \"${file}\"\n    mv \"${file}.tmp\" \"${file}\"\n}\n\n\nsetAdminAndMonitorPasswords()\
+    \ {\n    adminPassword=\"${DS_UID_ADMIN_PASSWORD:-$(cat \"${DS_UID_ADMIN_PASSWORD_FILE}\"\
+    )}\"\n    monitorPassword=\"${DS_UID_MONITOR_PASSWORD:-$(cat \"${DS_UID_MONITOR_PASSWORD_FILE}\"\
+    )}\"\n    if [ -n \"${OLD_DIRMANAGER_PW:-}\" ] ; then\n        adminPassword=\"\
+    $adminPassword $OLD_DIRMANAGER_PW\"\n    fi\n    if [ -n \"${OLD_MONITOR_PW:-}\"\
+    \ ] ; then\n        monitorPassword=\"$monitorPassword $OLD_MONITOR_PW\"\n   \
+    \ fi\n    enableMultiplePasswordValues\n    setUserPasswordInLdifFile $DS_DATA_DIR/db/rootUser/rootUser.ldif\
+    \       \"uid=admin\"   \"$adminPassword\"\n    setUserPasswordInLdifFile $DS_DATA_DIR/db/monitorUser/monitorUser.ldif\
+    \ \"uid=monitor\" \"$monitorPassword\"\n}\n\n# Copy the K8S secrets to the writable\
+    \ volume. The secrets are expected to be of type k8s.io/tls.\n# These are PEM\
+    \ files -see ds-setup.sh to understand how PingDS is configured for PEM support.\n\
+    # These are likely cert-manager generated, but any tool that generates valid PEM\
+    \ and puts it a k8s tls secret can be used.\n# See https://bugster.forgerock.org/jira/browse/OPENDJ-8374\n\
+    copyKeys() {\n    mkdir -p $PEM_KEYS_DIRECTORY\n    mkdir -p $PEM_TRUSTSTORE_DIRECTORY\n\
+    \n    # Copy the SSL certs. We also copy the ssl ca.crt to be used as the trustore\
+    \ in the case that\n    # a seperate truststore is not provided.\n    # Quote\
+    \ the expansions: unquoted, an unset variable collapses the test to\n    # the\
+    \ one-argument form [ -d ], which POSIX defines as TRUE \u2014 the guard\n   \
+    \ # would run and write a zero-byte PEM pair instead of skipping.\n    [ -d \"\
+    $SSL_CERT_DIR\" ] && cat \"$SSL_CERT_DIR/tls.crt\" \"$SSL_CERT_DIR/tls.key\" \
+    \ >\"$PEM_KEYS_DIRECTORY/ssl-key-pair\" && \\\n        cp \"$SSL_CERT_DIR/ca.crt\"\
+    \ \"$PEM_TRUSTSTORE_DIRECTORY/trust.pem\"\n\n    [ -d \"$MASTER_CERT_DIR\" ] &&\
+    \ cat \"$MASTER_CERT_DIR/tls.key\" \"$MASTER_CERT_DIR/tls.crt\" \"$MASTER_CERT_DIR/ca.crt\"\
+    \ > \"$PEM_KEYS_DIRECTORY/master-key\"\n\n    # If the user provides a truststore\
+    \ then use it.\n    [ -d \"$TRUSTSTORE_DIR\" ] && cp \"$TRUSTSTORE_DIR/ca.crt\"\
+    \ \"$PEM_TRUSTSTORE_DIRECTORY/trust.pem\"\n}\n\n# POD_STATEFULSET is the statefulset\
+    \ name part of the pod name\n# (ds-cts-0 -> ds-cts), which is where the per-pod\
+    \ runtime scripts live.\nPOD_STATEFULSET=${POD_NAME%-*}\n\n# Run a runtime script\
+    \ if the deployer supplied one. The default scripts in\n# this ConfigMap always\
+    \ provide setup/post-init; add-schema is only shipped\n# for ds-idrepo, so absence\
+    \ is not an error there.\nrunRuntimeScript() {\n    script=\"./runtime-scripts/${POD_STATEFULSET}/$1\"\
+    \n    if [ -f \"$script\" ]; then\n        sh \"$script\"\n    fi\n}\n\ninit()\
+    \ {\n    # Make sure master keys and truststore are in place and up to date.\n\
+    \    copyKeys\n    upgradeDataAndRebuildDegradedIndexes\n    # Set the admin and\
+    \ monitor passwords from K8S secrets\n    setAdminAndMonitorPasswords\n    # Add\
+    \ app schema\n    if [ -f \"./runtime-scripts/${POD_STATEFULSET}/add-schema\"\
+    \ ]; then\n        sh ./runtime-scripts/${POD_STATEFULSET}/add-schema\n    fi\n\
+    \n}\n\ndoInit() {\n    if [ -d \"$DS_DATA_DIR/db\" ];  then\n        echo \"data/\
+    \ directory contains data. setup is not required\";\n        # Init still needs\
+    \ to check and rebuild indexes.\n        init\n\n        # If the user supplies\
+    \ a post-init script, run it\n        # The runtime-script is a no-op.\n     \
+    \   runRuntimeScript post-init\n        exit 0;\n    fi\n    # Else - no data\
+    \ is present, we need to run setup.\n    # GNU tar's --no-overwrite-dir keeps\
+    \ it from rewriting the metadata of\n    # the extraction root (the PVC mount\
+    \ root; its mode/owner is kubelet/\n    # fsGroup-managed); busybox tar rejects\
+    \ the flag outright. Probe for it\n    # instead of choosing per image line. -v\
+    \ logs what the prime unpacked.\n    echo \"Untaring protoype setup to $DS_DATA_DIR\"\
+    \n    if tar --no-overwrite-dir --version >/dev/null 2>&1; then\n        tar --no-overwrite-dir\
+    \ -C $DS_DATA_DIR -xvzf data.tar.gz\n    else\n        tar -C $DS_DATA_DIR -xvzf\
+    \ data.tar.gz\n    fi\n    copyKeys\n    runRuntimeScript setup\n    init\n  \
+    \  runRuntimeScript post-init\n}\n\nCMD=\"${1:-help}\"\ncase \"$CMD\" in\n\n#\
+    \ init is run in an init container and prepares the directory for running.\n#\
+    \ initialize-only and init share the same path (busybox ash has no \";&\"\n# fallthrough).\n\
+    initialize-only|init)\n    doInit\n    ;;\n\n# Start the server.\nstart-ds|start)\n\
+    \    removeLocks\n    setOnlineToolProperties\n    exec start-ds --nodetach\n\
+    \    ;;\n\n*)\n    removeLocks\n    echo \"Undefined entrypoint. Will exec $@\"\
+    \n    shift\n    exec \"$@\"\n    ;;\n\nesac\n"
+  env.sh: "# Source this file to set the environment variables for the Docker container.\n\
+    #\n# Customizing: every setting below is read as ${VAR:-default}, so set the\n\
+    # corresponding environment variable to override it. In a chart deployment,\n\
+    # set DS_* variables through the ds_idrepo.env / ds_cts.env / platform.env\n#\
+    \ chart values (or envFrom secrets); in a standalone image run, set them in\n\
+    # the container environment (or bake them into the image). Note the chart\n# mounts\
+    \ THIS file over the image's baked copy \u2014 customize through the\n# environment,\
+    \ not by editing the image's env.sh.\n#\n# Two modes are supported via IMAGE_MODE\
+    \ (default \"forgeops\"):\n#   forgeops  - forgeops deployment contract: password\
+    \ files under\n#               /var/run/secrets/opendj-passwords/ (opt-in setting,\
+    \ on by\n#               default), SSL/MASTER/TRUSTSTORE cert directories matching\n\
+    #               the PEM managers created by ds-setup.sh, server id suffixed\n\
+    #               with the group id. This is the contract the forgeops images\n\
+    #               have always shipped; bare-image runs (kustomize manifests,\n#\
+    \               plain docker run) get it when IMAGE_MODE is unset.\n#   base \
+    \     - upstream samples/docker contract: keystore-based runtime,\n#         \
+    \      admin/monitor password files under secrets/, bootstrap\n#             \
+    \  replication servers derived from the pod hostname for both\n#             \
+    \  replicas (ds0, ds1). Opt-in via IMAGE_MODE=base.\n# Both branches share the\
+    \ G1 GC defaults with the DS_JAVA_ARGS tunables\n# (DS_JAVA_GC_LOGFILE, DS_JAVA_GC_PAUSE_TARGET,\
+    \ DS_JAVA_INITIAL_RAM_PERCENTAGE,\n# DS_JAVA_MAX_RAM_PERCENTAGE).\n#\n# busybox\
+    \ ash notes (alpine): no bash-only features are used here; the\n# k8s-pod-hostname\
+    \ regex is evaluated with grep -E instead of [[ =~ ]].\n\n# DS_JAVA_ARGS is the\
+    \ primary env var for DS 8.x+. OPENDJ_JAVA_ARGS is\n# deprecated but still exported\
+    \ for DS 7.4/7.5 backward compatibility.\nDEFAULT_DS_JAVA_ARGS=\"\n-XX:+UseG1GC\n\
+    -XX:+ExitOnOutOfMemoryError\n-Djava.security.egd=file:/dev/urandom\n-Xlog:gc:${DS_JAVA_GC_LOGFILE:-/opt/opendj/data/gc.log}:time,uptime:filecount=${DS_JAVA_GC_FILE_COUNT:-5},filesize=${DS_JAVA_GC_FILE_SIZE:-50M}\n\
+    -XX:MaxGCPauseMillis=${DS_JAVA_GC_PAUSE_TARGET:-300}\n-XX:InitialRAMPercentage=${DS_JAVA_INITIAL_RAM_PERCENTAGE:-65}\n\
+    -XX:MaxRAMPercentage=${DS_JAVA_MAX_RAM_PERCENTAGE:-65}\n-XX:MaxTenuringThreshold=${DS_JAVA_MAX_TENURING_THRESHOLD:-1}\n\
+    ${DS_JAVA_ADDITIONAL_ARGS:-}\n\"\nexport DS_JAVA_ARGS=${DS_JAVA_ARGS:-${DEFAULT_DS_JAVA_ARGS}}\n\
+    export OPENDJ_JAVA_ARGS=${DS_JAVA_ARGS}\n\nMODE=${IMAGE_MODE:-forgeops}\n\n# By\
+    \ default the admin and monitor passwords are provided as plain-text.\n# Set this\
+    \ to true if the passwords have been pre-encoded externally.\nexport DS_USE_PRE_ENCODED_PASSWORDS=${DS_USE_PRE_ENCODED_PASSWORDS:-false}\n\
+    \nif [ \"$MODE\" = \"forgeops\" ]; then\n    # forgeops deployments provision\
+    \ passwords via k8s secrets at these paths\n    # and expect them to be set unconditionally\
+    \ at startup (upstream forgeops\n    # env.sh defaults).\n    export DS_SET_UID_ADMIN_AND_MONITOR_PASSWORDS=${DS_SET_UID_ADMIN_AND_MONITOR_PASSWORDS:-true}\n\
+    \    export DS_UID_ADMIN_PASSWORD_FILE=\"${DS_UID_ADMIN_PASSWORD_FILE:-/var/run/secrets/opendj-passwords/dirmanager.pw}\"\
+    \n    export DS_UID_MONITOR_PASSWORD_FILE=\"${DS_UID_MONITOR_PASSWORD_FILE:-/var/run/secrets/opendj-passwords/monitor.pw}\"\
+    \nelse\n    # base mode (upstream samples/docker contract, IMAGE_MODE=base): password\n\
+    \    # setting is opt-in, defaults are relative to the instance secrets/\n   \
+    \ # directory.\n    export DS_SET_UID_ADMIN_AND_MONITOR_PASSWORDS=${DS_SET_UID_ADMIN_AND_MONITOR_PASSWORDS:-false}\n\
+    \    export DS_UID_ADMIN_PASSWORD_FILE=${DS_UID_ADMIN_PASSWORD_FILE:-secrets/admin.pwd}\n\
+    \    export DS_UID_MONITOR_PASSWORD_FILE=${DS_UID_MONITOR_PASSWORD_FILE:-secrets/monitor.pwd}\n\
+    fi\n\n# Group Id is important in multi-cluster (multi-region) deployments to\n\
+    # localize replication. For single cluster deployment, using default is fine.\n\
+    export DS_GROUP_ID=${DS_GROUP_ID:-default}\n# Concat the hostname and group id\
+    \ to make a unique server id. For example\n# if ds-idrep-0 is deployed both in\
+    \ groupid=us-west and group-id=us-east, this\n# serves to differentiate the two\
+    \ servers.\nHID=\"$(hostname)-$DS_GROUP_ID\"\nexport DS_SERVER_ID=${DS_SERVER_ID:-${HID}}\n\
+    # By default we advertise to listen on the default hostname.\nexport DS_ADVERTISED_LISTEN_ADDRESS=${DS_ADVERTISED_LISTEN_ADDRESS:-$(hostname\
+    \ -f)}\n\n# If the advertised listen address looks like a Kubernetes pod host\
+    \ name of\n# the form <statefulset-name>-<ordinal>.<domain-name> then derive the\
+    \ default\n# bootstrap servers names as\n# <statefulset-name>-0.<domain-name>,<statefulset-name>-1.<domain-name>.\n\
+    #\n# Sample hostnames from Kubernetes include:\n#\n#     ds-1.userstore.svc.cluster.local\n\
+    #     ds-userstore-1.userstore.svc.cluster.local\n#     userstore-1.userstore.jnkns-pndj-bld-pr-4958-1.svc.cluster.local\n\
+    #     ds-userstore-1.userstore.jnkns-pndj-bld-pr-4958-1.svc.cluster.local\n#\n\
+    # To deploy in a multi-cluster scenario explicitly set the\n# DS_BOOTSTRAP_REPLICATION_SERVERS\
+    \ per your topology. Examples below:\n# **Cloud DNS for GKE**\n# FQDN:       \
+    \       ds-cts-1.ds-cts.<namespace>.svc.eu\n# Results in:\n# Server ID:      \
+    \   ds-cts-1_eu\n# Group ID:          eu\n# Bootstrap servers: ds-cts-0.ds-cts.<namespace>.svc.eu,ds-cts-0.ds-cts.<namespace>.svc.us\n\
+    #\n# **KubeDNS**\n# FQDN:              ds-cts-1.ds-cts-eu.<namespace>.svc.cluster.local\n\
+    # Results in:\n# Server ID:         ds-cts-1_eu\n# Group ID:          eu\n# Bootstrap\
+    \ servers: ds-cts-0.ds-cts-eu.<namespace>.svc.cluster.local,ds-cts-0.ds-cts-us.<namespace>.svc.cluster.local\n\
+    #\n# **GKE multi-cluster Services (MCS)**\n# FQDN:              ds-cts-1.ds-cts-eu.eu.<namespace>.svc.cluster.local\n\
+    # Results in:\n# Server ID:         ds-cts-1_eu\n# Group ID:          eu\n# Bootstrap\
+    \ servers: ds-cts-0.ds-cts-eu.eu.<namespace>.svc.cluster.local,ds-cts-0.ds-cts-us.us.<namespace>.svc.cluster.local\n\
+    \n# busybox ash has no =~ regex; use grep -qE for the pod-hostname test.\nif printf\
+    \ '%s' \"$DS_ADVERTISED_LISTEN_ADDRESS\" | grep -qE '[^.]+-[0-9]+\\..+'; then\n\
+    \    # Domain is everything after the first dot\n    podDomain=${DS_ADVERTISED_LISTEN_ADDRESS#*.}\n\
+    \    # Name is everything up to the first dot\n    podName=${DS_ADVERTISED_LISTEN_ADDRESS%%.*}\n\
+    \    podPrefix=${podName%-*}\n\n    ds0=${podPrefix}-0.${podDomain}:8989\n   \
+    \ ds1=${podPrefix}-1.${podDomain}:8989\n    # Set the default bootstrap servers\
+    \ unless the user explicitly provides it\n    export DS_BOOTSTRAP_REPLICATION_SERVERS=${DS_BOOTSTRAP_REPLICATION_SERVERS:-${ds0},${ds1}}\n\
+    else\n    export DS_BOOTSTRAP_REPLICATION_SERVERS=${DS_BOOTSTRAP_REPLICATION_SERVERS:-${DS_ADVERTISED_LISTEN_ADDRESS}:8989}\n\
+    fi\n\nif [ \"$MODE\" = \"forgeops\" ]; then\n    # These are the default locations\
+    \ where cert-manager-generated PEM files\n    # are mounted. These files must\
+    \ be copied to the appropriate location and\n    # format expected by the DS PEM\
+    \ manager. To change these locations you\n    # must also change the ds-setup.sh\
+    \ script.\n    export SSL_CERT_DIR=\"${SSL_CERT_DIR:-/var/run/secrets/ds-ssl-keypair}\"\
+    \n    export MASTER_CERT_DIR=\"${MASTER_CERT_DIR:-/var/run/secrets/ds-master-keypair}\"\
+    \n    export TRUSTSTORE_DIR=\"${TRUSTSTORE_DIR:-/var/run/secrets/truststore}\"\
+    \nelse\n    # base mode (IMAGE_MODE=base): upstream keystore contract - the keystore\n\
+    \    # and PIN are provided at runtime in the secrets directory (mounted or\n\
+    \    # copied there by the entrypoint).\n    export SSL_CERT_DIR=\"${SSL_CERT_DIR:-/opt/opendj/secrets}\"\
+    \nfi\n\necho\necho \"Server configured with:\"\necho \"    Group ID          \
+    \              : $DS_GROUP_ID\"\necho \"    Server ID                       :\
+    \ $DS_SERVER_ID\"\necho \"    Advertised listen address       : $DS_ADVERTISED_LISTEN_ADDRESS\"\
+    \necho \"    Bootstrap replication server(s) : $DS_BOOTSTRAP_REPLICATION_SERVERS\"\
+    \necho\n"

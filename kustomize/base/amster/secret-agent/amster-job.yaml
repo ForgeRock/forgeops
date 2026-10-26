@@ -3,7 +3,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: amster
+  name: amster-1
   annotations:
     helm.sh/hook: post-install,post-upgrade
   labels:
@@ -17,7 +17,7 @@ metadata:
     app.kubernetes.io/component: amster
 spec:
   backoffLimit: 6
-  ttlSecondsAfterFinished: 7200
+  ttlSecondsAfterFinished: 43200
   template:
     metadata:
       annotations:
@@ -59,7 +59,7 @@ spec:
             - /bin/sh
             - -c
           args:
-            - "for f in $(find /amster-scripts); do\n  cp -r $f /opt/amster/ && chmod 775 /opt/amster/$(basename $f)\ndone\n[ -z \"$FUNCTION\" ] && FUNCTION=\"import\" \n./docker-entrypoint.sh $FUNCTION\n"
+            - "\ncase \"${FUNCTION:-}\" in\n\"\"|import)\n  \n  if [ -n \"$(find /opt/amster/config -mindepth 1 -print -quit 2>/dev/null)\" ] || [ -f /amster-import/amster-import.tar.gz ]; then\n    echo \"amster-job: importing the /opt/amster/config content (pre-baked in the image, and/or the amster-config tarball staged below)\"\n  else\n    echo \"amster-job: nothing to import -- /opt/amster/config is empty and no amster-config tarball is mounted; refusing to run an import that would silently configure nothing\" >&2\n    exit 1\n  fi\n  \n  if [ -f /amster-import/amster-import.tar.gz ]; then\n    mkdir -p /opt/amster/config || {\n      echo \"amster-job: could not create /opt/amster/config (runtime uid $(id -u) cannot write /opt/amster?)\" >&2\n      exit 1\n    }\n    cp /amster-import/amster-import.tar.gz /opt/amster/config/ || {\n      echo \"amster-job: failed to stage the amster-import.tar.gz ConfigMap content into /opt/amster/config (runtime uid $(id -u) cannot write it?)\" >&2\n      exit 1\n    }\n  elif [ -n \"$(find -L /amster-import -mindepth 1 -maxdepth 1 ! -name '..*' -print -quit 2>/dev/null)\" ]; then\n    \n    echo \"amster-job: the amster-config ConfigMap has no amster-import.tar.gz key (found: $(find -L /amster-import -mindepth 1 -maxdepth 1 ! -name '..*' -printf '%f ' 2>/dev/null | sed 's/ $//')); refusing to run an import that would silently ignore the supplied config\" >&2\n    exit 1\n  fi\n  ;;\nesac\nfor f in $(find /amster-scripts); do\n  cp -r $f /opt/amster/ && chmod 775 /opt/amster/$(basename $f) || {\n    echo \"amster-job: failed to install the chart's amster script $f over the image's own\" >&2\n    exit 1\n  }\ndone\n[ -z \"$FUNCTION\" ] && FUNCTION=\"import\"\n./docker-entrypoint.sh $FUNCTION\n"
           env:
             - name: NAMESPACE
               valueFrom:
@@ -90,8 +90,8 @@ spec:
               mountPath: /amster-scripts/import.sh
               subPath: 63ccbd1ea3a3b7fab64c58c9f0dc82359a2c4704d376e029800d4d139fb4e07e
             - name: config
-              mountPath: /opt/amster/config/amster-import.tar.gz
-              subPath: amster-import.tar.gz
+              mountPath: /amster-import
+              readOnly: true
             - name: amster-secrets
               mountPath: /var/run/secrets/amster
               readOnly: true
@@ -103,7 +103,7 @@ spec:
           image: amster
           imagePullPolicy: IfNotPresent
           args:
-            - bash
+            - sh
             - -c
             - sleep ${AMSTER_DURATION:-10}
           envFrom:

@@ -100,6 +100,13 @@ spec:
         - name: filesystem-init
           image: am
           imagePullPolicy: IfNotPresent
+          env:
+            - name: FORGEROCK_HOME
+              value: /home/forgerock
+            - name: AM_HOME
+              value: /home/forgerock/openam
+            - name: AM_CATALINA_HOME
+              value: /usr/local/tomcat
           volumeMounts:
             - mountPath: /fbc
               name: fbc
@@ -141,12 +148,13 @@ spec:
           image: am
           imagePullPolicy: IfNotPresent
           command:
-            - bash
+            - sh
             - /home/forgerock/entrypoint-scripts/entrypoint.sh
           env:
             - name: NAMESPACE
               valueFrom:
                 fieldRef:
+                  apiVersion: v1
                   fieldPath: metadata.namespace
             - name: AM_STORES_SSL_ENABLED
               value: "true"
@@ -216,6 +224,9 @@ spec:
               mountPath: /home/forgerock/logging
             - name: entrypoint-scripts
               mountPath: /home/forgerock/entrypoint-scripts
+            - name: writeable
+              mountPath: /usr/local/tomcat
+              subPath: tomcat
             - name: writeable
               mountPath: /tmp
               subPath: tmp

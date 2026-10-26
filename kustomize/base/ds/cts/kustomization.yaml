@@ -4,3 +4,4 @@ kind: Kustomization
 resources:
   - ds-cts-service.yaml
   - ds-cts-statefulset.yaml
+  - ds-cts-runtime-scripts.yaml

@@ -4,3 +4,4 @@ kind: Kustomization
 resources:
   - ds-idrepo-service.yaml
   - ds-idrepo-statefulset.yaml
+  - ds-idrepo-runtime-scripts.yaml

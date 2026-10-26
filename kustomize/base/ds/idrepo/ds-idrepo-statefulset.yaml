@@ -56,6 +56,18 @@ spec:
           emptyDir: {}
         - name: cloud-credentials-cache
           emptyDir: {}
+        - name: ds-runtime-scripts
+          configMap:
+            name: ds-runtime-scripts
+            defaultMode: 0755
+        - name: ds-idrepo-runtime-scripts
+          configMap:
+            name: ds-idrepo-runtime-scripts
+            defaultMode: 0755
+        - name: ds-entrypoint
+          configMap:
+            name: ds-entrypoint
+            defaultMode: 0755
       initContainers:
         - name: init
           securityContext: {}
@@ -78,6 +90,16 @@ spec:
               name: keys
             - mountPath: /var/run/secrets/cloud-credentials-cache/
               name: cloud-credentials-cache
+            - name: ds-entrypoint
+              mountPath: /opt/opendj/docker-entrypoint.sh
+              subPath: docker-entrypoint.sh
+            - name: ds-entrypoint
+              mountPath: /opt/opendj/env.sh
+              subPath: env.sh
+            - name: ds-runtime-scripts
+              mountPath: /opt/opendj/runtime-scripts
+            - name: ds-idrepo-runtime-scripts
+              mountPath: /opt/opendj/runtime-scripts/ds-idrepo
           command:
             - sh
             - -c
@@ -89,6 +111,12 @@ spec:
                   fieldPath: metadata.name
             - name: DS_SET_UID_ADMIN_AND_MONITOR_PASSWORDS
               value: "true"
+            - name: SSL_CERT_DIR
+              value: /var/run/secrets/ds-ssl-keypair
+            - name: MASTER_CERT_DIR
+              value: /var/run/secrets/ds-master-keypair
+            - name: TRUSTSTORE_DIR
+              value: /var/run/secrets/truststore
             - name: DS_UID_MONITOR_PASSWORD_FILE
               value: /var/run/secrets/monitor/monitor.pw
             - name: DS_UID_ADMIN_PASSWORD_FILE
@@ -134,6 +162,12 @@ spec:
                   fieldPath: metadata.name
             - name: DS_SET_UID_ADMIN_AND_MONITOR_PASSWORDS
               value: "true"
+            - name: SSL_CERT_DIR
+              value: /var/run/secrets/ds-ssl-keypair
+            - name: MASTER_CERT_DIR
+              value: /var/run/secrets/ds-master-keypair
+            - name: TRUSTSTORE_DIR
+              value: /var/run/secrets/truststore
             - name: DS_UID_MONITOR_PASSWORD_FILE
               value: /var/run/secrets/monitor/monitor.pw
             - name: DS_UID_ADMIN_PASSWORD_FILE
@@ -174,6 +208,10 @@ spec:
               cpu: 500m
               memory: 1366Mi
           volumeMounts:
+            - name: ds-runtime-scripts
+              mountPath: /opt/opendj/runtime-scripts
+            - name: ds-idrepo-runtime-scripts
+              mountPath: /opt/opendj/runtime-scripts/ds-idrepo
             - mountPath: /opt/opendj/data
               name: data
             - mountPath: /var/run/secrets/admin
@@ -190,6 +228,12 @@ spec:
               name: keys
             - mountPath: /var/run/secrets/cloud-credentials-cache/
               name: cloud-credentials-cache
+            - name: ds-entrypoint
+              mountPath: /opt/opendj/docker-entrypoint.sh
+              subPath: docker-entrypoint.sh
+            - name: ds-entrypoint
+              mountPath: /opt/opendj/env.sh
+              subPath: env.sh
       affinity:
         nodeAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:

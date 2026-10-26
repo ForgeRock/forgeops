@@ -5,6 +5,7 @@ resources:
   - ./base
   - ./secrets
   - ./ds-cts
+  - ./ds-shared
   - ./ds-idrepo
   - ./am
   - ./amster
