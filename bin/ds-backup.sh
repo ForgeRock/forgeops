@@ -66,12 +66,15 @@ if [ -z "${pods}" ]; then
 fi
 echo "Targeting pods: ${pods[@]}"
 
-echo "Verifying the runtime script directory"
+# Probe the first targeted pod, so a CTS-only HOSTS list is not aborted by an
+# unrelated ds-idrepo-0 check.
+probe_pod="${pods[0]}"
+echo "Verifying the runtime script directory on ${probe_pod}"
 # The probe runs under the pod's /bin/sh, not bash: the Alpine DS image ships
 # busybox ash only.
 SCHEDULE_BACKUP_SCRIPT="/opt/opendj/runtime-scripts/schedule-backup.sh"
-kubectl exec ds-idrepo-0 -- sh -c "test -f ${SCHEDULE_BACKUP_SCRIPT}" || {
-    echo "ERROR: ${SCHEDULE_BACKUP_SCRIPT} not found in ds-idrepo-0"
+kubectl exec "${probe_pod}" -- sh -c "test -f ${SCHEDULE_BACKUP_SCRIPT}" || {
+    echo "ERROR: ${SCHEDULE_BACKUP_SCRIPT} not found in ${probe_pod}"
     exit 1
 }
 

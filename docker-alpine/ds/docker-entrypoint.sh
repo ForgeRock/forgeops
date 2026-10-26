@@ -52,6 +52,13 @@ set -o pipefail
 # SHELLOPTS is a bash-only variable; busybox ash needs no equivalent.
 cd /opt/opendj
 
+# Trace every command to stderr to ease init-failure debugging; disable with
+# -e ENTRYPOINT_DEBUG=false.
+ENTRYPOINT_DEBUG=${ENTRYPOINT_DEBUG:-true}
+if [ "$ENTRYPOINT_DEBUG" = "true" ]; then
+    set -x
+fi
+
 # Container environment (JVM args, password-file locations, cert dirs,
 # bootstrap replication servers). Mode-aware: see env.sh. The forgeops
 # k8s deployment may override any of these via container env/envFrom.

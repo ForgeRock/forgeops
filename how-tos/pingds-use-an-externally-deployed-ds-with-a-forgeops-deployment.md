@@ -231,7 +231,7 @@ cd /opt/opendj
 Next step is to copy the PingDS runtime setup scripts from your local `forgeops` repo to your PingDS server.  
 
 For 7.4/7.5 release branches or earlier: 
-`docker/ds/default-scripts/setup`
+`docker/ds/runtime-scripts/ds-idrepo/setup` (7.4/7.5 shipped it as `docker/ds/default-scripts/setup`, removed since)
 
 For 2025.2.1:
 `docker/ds/runtime-scripts/ds-idrepo/setup`
