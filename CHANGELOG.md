@@ -80,6 +80,15 @@ base-generate.sh. The following flags have been removed from the Helm charts.
 
 ## Bugfixes
 
+### DS upgrade no longer crash-loops in add-schema when the instance schema lags the binary
+
+On an upgrade with existing data, `add-schema` created `fr-idm-reference-6..10` indexes for
+attribute types the persisted instance schema does not define, and `rebuild-index` failed to
+decode them, leaving the pod crash-looping. Each attribute is now gated on its presence in the
+schema the instance loads, so a schema-lagged upgrade completes and the missing indexes are
+created later when the schema catches up. Index configs left behind by the earlier build are
+pruned on the first boot of the fixed image; no manual recovery is needed.
+
 ### identity-platform amster job no longer mounts the import tarball inside the config directory
 
 The optional `amster-config` ConfigMap's tarball was subPath-mounted at

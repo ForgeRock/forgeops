@@ -16,11 +16,96 @@ plug_exists() {
     return $?
 }
 
+# Echoes the first schema directory holding LDIF files, mirroring DS's own
+# precedence: instance db/schema wins over instance config/schema, the server
+# root is the fallback for image-baked schema. Prints nothing and returns 1 when
+# no schema is found.
+find_schema_dir() {
+    for dir in "$DS_DATA_DIR/db/schema" "$DS_DATA_DIR/config/schema" \
+               "/opt/opendj/db/schema" "/opt/opendj/config/schema"; do
+        if [ -d "$dir" ] && ls "$dir"/*.ldif > /dev/null 2>&1; then
+            echo "$dir"
+            return 0
+        fi
+    done
+    return 1
+}
+
+# Returns 0 if the attribute type is defined in the schema DS will actually load.
+# The binary version (dsconfig -V) can run ahead of the instance schema on an
+# upgraded deployment: setup-profile only copies the profile schema in on a fresh
+# install, and the DS upgrade command refreshes the config schema only. The LDIF
+# unfolding makes the match fold-tolerant; the pattern accepts the bare name and
+# the parenthesized form, and the idm-repo schema declares these types with single
+# names (re-check on a profile-schema bump). The schema is read once per boot;
+# with no schema directory at all, every check re-probes to keep the warning.
+UNFOLDED_SCHEMA=""
+UNFOLDED_SCHEMA_LOADED=0
+
+load_unfolded_schema() {
+    dir=$(find_schema_dir) || return 1
+    UNFOLDED_SCHEMA=$(cat "$dir"/*.ldif | sed -e :a -e N -e '$!ba' -e 's/\n //g')
+    UNFOLDED_SCHEMA_LOADED=1
+}
+
+attr_in_schema() {
+    if [ "$UNFOLDED_SCHEMA_LOADED" -eq 0 ] && ! load_unfolded_schema; then
+        echo "WARNING: no schema LDIF found in the known locations; treating '${1}' as undefined" >&2
+        return 1
+    fi
+    printf '%s\n' "$UNFOLDED_SCHEMA" | grep -qE "NAME[[:space:]]*(\([[:space:]]*)?'${1}'"
+}
+
+# The only attribute types the earlier bootstrap could have written index config
+# for while undefined: the gated fr-idm-reference-6..10 additions. The prune is
+# deliberately limited to these names - a schema false negative must never delete
+# a profile index (fr-idm-uuid and friends) that nothing would recreate.
+PRUNEABLE_INDEXES="fr-idm-reference-6
+fr-idm-reference-7
+fr-idm-reference-8
+fr-idm-reference-9
+fr-idm-reference-10"
+
+# Deletes the amIdentityStore indexes the earlier bootstrap could have written for
+# attribute types undefined in the schema DS loads (see PRUNEABLE_INDEXES).
+# create-backend-index is schema-lax, so a leftover entry makes every rebuild-index
+# and backend open fail to decode it. Deployments that ran the older bootstrap need
+# this pruning to recover; fresh ones have nothing to prune. Runs first, before any
+# other dsconfig write, so the recovery is not blocked by an unrelated failure.
+prune_undefined_indexes() {
+    if ! find_schema_dir > /dev/null; then
+        echo "WARNING: no schema LDIF found in the known locations; skipping index pruning" >&2
+        return 0
+    fi
+    for index in $PRUNEABLE_INDEXES; do
+        if attr_in_schema "$index"; then
+            continue
+        fi
+        if ! index_exists amIdentityStore "$index"; then
+            continue
+        fi
+        if dsconfig --offline --no-prompt --batch <<EOF
+delete-backend-index \
+        --backend-name amIdentityStore \
+        --index-name ${index}
+EOF
+        then
+            echo "Deleted index '${index}': attribute not defined in the schema"
+        else
+            echo "WARNING: failed to delete index '${index}'" >&2
+        fi
+    done
+}
+
 index_exists() {
     dsconfig --offline --no-prompt get-backend-index-prop \
         --backend-name "$1" --index-name "$2" > /dev/null 2>&1
     return $?
 }
+
+# Recovery comes first: everything below is a dsconfig write that set -e makes
+# fatal, and a config-poisoned deployment must not be blocked from pruning.
+prune_undefined_indexes
 
 PLUG_NAME="User Unique Attribute"
 if  plug_exists "$PLUG_NAME" ; then
@@ -98,19 +183,28 @@ fr-idm-reference-5"
 # defines fr-idm-reference-1 through -5 only. Listing an undefined one makes DS
 # reject the plugin config with an OID decode error on every tool invocation,
 # which broke the 7.4 baseline used by the Kustomize.UpgradePlatform74To75 test.
+# On an 8.x binary paired with a schema dir still holding the 7.3-era attribute
+# set (upgrade with existing data) the offline dsconfig tools accept the config
+# but rebuild-index and backend open fail to decode it, so each attribute is
+# additionally gated on the schema, not the binary alone. version_gt stays only
+# as a cheap pre-filter - the schema check below is the authoritative gate.
 if version_gt "$IDM_REPO_VER" "7.5"; then
-    REFINT_ATTRS="${REFINT_ATTRS}
-fr-idm-reference-6
-fr-idm-reference-7
-fr-idm-reference-8
-fr-idm-reference-9
-fr-idm-reference-10"
+    for attr in fr-idm-reference-6 fr-idm-reference-7 fr-idm-reference-8 \
+                fr-idm-reference-9 fr-idm-reference-10; do
+        if attr_in_schema "$attr"; then
+            REFINT_ATTRS="${REFINT_ATTRS}
+${attr}"
+        else
+            echo "Skipping '${attr}': not defined in the instance schema"
+        fi
+    done
 fi
 
 # Existing deployments never run setup, so any index missing there is created
 # here. rebuild-index is required for an index added to a populated backend:
 # without it the index is left degraded and the plugin's searches miss entries.
 REFINT_NEW_INDEXES=""
+REFINT_NEW_INDEX_ATTRS=""
 for attr in $REFINT_ATTRS; do
     if index_exists amIdentityStore "$attr"; then
         continue
@@ -125,6 +219,7 @@ create-backend-index \
         --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.9
 EOF
     REFINT_NEW_INDEXES="${REFINT_NEW_INDEXES} --index ${attr}"
+    REFINT_NEW_INDEX_ATTRS="${REFINT_NEW_INDEX_ATTRS} ${attr}"
 done
 
 if [ -n "$REFINT_NEW_INDEXES" ]; then
@@ -134,8 +229,60 @@ if [ -n "$REFINT_NEW_INDEXES" ]; then
 fi
 
 PLUG_NAME="fr-am-referential-int-plugin"
+# shellcheck disable=SC2086  # word splitting on the attr list is the point
+wanted_attrs=$(printf '%s\n' $REFINT_ATTRS | sort -u)
 if plug_exists "$PLUG_NAME" ; then
-    echo "Found $PLUG_NAME, skipping create"
+    # A deployment that created the plugin while its schema lagged holds a reduced
+    # attribute set; once the schema defines the missing attributes the list must be
+    # brought up to the full one here. Compare first and write only when the list
+    # actually differs: base-dn and enabled are left alone so an operator who
+    # re-scoped base-dn or disabled the plugin keeps their choice; the attribute-type
+    # list is this script's to own, so an operator addition outside the fr-idm-*
+    # namespace is dropped. The comparison relies on get-plugin-prop reporting the
+    # names in the form this script lists them - a different name form (OIDs,
+    # aliases) would retrigger the update on every boot.
+    current_attrs=$(dsconfig --offline --no-prompt -s get-plugin-prop \
+        --plugin-name "$PLUG_NAME" --property attribute-type 2> /dev/null \
+        | grep -oE "fr-idm-[a-z0-9-]+" | sort -u)
+    if [ -z "$current_attrs" ]; then
+        # An empty read while the plugin exists means the property could not be
+        # read (format change, swallowed error), not that nothing is listed -
+        # "wanted" would then win the comparison below and every pre-existing
+        # index would land in the rebuild set. Leave the plugin alone and surface it.
+        echo "WARNING: could not read '${PLUG_NAME}' attribute-type; skipping reconciliation" >&2
+    elif [ "$current_attrs" != "$wanted_attrs" ]; then
+        echo "Updating '${PLUG_NAME}' attribute-type list"
+        {
+            printf 'set-plugin-prop \\\n        --plugin-name "%s"' "$PLUG_NAME"
+            for attr in $REFINT_ATTRS; do
+                printf ' \\\n        --set "attribute-type:%s"' "$attr"
+            done
+            printf '\n'
+        } | dsconfig --offline --no-prompt --batch || echo "WARNING: failed to update '${PLUG_NAME}'" >&2
+        # An attribute newly listed in the plugin whose index predates this boot
+        # (left over from the earlier bootstrap, written but never rebuilt) has
+        # unverifiable trust state - that is the set rebuilt here. One whose index
+        # was created above was already rebuilt, and one already listed has been in
+        # service, so neither is repeated.
+        rebuild_list=""
+        for attr in $wanted_attrs; do
+            if printf '%s\n' "$current_attrs" | grep -Fxq "$attr"; then
+                continue
+            fi
+            case " $REFINT_NEW_INDEX_ATTRS " in
+                *" $attr "*) continue ;;
+            esac
+            rebuild_list="$rebuild_list --index ${attr}"
+        done
+        if [ -n "$rebuild_list" ]; then
+            echo "Rebuilding referential integrity indexes for attributes newly added to '${PLUG_NAME}'"
+            # shellcheck disable=SC2086  # word splitting on the flag list is the point
+            rebuild-index --offline --noPropertiesFile --baseDn ou=identities $rebuild_list > /dev/null \
+                || echo "WARNING: rebuild-index failed; the newly added indexes may be degraded" >&2
+        fi
+    else
+        echo "Found $PLUG_NAME, attribute-type list is current"
+    fi
 else
     echo "Adding '${PLUG_NAME}'"
     {
@@ -148,4 +295,26 @@ else
         done
         printf '        --set "enabled:true"\n'
     } | dsconfig --offline --no-prompt --batch
+    # The plugin is missing on a fresh install (setup pre-creates the indexes before
+    # calling this script) and where the earlier bootstrap died at its unguarded
+    # rebuild, before create-plugin. In both cases pre-existing indexes whose
+    # attribute is in the list but was not created this boot were never rebuilt by
+    # this script: on a fresh install they carry no data yet, and in the crash-loop
+    # case their create boot crashed first. The plugin would otherwise come up
+    # against untrusted indexes whose searches silently miss entries, and with the
+    # crash gone there is no rebuildDegraded pass to converge later. On a fresh
+    # install the backend holds only base entries, so the pass is cheap there.
+    rebuild_list=""
+    for attr in $wanted_attrs; do
+        case " $REFINT_NEW_INDEX_ATTRS " in
+            *" $attr "*) continue ;;
+        esac
+        rebuild_list="$rebuild_list --index ${attr}"
+    done
+    if [ -n "$rebuild_list" ]; then
+        echo "Rebuilding referential integrity indexes that predate '${PLUG_NAME}'"
+        # shellcheck disable=SC2086  # word splitting on the flag list is the point
+        rebuild-index --offline --noPropertiesFile --baseDn ou=identities $rebuild_list > /dev/null \
+            || echo "WARNING: rebuild-index failed; the pre-existing indexes may be degraded" >&2
+    fi
 fi
