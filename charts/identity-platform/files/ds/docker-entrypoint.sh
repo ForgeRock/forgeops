@@ -189,7 +189,7 @@ doInit() {
         init
 
         # If the user supplies a post-init script, run it
-        # The default-script is a no-op.
+        # The runtime-script is a no-op.
         runRuntimeScript post-init
         exit 0;
     fi

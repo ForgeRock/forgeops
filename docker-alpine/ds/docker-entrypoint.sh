@@ -524,18 +524,18 @@ forgeopsInit() {
     fi
 }
 
-# Run one of the deployer-provided default-scripts (e.g. backup/restore).
-# The image does not ship default-scripts; deployments supply them via
+# Run one of the deployer-provided runtime-scripts (e.g. backup/restore).
+# The image does not ship runtime-scripts; deployments supply them via
 # mounted volumes/ConfigMaps at the well-known path. Executed directly (the
 # shebang decides the interpreter): this image has no bash, so a script
 # carrying a bash shebang must be supplied by the deployment -- the image's
 # busybox-ash runtime cannot run it either way.
 executeScript() {
-    script="/opt/opendj/default-scripts/$1"
+    script="/opt/opendj/runtime-scripts/$1"
     if [ -f "$script" ]; then
         "$script"
     else
-        log_error "Script ${script} not found - provide it via a mounted default-scripts directory"
+        log_error "Script ${script} not found - provide it via a mounted runtime-scripts directory"
         exit 1
     fi
 }
