@@ -7,7 +7,7 @@
 # Two runtime modes are supported via IMAGE_MODE (default "forgeops"),
 # selectable purely at run time, e.g.:
 #
-#     docker run -e IMAGE_MODE=forgeops ...
+#     docker run -e IMAGE_MODE=base ...
 #
 # (Single-image build: both modes run against the SAME baked instance, which
 # is always in the forgeops layout - the instance root is the directory named
@@ -176,6 +176,8 @@ validate_image() {
             log_error "The server cannot start because it appears that database encryption was enabled for a backend when the image was built. This feature is not yet supported when using Docker."
             exit 1
         }
+    else
+        log_warning "No instance admin-backend.ldif to compare against the template (fresh PVC?)"
     fi
 }
 

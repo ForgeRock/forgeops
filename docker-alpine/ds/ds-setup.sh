@@ -47,7 +47,7 @@ set -eux
 # docker-entrypoint.sh): it picks the runtime contract (base = upstream
 # samples/docker behavior against this same baked instance, forgeops = the
 # k8s/PVC contract), not what gets baked.
-MODE=${IMAGE_MODE:-base}
+MODE=${IMAGE_MODE:-forgeops}
 case "$MODE" in
     base|forgeops) ;;
     *) echo "ds-setup.sh: unknown IMAGE_MODE '$MODE' (expected base or forgeops)" >&2; exit 1 ;;

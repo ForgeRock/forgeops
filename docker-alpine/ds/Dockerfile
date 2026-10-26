@@ -43,13 +43,13 @@ ENV DS_DATA_DIR /opt/opendj/data
 ENV PEM_KEYS_DIRECTORY "/var/run/secrets/keys/ds"
 ENV PEM_TRUSTSTORE_DIRECTORY "/var/run/secrets/keys/truststore"
 
-# IMAGE_MODE is a RUNTIME selector only (default "base", re-exported as ENV,
-# overridable per container with -e IMAGE_MODE=...): base = upstream
-# samples/docker contract, forgeops = the k8s/PVC contract. The identity
-# platform chart sets the mode via platform.imageMode and its ds-entrypoint
-# ConfigMap replaces this image's entrypoint wholesale. One skeleton is
-# baked, always in the platform (forgeops) layout -- see ds-setup.sh.
-ENV IMAGE_MODE=base
+# IMAGE_MODE is a RUNTIME selector only (no ENV is set; the shipped env.sh
+# defaults it to forgeops, overridable per container with
+# -e IMAGE_MODE=...): base = upstream samples/docker contract, forgeops =
+# the k8s/PVC contract. The identity platform chart sets the mode via
+# platform.imageMode and its ds-entrypoint ConfigMap replaces this image's
+# entrypoint wholesale. One skeleton is baked, always in the platform
+# (forgeops) layout -- see ds-setup.sh.
 
 # Add the dual-mode runtime scripts that overlay the base's single-mode
 # entrypoint, and the setup that re-bakes the skeleton.

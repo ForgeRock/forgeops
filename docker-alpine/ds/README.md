@@ -50,17 +50,17 @@ there), PEM Trust/Key Manager providers replace PKCS12, password policies
 are relaxed, the AM/IDM setup profiles are enhanced from `ldif-ext/`, and
 `data.tar.gz` primes a fresh PVC. `IMAGE_MODE` is a runtime selector only:
 
-* `base` (default) — upstream samples/docker contract: keystore-based
-  runtime, secrets under `secrets/`, opt-in admin/monitor password setting.
-  The keystore is required in `/opt/opendj/secrets`, or set
-  `USE_DEMO_KEYSTORE_AND_PASSWORDS=true`.
-* `forgeops` — the k8s/PVC contract: passwords from
+* `forgeops` (default) — the k8s/PVC contract: passwords from
   `/var/run/secrets/opendj-passwords/`, PEM keys from the cert-manager
   secrets, per-pod runtime-scripts hooks. This is what the
   identity-platform chart uses (`platform.imageMode: forgeops`), and in
   chart deployments the chart's `ds-entrypoint` ConfigMap replaces the
   image's entrypoint wholesale — so the mode contract here mostly matters
   for standalone runs and for parity with the fork-internal image.
+* `base` — upstream samples/docker contract: keystore-based
+  runtime, secrets under `secrets/`, opt-in admin/monitor password setting.
+  The keystore is required in `/opt/opendj/secrets`, or set
+  `USE_DEMO_KEYSTORE_AND_PASSWORDS=true`.
 
 ## Not shipped in this image
 
