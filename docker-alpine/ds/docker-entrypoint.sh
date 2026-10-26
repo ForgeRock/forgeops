@@ -4,14 +4,14 @@
 # Read this carefully if you're not deploying with the provided operator or
 # Kubernetes manifests.
 #
-# Two runtime modes are supported via IMAGE_MODE (default "base"), selectable
-# purely at run time, e.g.:
+# Two runtime modes are supported via IMAGE_MODE (default "forgeops"),
+# selectable purely at run time, e.g.:
 #
 #     docker run -e IMAGE_MODE=forgeops ...
 #
 # (Single-image build: both modes run against the SAME baked instance, which
 # is always in the forgeops layout - the instance root is the directory named
-# by /opt/opendj/data/instance.loc (= $DS_DATA_DIR), so everything
+# by /opt/opendj/instance.loc (= $DS_DATA_DIR), so everything
 # persistable lives under the PVC mount point and data.tar.gz can prime a
 # fresh PVC. The base-mode helpers below resolve the instance root the same
 # way, so a base-mode standalone run works on the identical skeleton.)
@@ -58,7 +58,9 @@ cd /opt/opendj
 # "source" is supported by busybox ash as well as bash.
 . ./env.sh
 
-MODE=${IMAGE_MODE:-base}
+# env.sh resolves MODE from IMAGE_MODE (forgeops default); fall back only if
+# it left MODE unset.
+MODE=${MODE:-${IMAGE_MODE:-forgeops}}
 case "$MODE" in
     base|forgeops) ;;
     *) echo "docker-entrypoint.sh: unknown IMAGE_MODE '$MODE' (expected base or forgeops)" >&2; exit 1 ;;
@@ -167,10 +169,14 @@ OPENDJ_BOOTSTRAP_DATA_SOURCE="db changelogDb import-tmp locks var"
 
 validate_image() {
     # FIXME: fail-fast if database encryption has been used when the image was built (OPENDJ-6598).
-    diff -q template/db/adminRoot/admin-backend.ldif "$INSTANCE_ROOT/db/adminRoot/admin-backend.ldif" > /dev/null || {
-        log_error "The server cannot start because it appears that database encryption was enabled for a backend when the image was built. This feature is not yet supported when using Docker."
-        exit 1
-    }
+    # Skip the comparison when the instance file does not exist yet (fresh
+    # PVC) - there is nothing to compare.
+    if [ -f "$INSTANCE_ROOT/db/adminRoot/admin-backend.ldif" ]; then
+        diff -q template/db/adminRoot/admin-backend.ldif "$INSTANCE_ROOT/db/adminRoot/admin-backend.ldif" > /dev/null || {
+            log_error "The server cannot start because it appears that database encryption was enabled for a backend when the image was built. This feature is not yet supported when using Docker."
+            exit 1
+        }
+    fi
 }
 
 # Initialize persisted data in the "data" directory if it is empty, using

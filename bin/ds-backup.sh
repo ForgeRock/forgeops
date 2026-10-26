@@ -66,17 +66,14 @@ if [ -z "${pods}" ]; then
 fi
 echo "Targeting pods: ${pods[@]}"
 
-echo "Verifying the correct runtime script directory"
+echo "Verifying the runtime script directory"
+# The probe runs under the pod's /bin/sh, not bash: the Alpine DS image ships
+# busybox ash only.
 RUNTIME_SCRIPT_DIR="/opt/opendj/runtime-scripts/schedule-backup.sh"
-# Run the probe under the pod's /bin/sh, not bash: the Alpine DS image ships
-# busybox ash only (bash was deliberately dropped from the pingbase chain),
-# and `kubectl exec -- bash -c` fails with "bash: not found" there.
-kubectl exec ds-idrepo-0 -- sh -c "test -d /opt/opendj/default-scripts"
-
-if [[ $? -eq 0 ]]; then
-    echo "Different runtime script directory found. Changing directory."
-    RUNTIME_SCRIPT_DIR="/opt/opendj/default-scripts/schedule-backup.sh"
-fi
+kubectl exec ds-idrepo-0 -- sh -c "test -d /opt/opendj/runtime-scripts" || {
+    echo "ERROR: /opt/opendj/runtime-scripts not found in ds-idrepo-0"
+    exit 1
+}
 
 # Loop through pods and carry out dsbackup task
 for pod in "${pods[@]}"
