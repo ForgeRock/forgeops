@@ -1,5 +1,9 @@
 ---
-# Source: identity-platform/templates (kustomize base)
+# Source: identity-platform/templates/ds-runtime-scripts.yaml (ds-cts-runtime-scripts CM; hand-split into kustomize/base/ds/cts)
+# HAND-MAINTAINED: bin/base-generate.sh does NOT refresh this file
+# (see ../shared/kustomization.yaml). Split out of the chart's
+# multi-resource templates/ds-runtime-scripts.yaml; re-copy its content by hand from the chart
+# when the template changes.
 apiVersion: v1
 kind: ConfigMap
 metadata:

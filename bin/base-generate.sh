@@ -81,7 +81,20 @@ stripTag() {
     if [ "$(uname -o)" == "Darwin" ] ; then
       sed_opts="-i ''"
     fi
-    runOrPrint "sed $sed_opts -e 's/\(image:\) \"\([-a-z]*\):.*$/\1 \2/' ${file}"
+    # Replace any quoted image ref with its bare name: a fully-qualified or
+    # port-bearing repository keeps everything up to its final tag separator,
+    # and a digest reference (name@sha256:...) is left untouched. The base
+    # must carry short logical names (am, ds, kubectl, ...) so the
+    # image-defaulter component can match and re-point them.
+    runOrPrint "sed $sed_opts -E -e 's/(image:) \"([a-zA-Z0-9._\\/-]*:[0-9]+\\/)?([a-zA-Z0-9._\\/-]+):[a-zA-Z0-9._-]+\"/\\1 \\2\\3/' ${file}"
+    # Jobs rendered with Helm's Release.Revision suffix get it stripped:
+    # in a static base the suffix is meaningless (it can only ever be 1)
+    # and renaming Jobs on re-render breaks apply idempotence for existing
+    # deployments (amster / ds-set-passwords / keystore-create). Scoped to
+    # Job documents so other resources' names are never touched.
+    if grep -q '^kind: Job' ${file} ; then
+      runOrPrint "sed $sed_opts -e 's/\\(^  name: \\([a-z][a-z0-9-]*\\)\\)-[0-9][0-9]*$/\\1/' ${file}"
+    fi
     runOrPrint "$YQ_CMD -i eval -P 'del(.spec.template.metadata.annotations.deployment-date)' $file"
   fi
 

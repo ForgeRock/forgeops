@@ -1,5 +1,9 @@
 ---
-# Source: identity-platform/templates (kustomize base)
+# Source: identity-platform/templates/ds-runtime-scripts.yaml (ds-runtime-scripts CM; hand-split into kustomize/base/ds/shared)
+# HAND-MAINTAINED: bin/base-generate.sh does NOT refresh this file
+# (see ../shared/kustomization.yaml). Split out of the chart's
+# multi-resource templates/ds-runtime-scripts.yaml; re-copy its content by hand from the chart
+# when the template changes.
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -9,7 +13,7 @@ metadata:
     app.kubernetes.io/name: identity-platform
     app.kubernetes.io/part-of: identity-platform
     app.kubernetes.io/instance: identity-platform
-    app.kubernetes.io/version: 1.0.0
+    app.kubernetes.io/version: "1.0.0"
     app.kubernetes.io/managed-by: Helm
 data:
   init-and-restore.sh: "#!/bin/sh\n# Simple script to automatically restore DS from\

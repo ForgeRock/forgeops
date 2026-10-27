@@ -14,3 +14,13 @@ am:
 keystore_create:
   clusterRoleName: keystore-create
   appendNSToRole: false
+  # Pin both Job images to short logical names: the keystore Job's
+  # init container runs the AM image and its main container runs kubectl,
+  # and the image-defaulter component can only match short names
+  # (kustomize edit set image keys on the existing image name). The tag
+  # comes from the chart (AppVersion / the kubectl default) and the
+  # generator's stripTag removes it, leaving `am` / `kubectl`.
+  initImage:
+    repository: "am"
+  image:
+    repository: "kubectl"

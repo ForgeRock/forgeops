@@ -27,6 +27,10 @@ attempting in production.
 
 The new ForgeOps uses the Helm chart as the source of truth for Kustomize. The
 `kustomize/base` is generated from the Helm chart with `bin/base-generate.sh`.
+The DS ConfigMaps under `kustomize/base/ds/shared/` (and the per-sts
+`*-runtime-scripts` ConfigMaps) are hand-maintained exceptions: the generator
+does not refresh them, so they must be re-copied from the chart by hand when
+their templates change (see the notice in `kustomize/base/ds/shared/kustomization.yaml`).
 While you can still continue to use Kustomize, we highly recommend using this
 opportunity to switch to using Helm.
 

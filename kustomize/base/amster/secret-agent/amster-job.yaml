@@ -3,7 +3,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: amster-1
+  name: amster
   annotations:
     helm.sh/hook: post-install,post-upgrade
   labels:
