@@ -134,10 +134,9 @@ Define the key in the amster secret for the public SSH key
 
 {{/*
 Define a variable that determines if we should enable the keystore_create job.
-The Values.keystore_create.force allows base-generate.sh to create just the relevant resources.
 */}}
 {{- define "keystore_create.enabled" }}
-{{- if and .Values.keystore_create.enabled (or .Values.keystore_create.force (and .Values.platform.secrets_enabled .Values.platform.secrets.keystore_create (or .Values.am.enabled .Values.idm.enabled))) }}
+{{- if and .Values.keystore_create.enabled .Values.platform.secrets_enabled .Values.platform.secrets.keystore_create (or .Values.am.enabled .Values.idm.enabled) }}
 {{- printf "true" }}
 {{- else }}
 {{- printf "false" }}
@@ -146,10 +145,9 @@ The Values.keystore_create.force allows base-generate.sh to create just the rele
 
 {{/*
 Define a variable that determines if we should enable the keystore_create resources in deployments like am and idm.
-The Values.platform.base_generate allows base-generate.sh to create just the relevant resources.
 */}}
 {{- define "keystore_create.resources.enabled" }}
-{{- if and .Values.keystore_create.enabled .Values.platform.secrets_enabled (or .Values.platform.base_generate .Values.platform.secrets.keystore_create) (or .Values.am.enabled .Values.idm.enabled) }}
+{{- if and .Values.keystore_create.enabled .Values.platform.secrets_enabled .Values.platform.secrets.keystore_create (or .Values.am.enabled .Values.idm.enabled) }}
 {{- printf "true" }}
 {{- else }}
 {{- printf "false" }}

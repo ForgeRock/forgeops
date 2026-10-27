@@ -59,7 +59,7 @@ ou: assignment
 dn: ou=usermeta,o=alpha,o=root,ou=identities
 objectClass: top
 objectClass: organizationalUnit
-ou: alpha
+ou: usermeta
 
 dn: o=bravo,o=root,ou=identities
 objectClass: top

@@ -68,6 +68,16 @@ annotations work unchanged. `/igadmin` keeps its previous regex + rewrite behavi
 `ig-admin` ingress. If you override `ig.ingress.annotations` yourself, do not set
 `rewrite-target`, or requests will be double-prefixed.
 
+## Removed Features
+
+### Removed flags for base-generate.sh
+
+The Kustomize base used to be generated from the Helm chart with
+base-generate.sh. The following flags have been removed from the Helm charts.
+
+* platform.base_generate
+* keystore_create.force
+
 ## Bugfixes
 
 ### identity-platform amster job no longer mounts the import tarball inside the config directory

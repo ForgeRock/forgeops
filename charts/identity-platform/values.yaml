@@ -53,8 +53,6 @@ platform:
       enabled: false
   base:
     enabled: true
-  # Only used when using bin/base-generate.sh and need something to run in an alternate manner
-  base_generate: false
   configMap:
     enabled: false
     # Provide extra ENV vars to add to platform-config ConfigMap
