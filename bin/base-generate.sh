@@ -90,8 +90,9 @@ stripTag() {
     # Jobs rendered with Helm's Release.Revision suffix get it stripped:
     # in a static base the suffix is meaningless (it can only ever be 1)
     # and renaming Jobs on re-render breaks apply idempotence for existing
-    # deployments (amster / ds-set-passwords / keystore-create). Scoped to
-    # Job documents so other resources' names are never touched.
+    # deployments (amster / ds-set-passwords / keystore-create). File-level
+    # gate: every Job-bearing file in the base is single-document; revisit
+    # if a multi-document Job file ever lands.
     if grep -q '^kind: Job' ${file} ; then
       runOrPrint "sed $sed_opts -e 's/\\(^  name: \\([a-z][a-z0-9-]*\\)\\)-[0-9][0-9]*$/\\1/' ${file}"
     fi
