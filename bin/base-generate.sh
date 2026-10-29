@@ -101,6 +101,31 @@ stripTag() {
   message "Finishing stripTag()" "debug"
 }
 
+# The DS statefulsets must not mount the chart's ds-entrypoint /
+# ds-runtime-scripts / ds-*-runtime-scripts ConfigMaps in the kustomize
+# base: the docker images already bake identical runtime-scripts, and the
+# ConfigMaps are only created by the chart or by a top-level overlay that
+# includes them. A component-scoped overlay (overlay/<env>/ds-cts or
+# ds-idrepo) applies this base WITHOUT those ConfigMaps, so any mount
+# wedges DS pods in FailedMount and every DS-waiting suite fails. Strip
+# the mounts here so a re-render cannot silently re-introduce them.
+stripDsConfigMapMounts() {
+  local file=$1
+  message "Stripping DS ConfigMap mounts from ${file}" "debug"
+
+  local names='["ds-entrypoint","ds-runtime-scripts","ds-cts-runtime-scripts","ds-idrepo-runtime-scripts"]'
+  local yq_opts="-i eval"
+  runOrPrint "$YQ_CMD $yq_opts \
+    'del(.spec.template.spec.volumes[] | select(.name == \"ds-entrypoint\" or .name == \"ds-runtime-scripts\" or .name == \"ds-cts-runtime-scripts\" or .name == \"ds-idrepo-runtime-scripts\")) \
+     | .spec.template.spec.initContainers[].volumeMounts |= map(select(.name != \"ds-entrypoint\" and .name != \"ds-runtime-scripts\" and .name != \"ds-cts-runtime-scripts\" and .name != \"ds-idrepo-runtime-scripts\")) \
+     | .spec.template.spec.containers[].volumeMounts |= map(select(.name != \"ds-entrypoint\" and .name != \"ds-runtime-scripts\" and .name != \"ds-cts-runtime-scripts\" and .name != \"ds-idrepo-runtime-scripts\"))' ${file}"
+
+  if grep -qE 'name: (ds-entrypoint|ds-runtime-scripts|ds-cts-runtime-scripts|ds-idrepo-runtime-scripts)' ${file} ; then
+    message "ERROR: DS ConfigMap references remain in ${file} after stripping" "error"
+    exit 1
+  fi
+}
+
 pruneDir() {
   local dir=$1
   local kust_file="kustomization.yaml"
@@ -117,6 +142,11 @@ pruneDir() {
       fi
       if containsElement "$file" "$resources" ; then
         stripTag "$f"
+        case "$file" in
+          ds-cts-statefulset.yaml|ds-idrepo-statefulset.yaml)
+            stripDsConfigMapMounts "$f"
+            ;;
+        esac
       else
         rm $f
       fi
