@@ -1,14 +1,6 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-# This base is NOT self-contained: the statefulset here mounts the
-# `ds-entrypoint` and `ds-runtime-scripts` ConfigMaps, which live in
-# ../shared. Any overlay that includes this base must ALSO include
-# kustomize/base/ds/shared exactly once (the default overlay does this
-# via its ds-shared component); omitting it builds cleanly and leaves
-# DS pods stuck in ContainerCreating on a missing ConfigMap.
-
 resources:
   - ds-idrepo-service.yaml
   - ds-idrepo-statefulset.yaml
-  - ds-idrepo-runtime-scripts.yaml
