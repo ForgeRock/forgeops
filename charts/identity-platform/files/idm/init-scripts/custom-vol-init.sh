@@ -10,3 +10,11 @@ elif [ "$(ls -A /config)" ]; then
 else
     echo "No custom FBC found. Continuing with defaults."
 fi
+
+if [ -d /connectors ] && [ "$(ls -A /connectors)" ] ; then
+    echo "Copying custom connectors to the custom volume."
+    mkdir -p /custom/connectors
+    cp -rv /connectors/* /custom/connectors
+else
+    echo "No custom connectors found. Continuing."
+fi

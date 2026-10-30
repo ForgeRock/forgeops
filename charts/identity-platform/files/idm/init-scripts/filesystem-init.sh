@@ -189,3 +189,9 @@ mkdir -p /writeable/opt
 # default depends on build config — behaving identically. -R recurses; both
 # busybox cp and GNU cp support the -dR pair.
 cp -dRv /opt/openidm/ /writeable/opt/openidm
+
+if [ -d /custom/connectors ] && [ "$(ls -A /custom/connectors)" ] ; then
+  echo "Copying custom connectors into place."
+  mkdir -p /writable/opt/openidm/connectors
+  cp -rv /custom/connectors/* /writable/opt/openidm/connectors
+fi
