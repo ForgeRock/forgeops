@@ -51,7 +51,6 @@ def runLodestar(PipelineRunLegacyAdapter pipelineRun, String stageName, Map conf
         CLOUD_REPORT_LINE_NAME      : normalizedStageName,
         DEPLOYMENT_NAMESPACE        : cloud_utils.computeNamespaceName("${normalizedStageName}-ns"),
         SHORT_LIVED_CLUSTER_NAME    : clusterName,
-        SHORT_LIVED_CLUSTER_REGION  : cloud_constants.FORGEOPS_PIPELINE_REGION,
         REPORT_NAME_PREFIX          : normalizedStageName,
         DO_RECORD_RESULT            : false,
         SLACK_CHANNEL               : "",
