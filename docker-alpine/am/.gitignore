@@ -1,0 +1,6 @@
+# /config/ and config-exported/ are local export dirs (git-ignored on the Debian
+# line too). /releases/ holds build-time-generated release files (see the ig
+# child README for why it is ignored).
+/config/
+config-exported/
+/releases/
