@@ -63,11 +63,17 @@ directory from scripts, use
 
 ## Keeping copies in sync
 
-`config-profiles/`, `export.sh`, `import-pem-certs.sh` and
-`Dockerfile-custom` here are copies of `docker/am`'s. Update both together.
+`config-profiles/`, `import-pem-certs.sh` and `Dockerfile-custom` here are
+copies of `docker/am`'s. Update both together.
 **`Dockerfile` is NOT a copy**: it drops the jq apt layer and switches
 `COPY --chown` to `${PING_USER}:${PING_GID}`. Don't re-sync it from the
 Debian child.
+**`export.sh` differs in one line**: its shebang is `#!/bin/sh` here
+(the Alpine base has no bash; the script body is fully POSIX and runs
+under busybox ash, verified) — the Debian copy keeps
+`#!/usr/bin/env bash`. Re-syncing it from the Debian child must keep the
+shebang flip, or `kubectl exec am-pod -- export.sh -` fails on this
+image line.
 
 ## See Also
 

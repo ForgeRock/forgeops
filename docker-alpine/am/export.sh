@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 # Script to assist in exporting PingAM configuration
 
 cd /home/forgerock/openam
