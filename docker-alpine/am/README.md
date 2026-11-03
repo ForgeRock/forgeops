@@ -18,22 +18,30 @@ does for Debian.
 
 What this directory layers on:
 
+* `jq` via apk (the Debian child installs it via apt): the chart's
+  keystore-create job runs `files/keystore/keystore-create.sh` on the AM
+  image (its `initImage` resolves via `platform.imageRef "am"`), and that
+  script parses `keystore.json` with jq under `set -e` — in forgeops image
+  mode the deployer re-points `platform.imageRepository` at the alpine line
+  and this job follows, so the alpine AM image must carry jq on PATH just
+  like the Debian one
 * the selected `config-profiles/<profile>/` overlay into
   `/home/forgerock/openam/` (the chart's `platform.amHome` is a constant
   `/home/forgerock`; the Alpine pingbase chain sets `PING_HOME=/home/forgerock`
-  too) plus the whole build context — `export.sh` and `import-pem-certs.sh`
-  (the latter is already written to be shared by the Debian and Alpine image
-  lines; the chart mounts it over the image copy per image line)
-* `/home/forgerock/logging/` (the logback drop-in directory the base's
-  `CATALINA_OPTS` points at)
+  too) plus the two helper scripts (`COPY *.sh`) — `export.sh` and
+  `import-pem-certs.sh` (the latter is written to be shared by the Debian and
+  Alpine image lines; the chart mounts its one POSIX tree over the image copy
+  identically for both lines since FORGEOPS-6971)
+* `/home/forgerock/logging/` (the logback drop-in directory the Dockerfile's
+  `CATALINA_OPTS` line points at)
 * the SecurID auth-module workaround (FORGEOPS-6642; remove after the next
   Maj/Min release per the Debian child's comment)
-* `ENV CATALINA_OPTS` re-statement of the logback flag (idempotent append,
-  matching the Debian child)
+* `ENV CATALINA_OPTS` re-statement of the logback flag (an append matching
+  the Debian child; the base does not set the flag itself)
 
-Dropped from the Debian child: the `apt-get install jq` layer — nothing in
-this build context or the chart's AM templates invokes the jq CLI. The
-Alpine base has no Debian apt.
+The Debian child's `apt-get install jq` becomes the apk layer above; its
+`USER root` → `USER 11111` bracket (an apt artifact) is dropped — the runtime
+uid here comes entirely from the base, as in the idm/ig children.
 
 ## The base image reference
 
@@ -65,7 +73,8 @@ directory from scripts, use
 
 `config-profiles/`, `import-pem-certs.sh` and `Dockerfile-custom` here are
 copies of `docker/am`'s. Update both together.
-**`Dockerfile` is NOT a copy**: it drops the jq apt layer and switches
+**`Dockerfile` is NOT a copy**: it installs jq via apk (the Debian line via
+apt), drops the `USER root` → `USER 11111` apt bracket, and switches
 `COPY --chown` to `${PING_USER}:${PING_GID}`. Don't re-sync it from the
 Debian child.
 **`export.sh` differs in one line**: its shebang is `#!/bin/sh` here
@@ -74,6 +83,16 @@ under busybox ash, verified) — the Debian copy keeps
 `#!/usr/bin/env bash`. Re-syncing it from the Debian child must keep the
 shebang flip, or `kubectl exec am-pod -- export.sh -` fails on this
 image line.
+**`.gitignore` adds `/releases/`** over `docker/am`'s (generated release
+files are build-time artifacts, never tracked — see the ig child README).
+
+**`Dockerfile-custom` quirk inherited from the Debian copy**: its
+`COPY --chown=forgerock:root` runs against a `busybox:musl` base that has no
+`forgerock` account, so the chown silently falls back to root (verified
+empirically; the same is true of the Debian line's carrier). Unlike the ig
+child's unreachable copy, `forgeops config build` ACCEPTS `am` as a
+component, so this file is reachable from the CLI on this line — if the
+chown ever matters, fix it on both lines in the same commit.
 
 ## See Also
 

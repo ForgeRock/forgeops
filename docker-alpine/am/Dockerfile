@@ -10,10 +10,17 @@ FROM ${REPO}:${TAG}
 # the two helper scripts, the logging directory, the SecurID auth-module
 # workaround and the logback CATALINA_OPTS re-statement.
 #
-# The Debian child's apt layer (jq) is dropped: nothing in this build context
-# or the chart's AM templates invokes the jq CLI (grep-verified against
-# export.sh/import-pem-certs.sh and charts/identity-platform); if a future
-# script needs it, it returns as an `apk add jq` layer.
+# jq is installed here (apk, was apt on the Debian line): the chart's
+# keystore-create job runs files/keystore/keystore-create.sh on the AM image
+# (keystore-create-job.yaml resolves its initImage via platform.imageRef
+# "am"), and that script parses keystore.json with jq under `set -e` -- in
+# forgeops image mode the deployer re-points platform.imageRepository at the
+# alpine line and this job follows, so the alpine AM image must carry jq on
+# PATH just like the Debian one (verified: no jq on the stand-in base).
+#
+# The Debian child's USER root -> USER 11111 lines went with the apt layer:
+# the runtime uid here comes entirely from the base (as in the idm/ig
+# children; ds restates USER explicitly).
 #
 # The base's PING_USER/PING_GID ENVs are the build-time tell that the pinned
 # TAG is an Alpine pingbase-based build and not the Debian image: against the
@@ -22,6 +29,10 @@ FROM ${REPO}:${TAG}
 # stays hardcoded at /home/forgerock (matching docker/am and the chart's
 # platform.amHome helper, which is a constant); the Alpine pingbase chain
 # sets PING_HOME=/home/forgerock too.
+
+USER 0:0
+RUN apk add --no-cache jq
+USER ${PING_UID}:${PING_GID}
 
 ARG CONFIG_PROFILE=default
 RUN echo "\033[0;36m*** Building '${CONFIG_PROFILE}' profile ***\033[0m"

@@ -21,10 +21,10 @@ set -e
 AM_DEFAULT_TRUSTSTORE=${AM_DEFAULT_TRUSTSTORE:-$JAVA_HOME/lib/security/cacerts}
 # If a $AM_PEM_TRUSTSTORE is provided, import it into the truststore. Otherwise, do nothing
 if [ -f "$AM_DEFAULT_TRUSTSTORE" ] && { [ -f "$AM_PEM_TRUSTSTORE" ] || [ -f "$AM_PEM_TRUSTSTORE_DS" ] || [ -f "$AM_PEM_TRUSTSTORE_EXTRA" ] ; }; then
-    # The alpine pingbase images bake FORGEROCK_HOME=/home/ping; the Debian
-    # images set nothing -> /home/forgerock. The chart sets TRUSTSTORE_PATH
-    # explicitly for the truststore-init container, so this default is a
-    # fallback only.
+    # Both image lines resolve FORGEROCK_HOME to /home/forgerock (the alpine
+    # images bake it; the Debian images set nothing). The chart sets
+    # TRUSTSTORE_PATH explicitly for the truststore-init container, so this
+    # default is a fallback only.
     TRUSTSTORE_PATH="${TRUSTSTORE_PATH:-${FORGEROCK_HOME:-/home/forgerock}/amtruststore}"
     TRUSTSTORE_PASSWORD="${TRUSTSTORE_PASSWORD:-changeit}"
     echo "Copying ${AM_DEFAULT_TRUSTSTORE} to ${TRUSTSTORE_PATH}"
