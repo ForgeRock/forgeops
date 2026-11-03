@@ -10,10 +10,13 @@ FROM ${REPO}:${TAG}
 # debian-buster-sources.list apt pin) is Debian-specific and dropped -- the
 # Alpine base has no Debian apt.
 #
-# The base's PING_USER/PING_UID/PING_GID ENVs are the build-time tell that
+# The base's PING_USER/PING_GID ENVs are the build-time tell that
 # the pinned TAG is an Alpine pingbase-based build and not the Debian image:
 # against the Debian tag the COPY --chown below fails with an unresolved
 # variable (latest on images-base/ig is the Debian build today).
+# ${IG_INSTANCE_DIR} likewise comes from the base (its env contract); an
+# empty expansion makes the COPY a one-argument instruction and the build
+# aborts loudly.
 
 # Copy all config files into the docker image.
 # The default ig directory is /var/gateway (IG_INSTANCE_DIR env var from the

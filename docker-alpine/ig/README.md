@@ -55,7 +55,24 @@ directory from scripts, use
 ## Keeping copies in sync
 
 `config-profiles/` and `Dockerfile-custom` here are copies of `docker/ig`'s.
-Update both together.
+Update both together — with two deliberate exceptions on top of the apt-pin
+drop:
+
+* **`Dockerfile` is NOT a copy** of `docker/ig/Dockerfile`: it drops the
+  buster apt pin and switches `COPY --chown` to `${PING_USER}:${PING_GID}`.
+  Don't re-sync it from the Debian child.
+* **`.gitignore` adds `/releases/`** (generated release files are
+  build-time artifacts, never tracked — nothing under `releases/` is
+  tracked anywhere in this repo; the base pin travels via
+  `--build-arg TAG=`/CI, not a committed file).
+
+`Dockerfile-custom` is a verbatim copy, with one inherited quirk documented
+here because it is unreachable from the CLI on both lines (`forgeops config
+build` accepts only `am` and `idm` as components): its
+`COPY --chown=forgerock:root` runs against a `busybox:musl` base that has no
+`forgerock` account, so the chown silently falls back to root (verified
+empirically — the build succeeds and the files land root-owned; the same is
+true of the Debian line's custom carrier today).
 
 ## See Also
 

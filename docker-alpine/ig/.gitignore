@@ -1,3 +1,8 @@
+# /config/ and /scripts/ are the dirs deployers may add locally (git-ignored
+# upstream too). /releases/ is deliberately ignored here AND on the Debian line:
+# release files are build-time-generated (bin/commands/image write_release_names)
+# and never tracked — the Alpine base pin travels via --build-arg TAG= or CI,
+# not a committed file (nothing under releases/ is tracked anywhere in this repo).
 /config/
 /scripts/
 /releases/
