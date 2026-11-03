@@ -60,11 +60,16 @@ directory from scripts, use
 
 ## Keeping copies in sync
 
-`bin/import-pem-certs.sh`, `config-profiles/default/`, `resolver/boot.properties`
-and `Dockerfile-custom` here are copies of `docker/idm`'s. Update both
-together (the script itself is already written to be shared by the Debian and
-Alpine image lines — it takes the CA bundle path from the environment, and the
-chart sets the Alpine path per image line).
+`bin/import-pem-certs.sh`, `config-profiles/default/`,
+`resolver/boot.properties`, `connectors/` and `Dockerfile-custom` here are
+copies of `docker/idm`'s. Update both together (the script itself is already
+written to be shared by the Debian and Alpine image lines — it takes the CA
+bundle path from the environment, and the chart sets the Alpine path per
+image line). `Dockerfile-custom` cannot be synced independently of
+`connectors/`: its `COPY *connectors/` globs on that directory (empty in git,
+kept by `.gitkeep` — the exported IDM connector jars land there at deploy
+time), so a build of the custom-config carrier fails if the directory is
+absent.
 
 ## See Also
 
