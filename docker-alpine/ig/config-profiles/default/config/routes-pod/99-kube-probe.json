@@ -1,0 +1,29 @@
+{
+   "name": "Kubernetes endpoints",
+   "condition": "${find(request.uri.path, '^/kube')}",
+   "handler": {
+      "type": "DispatchHandler",
+      "config": {
+         "bindings": [
+           {
+             "condition": "${find(request.uri.path, 'liveness$')}",
+             "handler": {
+               "type": "StaticResponseHandler",
+               "config": {
+                 "status": 200
+               }
+             }
+           },
+           {
+             "condition": "${find(request.uri.path, 'readiness$')}",
+             "handler": {
+               "type": "StaticResponseHandler",
+               "config": {
+                 "status": 200
+               }
+             }
+           }
+         ]
+      }
+   }
+}

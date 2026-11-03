@@ -1,0 +1,11 @@
+{
+  "baseURI" : "http://idm:80/",
+  "handler" : {
+    "type" : "ReverseProxyHandler",
+    "config" : {
+      "connections" : 100,
+      "numberOfWorkers" : 20,
+      "soTimeout" : "30 seconds"
+    }
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "heap": [
+    {
+      "_comment": "This NO-OP filter is needed to expose PingGateway API while being in production mode",
+      "name": "MyApiProtectionFilter",
+      "type": "ScriptableFilter",
+      "config": {
+        "type": "application/x-groovy",
+        "source": [
+          "return next.handle(context, request)"
+        ]
+      }
+    }
+  ],
+  "apiProtectionFilter": "MyApiProtectionFilter",
+  "mode": "PRODUCTION"
+}
