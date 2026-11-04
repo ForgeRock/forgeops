@@ -31,18 +31,24 @@ What this directory layers on:
 `amster-scripts/import-upload.amster` is carried in this directory (verbatim
 from `docker/amster`) but NOT copied into the image — the Debian
 Dockerfile doesn't COPY it either, and no chart or script in the repo
-references it (it came from the 7.0 migration as dead weight).
+references it (it came from the 7.0 migration as dead weight). Intent:
+delete it from BOTH lines in a follow-up; it is duplicated here only so
+the directories stay mirror-able until then.
 
 Dropped from the Debian child: the whole apt layer. Of its three packages
 only `wget` is invoked (the scripts' alive checks), and the Alpine pingbase
-base already ships busybox wget, which supports the exact flags the scripts
-use (`--server-response --tries=1`, verified against the pingbase alpine
-chain). `jq` and `openldap-utils` have no consumer in this build context or
+base already ships busybox wget, which handles the flags the scripts use
+(`--server-response` is honoured; `--tries` is accepted-and-ignored — the
+retry is the scripts' own shell loop, not wget's counter), verified against
+the pingbase alpine chain. `jq` and `openldap-utils` have no consumer in this build context or
 the chart's amster templates — the chart's jq consumers
 (`keystore-create.sh`, `ds-set-passwords`) run on the AM and DS images, not
 amster. `DEBIAN_FRONTEND`/`APT_OPTS` were apt-only envs, and the
 `USER root` → `USER forgerock` bracket went with them: the runtime uid here
-comes entirely from the base, as in the idm/ig/am children.
+comes entirely from the base, as in the idm/ig/am children. (The
+`ENV SERVER_URI /am` legacy space-separated form is kept for byte-parity
+with `docker/amster` — BuildKit warns about it; modernizing belongs in a
+cross-line follow-up.)
 
 ## The base image reference
 
@@ -69,6 +75,16 @@ directory instead of `docker/`; everything else — release files
 helm values update — works exactly as for the Debian child. To resolve this
 directory from scripts, use
 `bin/forgeops config path docker-alpine amster [profile]`.
+
+Profile caveat (Debian-line behavior, mirrored here): `amster` is not in
+`bin/commands/build`'s COMPONENTS_FBC list, so `-p/--config-profile` is
+silently ignored for this component — only `default` is baked unless the
+profile is passed explicitly via `BUILD_ARGS="--build-arg
+CONFIG_PROFILE=am-only"` or a release file. (`forgeops build platform`
+expands to `am idm ds amster` and builds this directory the same way; the
+tool's own usage note "building amster images is not supported, use
+bin/amster" refers to that older flow and predates the platform-path
+build loop.)
 
 ## Keeping copies in sync
 
