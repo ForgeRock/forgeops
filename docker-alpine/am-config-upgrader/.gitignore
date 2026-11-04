@@ -1,2 +1,3 @@
-# Local export dirs (git-ignored on the Debian line too).
+# Build-time-generated release files; never tracked (same on the Debian line,
+# which has no .gitignore of its own).
 /releases/

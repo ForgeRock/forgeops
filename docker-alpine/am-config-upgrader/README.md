@@ -14,40 +14,56 @@ The Debian child's entire delta is `chown 11111:11111 /home/forgerock` — the
 Debian base lands its home root-owned.
 
 The Alpine pingbase chain does not have that problem: the base lands
-`/home/forgerock` forgerock-owned (`PING_USER`/`PING_UID`/`PING_GID`,
-verified against the pingbase alpine images — uid 11111, home writable). So
-per the ticket ("verify how the Alpine base lands its ownership and reduce
-the delta accordingly"), **the ForgeOps delta here is empty by design**: the
-directory exists to give the alpine line a build path (`forgeops build -b
-docker-alpine am-config-upgrader`, release files, `set-images`/`config
-path` resolution) and to carry the wrong-pin tell.
+`/home/forgerock` forgerock-owned. Verified against our CI's pingbase-based
+alpine images (`us-docker.pkg.dev/forgeops-public/images/alpine/{am,amster,idm,ig}`:
+`PING_UID=11111` exported as an ENV, `/home/forgerock` owned by uid 11111 and
+writable by it). So per the ticket ("verify how the Alpine base lands its
+ownership and reduce the delta accordingly"), **the ForgeOps delta here is
+empty by design**: the directory exists to give the alpine line a build path
+(`forgeops build -b docker-alpine am-config-upgrader`; release files via
+`forgeops image`, whose COMPONENTS_APPS covers this component; consumed by
+`forgeops upgrade-am-config`) and to carry the wrong-pin tell. Note
+`bin/set-images --products` and `forgeops config path` do NOT list this
+component on the Debian line either — this child mirrors that status quo
+rather than widening the component lists.
 
 ## The wrong-pin tell
 
-The other children fail loudly on a Debian tag at their first
-`COPY --chown=${PING_USER}` (unresolved variable). This Dockerfile has no
-COPY, so the ownership `RUN` stands in: it passes on any Alpine
-pingbase-based base and **fails on the Debian tag** (whose home is
-root-owned until the Debian child's chown). `latest` on
-`images-base/am-config-upgrader` is the Debian build today (verified at the
-time of writing: no Alpine tag published yet) — pin the Alpine tag with
-`--build-arg TAG=<alpine-tag>` or a release file.
+The other children fail loudly on a Debian tag at their first use of the
+base's `PING_*` variables — for most a `COPY --chown=${PING_USER}` with an
+unresolved variable, for the ds and am children a `USER`/`RUN chown` line
+that reaches them even earlier. This Dockerfile has no COPY, so the
+ownership assert in the Dockerfile stands in, hardened against the vacuous
+pass a naive `[ "$(stat ...)" = "${PING_UID}" ]` would produce (both sides
+empty on a base that exports no `PING_UID` and has no home): an unset or
+empty `PING_UID` aborts the build with an explanatory error, a missing
+`/home/forgerock` fails the `stat`, and only a base that exports `PING_UID`
+AND lands the home owned by that same uid passes. The assert is
+base-relative — whatever uid the platform's Alpine base bakes, home and
+`PING_UID` must agree. `latest` on `images-base/am-config-upgrader` is the
+Debian build today (verified at the time of writing: no Alpine tag
+published yet) — pin the Alpine tag with `--build-arg TAG=<alpine-tag>` or a
+release file.
 
 ## Build
 
     bin/forgeops build -b docker-alpine -e <env> --push-to <registry> am-config-upgrader
 
-`-b` points the build (and `forgeops image`, for release files) at this
-directory instead of `docker/`; everything else — release files, the
-image-defaulter update, the helm values update — works exactly as for the
-Debian child. To resolve this directory from scripts, use
-`bin/forgeops config path docker-alpine am-config-upgrader`.
+`-b` (a `forgeops build`/`forgeops image` flag) points the build — and
+release-file generation — at this directory instead of `docker/`. Unlike the
+ds/am/idm/ig/amster children, `forgeops config path` cannot resolve this
+directory: `am-config-upgrader` is absent from its component choices on the
+Debian line too (pre-existing; same for `set-images --products`).
 
 ## Keeping copies in sync
 
 Nothing to sync: this directory carries no copies of `docker/am-config-upgrader`'s
 files — the Debian child has only its Dockerfile, whose entire delta (the
-chown) is deliberately not reproduced here (see above).
+chown) is deliberately not reproduced here (see above). The `.gitignore`
+(the only file besides the Dockerfile and this README) ignores
+`/releases/`: build-time-generated release files (`bin/commands/image` and
+`bin/commands/upgrade-am-config` write under it), never tracked — the
+Debian directory has no `.gitignore` of its own.
 
 ## See Also
 
