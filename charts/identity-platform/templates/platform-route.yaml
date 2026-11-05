@@ -1,0 +1,257 @@
+{{- if .Values.platform.route.enabled }}
+{{/* OpenShift Routes (FC2e, opt-in via platform.route.enabled). Renders the
+     Route set live-tested on OpenShift 4.22.14 (2026-11-04/05): AM edge + the
+     IDM/UI path set, all hostnames equal to platform.ingress.hosts[0].
+
+     Three constraints this template encodes, all live-proven:
+
+     1. EDGE-ONLY termination for AM. AM's 8081 port (the "https" container
+        port) is PLAIN HTTP behind Tomcat's TLS-offload connector
+        (SSLEnabled=false): it does NOT terminate TLS. passthrough Routes
+        fail the handshake (nothing at the pod terminates TLS) and reencrypt
+        Routes 503 (the backend speaks plaintext to a TLS expectation).
+        Edge termination (TLS at the router) is the only working mode. The
+        platform.route.am.termination value exists so a future AM
+        TLS-enabled image can opt into reencrypt without editing this file;
+        the default "edge" is the tested mode.
+
+     2. The route hostname MUST equal platform.ingress.hosts[0] (the chart
+        FQDN, rendered into the platform-config ConfigMap's FQDN key). AM
+        FQDN-validates OAuth2 requests: a discovery request arriving under
+        any other hostname returns 400 "FQDN ... is not valid" — make the
+        Route match the chart's FQDN (a DNS alias), never the reverse.
+        UI callback/cookie domains follow the same FQDN.
+
+     3. ONE HOST, PATH-SPLIT: OpenShift grants the first Route claiming a
+        host an exclusive claim; a second Route for the SAME host with no
+        path renders HostAlreadyClaimed and never routes. The AM Route
+        claims the whole host (it owns /am, /am/XUI); IDM and the UIs route
+        by PATH (/openidm, /upload, /export, /admin, /api, /openicf,
+        /enduser, /platform) exactly as the Ingress templates above split
+        them. The AM Route therefore carries no path (whole-host claim) and
+        every other Route carries the path list from the corresponding
+        Ingress.
+
+     Certificates: with platform.route.tls.certManager true (default), the
+     Routes carry no explicit cert and the router's default certificate
+     serves TLS (or cert-manager wiring the deployer adds). To pin an
+     explicit certificate, set certManager false and reference a
+     kubernetes.io/tls Secret by name (platform.route.tls.secretName); the
+     router reads key/cert from that Secret — the Route itself stays
+     cert-free, matching `oc create route edge --cert/--key` behavior which
+     wraps the material in a Secret. */}}
+{{- $fqdn := first .Values.platform.ingress.hosts }}
+{{- $term := .Values.platform.route.am.termination | default "edge" }}
+{{- if .Values.platform.route.am.enabled | default true }}
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: {{ .Values.platform.route.am.name | default "am" }}
+  labels:
+    {{- include "identity-platform.labels" . | nindent 4 }}
+spec:
+  host: {{ $fqdn | quote }}
+  tls:
+    termination: {{ $term }}
+    insecureEdgeTerminationPolicy: {{ .Values.platform.route.tls.insecurePolicy | default "None" }}
+  to:
+    kind: Service
+    name: am
+    weight: 100
+  port:
+    {{- if .Values.am.service.httpsPort }}
+    targetPort: https
+    {{- else }}
+    targetPort: http
+    {{- end }}
+  wildcardPolicy: None
+---
+{{- end }}
+{{- if and .Values.idm.enabled (.Values.platform.route.idm.enabled | default true) }}
+{{/* IDM + idm-admin-ui paths, mirroring templates/idm-ingress.yaml. IDM
+     serves plain HTTP on 8080; edge termination keeps TLS at the router. */}}
+{{- $adminUiSvcPort := .Values.idm_admin_ui.service.port }}
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: {{ .Values.platform.route.idm.name | default "idm" }}
+  labels:
+    {{- include "identity-platform.labels" . | nindent 4 }}
+spec:
+  host: {{ $fqdn | quote }}
+  path: /openidm
+  tls:
+    termination: edge
+  to:
+    kind: Service
+    name: idm
+    weight: 100
+  port:
+    targetPort: http
+  wildcardPolicy: None
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: {{ .Values.platform.route.idm.name | default "idm" }}-upload
+  labels:
+    {{- include "identity-platform.labels" . | nindent 4 }}
+spec:
+  host: {{ $fqdn | quote }}
+  path: /upload
+  tls:
+    termination: edge
+  to:
+    kind: Service
+    name: idm
+    weight: 100
+  port:
+    targetPort: http
+  wildcardPolicy: None
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: {{ .Values.platform.route.idm.name | default "idm" }}-export
+  labels:
+    {{- include "identity-platform.labels" . | nindent 4 }}
+spec:
+  host: {{ $fqdn | quote }}
+  path: /export
+  tls:
+    termination: edge
+  to:
+    kind: Service
+    name: idm
+    weight: 100
+  port:
+    targetPort: http
+  wildcardPolicy: None
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: {{ .Values.platform.route.idm.name | default "idm" }}-admin
+  labels:
+    {{- include "identity-platform.labels" . | nindent 4 }}
+spec:
+  host: {{ $fqdn | quote }}
+  path: /admin
+  tls:
+    termination: edge
+  to:
+    kind: Service
+    {{- if .Values.idm_admin_ui.enabled }}
+    name: idm-admin-ui
+    {{- else }}
+    name: idm
+    {{- end }}
+    weight: 100
+  port:
+    targetPort: {{ if .Values.idm_admin_ui.enabled }}http{{ else }}http{{ end }}
+  wildcardPolicy: None
+---
+{{- if .Values.idm_admin_ui.enabled }}
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: {{ .Values.platform.route.idm.name | default "idm" }}-api
+  labels:
+    {{- include "identity-platform.labels" . | nindent 4 }}
+spec:
+  host: {{ $fqdn | quote }}
+  path: /api
+  tls:
+    termination: edge
+  to:
+    kind: Service
+    name: idm-admin-ui
+    weight: 100
+  port:
+    targetPort: http
+  wildcardPolicy: None
+---
+{{- end }}
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: {{ .Values.platform.route.idm.name | default "idm" }}-openicf
+  labels:
+    {{- include "identity-platform.labels" . | nindent 4 }}
+spec:
+  host: {{ $fqdn | quote }}
+  path: /openicf
+  tls:
+    termination: edge
+  to:
+    kind: Service
+    name: idm
+    weight: 100
+  port:
+    targetPort: http
+  wildcardPolicy: None
+---
+{{- end }}
+{{- if and .Values.login_ui.enabled (.Values.platform.route.loginUi.enabled | default true) }}
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: login-ui
+  labels:
+    {{- include "identity-platform.labels" . | nindent 4 }}
+spec:
+  host: {{ $fqdn | quote }}
+  path: /am/XUI
+  tls:
+    termination: edge
+  to:
+    kind: Service
+    name: login-ui
+    weight: 100
+  port:
+    targetPort: http
+  wildcardPolicy: None
+---
+{{- end }}
+{{- if and .Values.enduser_ui.enabled (.Values.platform.route.endUserUi.enabled | default true) }}
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: end-user-ui
+  labels:
+    {{- include "identity-platform.labels" . | nindent 4 }}
+spec:
+  host: {{ $fqdn | quote }}
+  path: /enduser
+  tls:
+    termination: edge
+  to:
+    kind: Service
+    name: end-user-ui
+    weight: 100
+  port:
+    targetPort: http
+  wildcardPolicy: None
+---
+{{- end }}
+{{- if and .Values.admin_ui.enabled (.Values.platform.route.adminUi.enabled | default true) }}
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: admin-ui
+  labels:
+    {{- include "identity-platform.labels" . | nindent 4 }}
+spec:
+  host: {{ $fqdn | quote }}
+  path: /platform
+  tls:
+    termination: edge
+  to:
+    kind: Service
+    name: admin-ui
+    weight: 100
+  port:
+    targetPort: http
+  wildcardPolicy: None
+{{- end }}
+{{- end }}

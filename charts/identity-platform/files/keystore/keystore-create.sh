@@ -6,7 +6,13 @@
 
 set -e
 
-[ -z "$KEYSTORE_CONF_DIR" ] && KEYSTORE_CONF_DIR=/home/forgerock
+# FORGEOPS-6975 neutral-mount pattern: the job template mounts this script at
+# /keystore-create/ and its config at /keystore-conf/ — OUTSIDE the image's
+# private home (a subPath parent inside /home/forgerock is pre-created by the
+# kubelet as root:root 0755 and an injected non-home UID cannot exec through
+# it; live-reproduced on OpenShift 4.22.14). The defaults follow those mounts
+# and stay overridable for any caller that still stages under the home dir.
+[ -z "$KEYSTORE_CONF_DIR" ] && KEYSTORE_CONF_DIR=/keystore-conf
 [ -z "$KEYSTORE_CONF" ] && KEYSTORE_CONF=$KEYSTORE_CONF_DIR/keystore.json
 [ -z "$KEYSTORE_TYPE" ] && KEYSTORE_TYPE=$(jq -r .storeType $KEYSTORE_CONF)
 [ -z "$KEYSTORE_DIR" ] && KEYSTORE_DIR=/keystore

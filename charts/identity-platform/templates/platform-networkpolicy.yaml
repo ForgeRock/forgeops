@@ -1,0 +1,106 @@
+{{- if .Values.platform.networkPolicy.enabled }}
+{{/* NetworkPolicy templates (FC2e, opt-in via platform.networkPolicy.enabled):
+     the four policies live-tested on OpenShift 4.22.14 (2026-11-04/05) under
+     a default-deny posture, with the full user journey re-passing while they
+     were applied. The chart ships zero NetworkPolicy templates today, so a
+     bank-default deny-all kills the platform in three distinct ways: AM loses
+     its CTS connection to DS within seconds, DNS resolution stops (breaking
+     every intra-platform service lookup), and jobs with kubectl sidecars hang
+     indefinitely on Kubernetes API calls.
+
+     The policies below are written to COEXIST with a default-deny-all
+     policy in the same namespace — that exact combination is what was
+     tested. They are additive allow rules; they never deny anything.
+
+     Policy notes (each maps to one tested failure):
+     - allow-same-namespace: AM<->DS (CTS + config + user stores), IDM<->DS,
+       UIs<->AM/IDM, and job-to-platform traffic.
+     - allow-dns: egress to the openshift-dns namespace on 5353 UDP/TCP.
+       All service lookups (ds-idrepo-0.ds-idrepo etc.).
+     - allow-from-router: ingress from the openshift-ingress namespace —
+       Route traffic reaching the pods.
+     - allow-kubeapi-egress: egress to the default namespace on 443, where
+       the OpenShift API service lives. keystore-create and amster run
+       kubectl against the API server; without this they hang on
+       `kubectl get secret` (live-proven: keystore-create-2 hung until this
+       was added, 2026-11-05).
+
+     Application timing: the tested sequence applied these with the platform
+     already running; applying them BEFORE the first install is recommended
+     (jobs that hang on a blocked API path burn their backoff budget) but
+     was not separately tested. Either order works with the allowlist
+     present.
+
+     platform.networkPolicy.allowKubeApi defaults to true because the
+     chart's own jobs need it; it can be disabled for clusters whose API
+     egress is handled by a platform-level policy. */}}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ .Values.platform.networkPolicy.namePrefix | default "identity-platform" }}-allow-same-namespace
+  labels:
+    {{- include "identity-platform.labels" . | nindent 4 }}
+spec:
+  podSelector: {}
+  ingress:
+    - from:
+        - podSelector: {}
+  egress:
+    - to:
+        - podSelector: {}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ .Values.platform.networkPolicy.namePrefix | default "identity-platform" }}-allow-dns
+  labels:
+    {{- include "identity-platform.labels" . | nindent 4 }}
+spec:
+  podSelector: {}
+  policyTypes: ["Egress"]
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: openshift-dns
+      ports:
+        - protocol: UDP
+          port: 5353
+        - protocol: TCP
+          port: 5353
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ .Values.platform.networkPolicy.namePrefix | default "identity-platform" }}-allow-from-router
+  labels:
+    {{- include "identity-platform.labels" . | nindent 4 }}
+spec:
+  podSelector: {}
+  policyTypes: ["Ingress"]
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: openshift-ingress
+---
+{{- if .Values.platform.networkPolicy.allowKubeApi | default true }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ .Values.platform.networkPolicy.namePrefix | default "identity-platform" }}-allow-kubeapi-egress
+  labels:
+    {{- include "identity-platform.labels" . | nindent 4 }}
+spec:
+  podSelector: {}
+  policyTypes: ["Egress"]
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: default
+      ports:
+        - protocol: TCP
+          port: 443
+{{- end }}
+{{- end }}

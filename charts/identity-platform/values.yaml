@@ -115,6 +115,59 @@ platform:
       #    crt: # base64 encoded string (Ex: base64 -w 0 <domain-file>.pem)
       #    key: # base64 encoded string (Ex: base64 -w 0 <domain-file>.key)
 
+  # OpenShift Routes (FC2e, opt-in). On OpenShift, expose the platform via
+  # native Routes instead of (or alongside) Ingress objects. All Route
+  # hostnames are platform.ingress.hosts[0] — AM FQDN-validates OAuth2
+  # requests, so a Route under any other hostname returns 400 "FQDN ...
+  # is not valid" (make the Route match the chart FQDN, never the reverse).
+  # AM's Route is EDGE termination by design: AM's 8081 ("https" container
+  # port) is plain HTTP behind Tomcat's TLS-offload connector, so
+  # passthrough fails the handshake and reencrypt 503s (tested on OpenShift
+  # 4.22.14, 2026-11-04). Edge puts TLS at the router; pair with the AM
+  # service httpsPort (below) so the Route's targetPort resolves.
+  route:
+    enabled: false
+    am:
+      enabled: true
+      name: "am"
+      # edge is the only tested working mode for AM (plain-HTTP 8081);
+      # reencrypt requires an AM TLS-enabled image (out of chart scope).
+      termination: "edge"
+    idm:
+      enabled: true
+      name: "idm"
+    # UI path routes (each claims a PATH under the same chart FQDN; OpenShift
+    # grants the first whole-host claim to the AM Route).
+    loginUi:
+      enabled: true
+    endUserUi:
+      enabled: true
+    adminUi:
+      enabled: true
+    tls:
+      # true: Route uses the router's default certificate (or cert-manager
+      # wiring the deployer adds). false: set secretName + key/cert values
+      # to pin an explicit certificate Secret's material inline.
+      certManager: true
+      secretName: # "identity-platform-route-tls"
+      # insecurePolicy: "Allow" would enable HTTP redirect; default None
+      insecurePolicy: "None"
+
+  # NetworkPolicy templates (FC2e, opt-in): the four policies live-tested
+  # under a default-deny posture with the full user journey re-passing
+  # (OpenShift 4.22.14, 2026-11-04/05). The chart ships none by default;
+  # a default-deny namespace kills the platform (AM loses CTS, DNS dies,
+  # kubectl-sidecar jobs hang on API calls) — these four are the tested
+  # minimal allowlist, written to coexist with a default-deny-all policy.
+  # allowKubeApi covers the chart's own kubectl-sidecar jobs
+  # (keystore-create, amster); disable only if a platform-level policy
+  # already grants API egress.
+  networkPolicy:
+    enabled: false
+    namePrefix: "identity-platform"
+    allowKubeApi: true
+
+
   service:
     annotations:
       traefik.ingress.kubernetes.io/service.sticky.cookie: "true"
@@ -356,6 +409,17 @@ am:
   service:
     type: ClusterIP
     port: 80
+    # OpenShift Route resolution (FC2d): when set, the am Service renders a
+    # SECOND port literally NAMED "https" (targeting AM's 8081) so OpenShift
+    # Routes resolve their targetPort against a matching service port name.
+    # Without it, the router finds no port named "https" (the service port is
+    # named "http"), the haproxy backend renders empty, and every AM Route
+    # 503s in every termination mode (live-proven on OpenShift 4.22.14:
+    # adding the named port converted the Route 503 -> 200). Default unset:
+    # the Service renders exactly as before — zero change on non-OpenShift
+    # (GKE resolves by port NUMBER) and for existing consumers of port
+    # name http. Pair with platform.route.enabled for native Routes.
+    httpsPort: # 81
 
   prometheus:
     servicemonitor:
