@@ -41,6 +41,9 @@
      cert-free, matching `oc create route edge --cert/--key` behavior which
      wraps the material in a Secret. */}}
 {{- $fqdn := first .Values.platform.ingress.hosts }}
+{{- if not $fqdn }}
+{{- fail (printf "platform.route.enabled is true but platform.ingress.hosts is empty - the Route hostnames come from hosts[0] (the chart FQDN; AM FQDN-validates OAuth2 requests against it). Set platform.ingress.hosts[0] even with ingress disabled.") }}
+{{- end }}
 {{- $term := .Values.platform.route.am.termination | default "edge" }}
 {{- if .Values.platform.route.am.enabled | default true }}
 apiVersion: route.openshift.io/v1
