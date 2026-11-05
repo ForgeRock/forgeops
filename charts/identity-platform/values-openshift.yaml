@@ -137,6 +137,14 @@ ds_set_passwords:
   podSecurityContext: null
   securityContext: null
 
+# Route targetPort resolution (FC2d): the second Service port literally NAMED
+# "https" is what the chart-rendered AM Route resolves against. Without it the
+# Route falls back to the "http" port (still functional chart-side, but the
+# live-proven 503 root cause and fix pair is Route + this named port).
+am:
+  service:
+    httpsPort: 81
+
 # The chart's optional ssh-keygen job (off by default): keep off; the guide's
 # Step 4 creates the amster keypair locally with the PEM rule and pushes it
 # as a Secret.

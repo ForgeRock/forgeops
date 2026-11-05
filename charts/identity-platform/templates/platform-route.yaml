@@ -45,7 +45,24 @@
 {{- fail (printf "platform.route.enabled is true but platform.ingress.hosts is empty - the Route hostnames come from hosts[0] (the chart FQDN; AM FQDN-validates OAuth2 requests against it). Set platform.ingress.hosts[0] even with ingress disabled.") }}
 {{- end }}
 {{- $term := .Values.platform.route.am.termination | default "edge" }}
-{{- if .Values.platform.route.am.enabled | default true }}
+{{- $insecure := .Values.platform.route.tls.insecurePolicy | default "None" }}
+{{- /* The OpenShift Route API rejects passthrough + insecureEdgeTerminationPolicy:
+     Allow outright ("cannot have both spec.tls.termination: passthrough and
+     spec.tls.insecureEdgeTerminationPolicy: Allow"; None and Redirect are
+     compatible - openshift/api route validation). Fail at render rather than
+     letting the API reject the object at apply time. */}}
+{{- if and (eq $term "passthrough") (eq $insecure "Allow") }}
+{{- fail "platform.route.am.termination: passthrough cannot combine with platform.route.tls.insecurePolicy: Allow (the OpenShift Route API rejects it). Use insecurePolicy None or Redirect, or drop passthrough - note AM's 8081 is plain HTTP so passthrough cannot serve AM anyway (see template header)." }}
+{{- end }}
+{{- /* Per-toggle opt-outs use `ne ... false` NOT `| default true`: sprig's
+     default treats boolean false as empty, so `false | default true` is
+     true and an explicit opt-out would silently render the object anyway
+     (found in QA 2026-11-05). `ne X false` keeps default-on (nil/false
+     distinction: nil = unset = on, false = explicit off). */}}
+{{- /* The AM Route requires the am Service: when the component is disabled
+     the Route would dangle (a Route to a non-existent Service). Gating the
+     Route on the component makes the component-level disable coherent. */}}
+{{- if and .Values.am.enabled (ne (.Values.platform.route.am.enabled | toString) "false") }}
 apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
@@ -70,10 +87,9 @@ spec:
   wildcardPolicy: None
 ---
 {{- end }}
-{{- if and .Values.idm.enabled (.Values.platform.route.idm.enabled | default true) }}
+{{- if and .Values.idm.enabled (ne (.Values.platform.route.idm.enabled | toString) "false") }}
 {{/* IDM + idm-admin-ui paths, mirroring templates/idm-ingress.yaml. IDM
      serves plain HTTP on 8080; edge termination keeps TLS at the router. */}}
-{{- $adminUiSvcPort := .Values.idm_admin_ui.service.port }}
 apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
@@ -151,7 +167,7 @@ spec:
     {{- end }}
     weight: 100
   port:
-    targetPort: {{ if .Values.idm_admin_ui.enabled }}http{{ else }}http{{ end }}
+    targetPort: http
   wildcardPolicy: None
 ---
 {{- if .Values.idm_admin_ui.enabled }}
@@ -195,7 +211,7 @@ spec:
   wildcardPolicy: None
 ---
 {{- end }}
-{{- if and .Values.login_ui.enabled (.Values.platform.route.loginUi.enabled | default true) }}
+{{- if and .Values.login_ui.enabled (ne (.Values.platform.route.loginUi.enabled | toString) "false") }}
 apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
@@ -216,7 +232,7 @@ spec:
   wildcardPolicy: None
 ---
 {{- end }}
-{{- if and .Values.enduser_ui.enabled (.Values.platform.route.endUserUi.enabled | default true) }}
+{{- if and .Values.enduser_ui.enabled (ne (.Values.platform.route.endUserUi.enabled | toString) "false") }}
 apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
@@ -237,7 +253,7 @@ spec:
   wildcardPolicy: None
 ---
 {{- end }}
-{{- if and .Values.admin_ui.enabled (.Values.platform.route.adminUi.enabled | default true) }}
+{{- if and .Values.admin_ui.enabled (ne (.Values.platform.route.adminUi.enabled | toString) "false") }}
 apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
