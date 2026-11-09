@@ -1,4 +1,25 @@
 {{- if .Values.am.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: am
+  annotations:
+    {{- with .Values.platform.service.annotations }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+  labels:
+    {{- include "identity-platform.labels" . | nindent 4 }}
+    {{- with .Values.am.podLabels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  type: {{ .Values.am.service.type }}
+  ports:
+    - port: {{ .Values.am.service.port }}
+      targetPort: https
+      protocol: TCP
+      name: http
+{{- if .Values.am.service.httpsPort }}
 {{/* OpenShift Route port-name resolution (FC2d): the OpenShift router
      resolves a Route's targetPort against the SERVICE PORT NAME, not the
      container port. This chart names the service port "http" while targeting
@@ -7,67 +28,21 @@
      the name "https", finds no service port by that name, and renders an
      empty haproxy backend: 503 on every AM Route, all termination modes
      (live-proven 2026-11-04 on OpenShift 4.22.14: adding a port literally
-     NAMED https converted the Route from 503 to 200). am.service.httpsPort,
-     when set, adds that second port named "https" so Routes resolve natively.
-     Default (unset): the service renders exactly as before — zero change for
+     NAMED https converted the Route from 503 to 200). This conditional adds
+     one port entry named "https" to THIS Service so Routes resolve natively
+     — not a second Service resource (review 2026-11-09). Default (unset):
+     the ports list renders exactly as before — zero change for
      non-OpenShift deployers and for existing Scripts that reference port
      name http. GKE Ingress is unaffected either way: it resolves by port
      NUMBER on the Service. */}}
-{{- if .Values.am.service.httpsPort }}
-apiVersion: v1
-kind: Service
-metadata:
-  name: am
-  annotations:
-    {{- with .Values.platform.service.annotations }}
-      {{- toYaml . | nindent 4 }}
-    {{- end }}
-  labels:
-    {{- include "identity-platform.labels" . | nindent 4 }}
-    {{- with .Values.am.podLabels }}
-      {{- toYaml . | nindent 4 }}
-    {{- end }}
-spec:
-  type: {{ .Values.am.service.type }}
-  ports:
-    - port: {{ .Values.am.service.port }}
-      targetPort: https
-      protocol: TCP
-      name: http
     - port: {{ .Values.am.service.httpsPort }}
       targetPort: https
       protocol: TCP
       name: https
-  selector:
-    {{- include "identity-platform.selectorLabels" . | nindent 4 }}
-    {{- with .Values.am.podLabels }}
-      {{- toYaml . | nindent 4 }}
-    {{- end }}
-{{- else }}
-apiVersion: v1
-kind: Service
-metadata:
-  name: am
-  annotations:
-    {{- with .Values.platform.service.annotations }}
-      {{- toYaml . | nindent 4 }}
-    {{- end }}
-  labels:
-    {{- include "identity-platform.labels" . | nindent 4 }}
-    {{- with .Values.am.podLabels }}
-      {{- toYaml . | nindent 4 }}
-    {{- end }}
-spec:
-  type: {{ .Values.am.service.type }}
-  ports:
-    - port: {{ .Values.am.service.port }}
-      targetPort: https
-      protocol: TCP
-      name: http
-  selector:
-    {{- include "identity-platform.selectorLabels" . | nindent 4 }}
-    {{- with .Values.am.podLabels }}
-      {{- toYaml . | nindent 4 }}
-    {{- end }}
 {{- end }}
+  selector:
+    {{- include "identity-platform.selectorLabels" . | nindent 4 }}
+    {{- with .Values.am.podLabels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
 {{- end }}

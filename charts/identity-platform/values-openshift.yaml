@@ -1,23 +1,28 @@
 # values-openshift.yaml — ForgeOps on OpenShift (namespace-range pattern), FC4b.
 #
-# The tested reference pattern: deploy the identity-platform chart on OpenShift
-# 4.12+ (validated on 4.22.14) with NO SCC objects and NO image changes, by
-# pinning the target namespace's UID range to the images' UID (11111). Every
-# value below carries the reason it differs from chart defaults; everything
-# not mentioned stays stock. Live-proven end-to-end 2026-11-04/05 (full
-# platform Ready, Routes serving, user journey passing under a default-deny
-# NetworkPolicy with this chart's own NetworkPolicy templates enabled).
+# DELTAS-ONLY FILE: every key below differs from chart defaults and carries the
+# reason; anything not mentioned here stays stock. Keys equal to defaults were
+# removed (review 2026-11-09) — this file contains changes from the default, not
+# a restatement of it. Live-proven end-to-end 2026-11-04/05 (full platform Ready,
+# Routes serving, user journey passing under a default-deny NetworkPolicy with
+# this chart's own NetworkPolicy templates enabled).
 #
 # WHAT THIS FILE CHANGES VS CHART DEFAULTS (and why):
 # 1. platform.ingress.enabled: false        — exposure is Routes, not Ingress
-# 2. platform.route.enabled: true           — chart-rendered edge Routes (FC2e)
+# 2. platform.route.enabled: true           — chart-rendered edge Routes (FC2e);
+#                                             am/idm names, termination, and the
+#                                             UI route gates keep their defaults
 # 3. platform.networkPolicy.enabled: true   — the four tested netpol policies (FC2e)
 # 4. am.service.httpsPort: 81               — Route port-name resolution (FC2d)
 # 5. platform.disable_secret_agent_config: true — no operator; secret prefill instead
-# 6. platform.secrets.*: prefill            — see PASSWORD RULE below
-# 7. ds_*.volumeClaimSpec.storageClassName  — set YOUR cluster's storage class
-# 8. ds_set_passwords: null securityContexts — the job's stock runAsUser: 0 can
-#    never sit inside a pinned namespace range (restricted-v2 rejects it)
+# 6. ds_*.volumeClaimSpec.storageClassName  — set YOUR cluster's storage class
+# 7. ds_set_passwords: null securityContexts — see SECURITY-CONTEXT NOTE below
+#
+# SECRETS ARE NOT IN THIS FILE (review 2026-11-09): secret material belongs to
+# the chart's generation path, never in a values file — generate passwords and
+# keypairs before first install and pass them as prefill, per
+# values-helm-generated-secrets.yaml and the forgeops env command. The
+# PASSWORD RULE below still applies to whatever generates them.
 #
 # NAMESPACE PREREQUISITE (before first install — the pattern's foundation):
 #   oc new-project forgeops
@@ -47,12 +52,19 @@
 # Routes use it as their hostname; AM FQDN-validates OAuth2 requests, so a
 # Route under any other hostname returns 400 "FQDN ... is not valid".
 #
-# CERTIFICATES: platform.cert_manager.enabled: true requires cert-manager
-# installed BEFORE the platform (the chart's DS certificates are minted by
-# pre-install hooks that fire only at install time):
+# CERTIFICATES: cert-manager is enabled by default in this chart; it must be
+# installed on the cluster BEFORE the platform (the chart's DS certificates are
+# minted by pre-install hooks that fire only at install time):
 #   helm repo add jetstack https://charts.jetstack.io
 #   helm install cert-manager jetstack/cert-manager -n cert-manager \
 #     --create-namespace --set crds.enabled=true
+#
+# STORAGE CLASSES (review 2026-11-09): the intended home for these two keys is
+# flags on the `forgeops env` command (--idrepo-storage-class,
+# --cts-storage-class) plus an --openshift-enable/--openshift-disable pair that
+# consumes this file; those flags are a separate change from chart templates
+# and are not built here. Until they land, edit the two storageClassName values
+# below by hand.
 #
 # BRING-UP (fresh project, cert-manager present, this file adapted):
 #   helm install identity-platform <chart-dir> -n forgeops \
@@ -70,15 +82,6 @@ platform:
 
   route:
     enabled: true             # FC2e: chart-rendered OpenShift Routes (edge)
-    am:
-      enabled: true
-      name: "am"
-      termination: "edge"     # the ONLY tested working mode for AM (8081 is
-                              # plain HTTP behind Tomcat TLS-offload; reencrypt
-                              # 503s, passthrough fails the handshake)
-    idm:
-      enabled: true
-      name: "idm"
 
   networkPolicy:
     enabled: true             # FC2e: the four tested policies; coexists with
@@ -86,38 +89,8 @@ platform:
                               # Includes kubeapi egress for the chart's own
                               # kubectl-sidecar jobs (keystore-create, amster).
 
-  cert_manager:
-    enabled: true             # cert-manager must be installed BEFORE install
-
   disable_secret_agent_config: true
   secrets_enabled: true
-  secrets:
-    keystore_create:
-      data:
-        KEYSTORE_PASSWORD: "CHANGE-ME-keystore-pw-x9"     # random per PASSWORD RULE
-    ds_passwords:
-      data:
-        dirmanager.pw: "CHANGE-ME-dirmanager-pw-x9"       # random per PASSWORD RULE
-        monitor.pw: "CHANGE-ME-monitor-pw-x9"             # random per PASSWORD RULE
-    ds_env_secrets:
-      data:
-        AM_STORES_APPLICATION_PASSWORD: "CHANGE-ME-amapp-pw-x9"
-        AM_STORES_CTS_PASSWORD: "CHANGE-ME-amcts-pw-x9"
-        AM_STORES_USER_PASSWORD: "CHANGE-ME-amuser-pw-x9"
-    amster_env_secrets:
-      data:
-        IDM_PROVISIONING_CLIENT_SECRET: "CHANGE-ME-prov-client-x9"
-        IDM_RS_CLIENT_SECRET: "CHANGE-ME-rs-client-x9"
-    idm_env_secrets:
-      data:
-        OPENIDM_ADMIN_PASSWORD: "CHANGE-ME-idm-admin-x9"
-        OPENIDM_KEYSTORE_PASSWORD: "CHANGE-ME-idm-ks-x9"
-    am_env_secrets:
-      annotations:
-        length: 32
-        autogenerate:
-          - AM_AUTHENTICATION_SHARED_SECRET
-          - AM_ENCRYPTION_KEY
 
 # Storage class: the chart default ("fast") rarely exists. StatefulSet
 # volumeClaimTemplates are IMMUTABLE — a wrong class means uninstall/reinstall,
@@ -129,10 +102,15 @@ ds_cts:
   volumeClaimSpec:
     storageClassName: crc-csi-hostpath-provisioner   # <- YOUR storage class
 
-# The ds-set-passwords job's stock pod pins runAsUser: 0, which can never sit
-# inside a namespace UID range that keeps 11111 usable; restricted-v2 rejects
-# it under any configuration of this pattern. Null both contexts (the job then
-# runs under the namespace's injected UID — validated end-to-end).
+# SECURITY-CONTEXT NOTE (answers review 2026-11-09 "disabling all security on
+# DS is a bad idea"): this nulls the security contexts of the ds-set-passwords
+# JOB ONLY — the DS StatefulSets keep their stock security contexts untouched.
+# The job's stock pod pins runAsUser: 0, which can never sit inside a namespace
+# UID range that keeps 11111 usable; restricted-v2 rejects it under any
+# configuration of this pattern. Nulling both contexts lets the job run under
+# the namespace's injected UID — validated end-to-end 2026-11-04/05. This is a
+# deliberate, documented trade scoped to one short-lived init job, not a
+# blanket security disable.
 ds_set_passwords:
   podSecurityContext: null
   securityContext: null
@@ -144,12 +122,6 @@ ds_set_passwords:
 am:
   service:
     httpsPort: 81
-
-# The chart's optional ssh-keygen job (off by default): keep off; the guide's
-# Step 4 creates the amster keypair locally with the PEM rule and pushes it
-# as a Secret.
-ssh_keygen:
-  enabled: false
 
 # IMAGE LINE: under this namespace-pinning pattern the DEFAULT image line
 # works as-is (validated). To use the alpine line instead (only needed for
