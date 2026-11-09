@@ -21,7 +21,7 @@
 # SECRETS ARE NOT IN THIS FILE: secret material belongs to
 # the chart's generation path, never in a values file — generate passwords and
 # keypairs before first install and pass them as prefill, per
-# values-helm-generated-secrets.yaml and the forgeops env command. The
+# values-helm-generate-secrets.yaml and the forgeops env command. The
 # PASSWORD RULE below still applies to whatever generates them.
 #
 # NAMESPACE PREREQUISITE (before first install — the pattern's foundation):
@@ -69,7 +69,10 @@
 #
 # BRING-UP (fresh project, cert-manager present, this file adapted):
 #   helm install identity-platform <chart-dir> -n forgeops \
-#     -f values-openshift.yaml --timeout 15m
+#     -f values-openshift.yaml -f values-helm-generate-secrets.yaml --timeout 15m
+# (the second -f is REQUIRED: this file carries no secret material, so without
+# the generated-secrets file the workloads reference Secrets nothing creates
+# and pods sit in CreateContainerConfigError)
 # Expected: ~8-15 min to all-Ready. If helm reports an amster hook timeout,
 # the resources ARE installed — let workloads converge, then re-run
 # `helm upgrade` with the same values to settle release state. Do NOT
