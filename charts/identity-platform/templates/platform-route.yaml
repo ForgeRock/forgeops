@@ -46,6 +46,20 @@
 {{- end }}
 {{- $term := .Values.platform.route.am.termination | default "edge" }}
 {{- $insecure := .Values.platform.route.tls.insecurePolicy | default "None" }}
+{{- /* Toggle normalization (one place, used by every per-component Route
+     guard below): a component Route renders unless its toggle is EXPLICITLY
+     disabled. Sprig treats any non-empty string as truthy, so a values file
+     written with a quoted enabled: "false" would render the Route under a
+     plain boolean test (unintended external exposure).
+     Normalizing to a string and comparing against every stringified falsy
+     spelling closes that hole for ALL of them in one guard. Set
+     `enabled: false` (unquoted boolean) to disable; that is the only
+     documented spelling. */}}
+{{- $amOn := ne (.Values.platform.route.am.enabled | toString) "false" }}
+{{- $idmOn := ne (.Values.platform.route.idm.enabled | toString) "false" }}
+{{- $loginUiOn := ne (.Values.platform.route.loginUi.enabled | toString) "false" }}
+{{- $endUserUiOn := ne (.Values.platform.route.endUserUi.enabled | toString) "false" }}
+{{- $adminUiOn := ne (.Values.platform.route.adminUi.enabled | toString) "false" }}
 {{- /* The OpenShift Route API rejects passthrough + insecureEdgeTerminationPolicy:
      Allow outright ("cannot have both spec.tls.termination: passthrough and
      spec.tls.insecureEdgeTerminationPolicy: Allow"; None and Redirect are
@@ -54,15 +68,15 @@
 {{- if and (eq $term "passthrough") (eq $insecure "Allow") }}
 {{- fail "platform.route.am.termination: passthrough cannot combine with platform.route.tls.insecurePolicy: Allow (the OpenShift Route API rejects it). Use insecurePolicy None or Redirect, or drop passthrough - note AM's 8081 is plain HTTP so passthrough cannot serve AM anyway (see template header)." }}
 {{- end }}
-{{- /* Per-toggle opt-outs use `ne ... false` NOT `| default true`: sprig's
-     default treats boolean false as empty, so `false | default true` is
-     true and an explicit opt-out would silently render the object anyway
-     (found in QA 2026-11-05). `ne X false` keeps default-on (nil/false
-     distinction: nil = unset = on, false = explicit off). */}}
+{{- /* Per-toggle opt-outs use the normalized $xOn variables above, NOT
+     `| default true`: sprig's default treats boolean false as empty, so
+     `false | default true` is true and an explicit opt-out would silently
+     render the object anyway (found in QA 2026-11-05). nil = unset = on,
+     false (any stringified falsy spelling) = explicit off. */}}
 {{- /* The AM Route requires the am Service: when the component is disabled
      the Route would dangle (a Route to a non-existent Service). Gating the
      Route on the component makes the component-level disable coherent. */}}
-{{- if and .Values.am.enabled (ne (.Values.platform.route.am.enabled | toString) "false") }}
+{{- if and .Values.am.enabled $amOn }}
 apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
@@ -87,7 +101,7 @@ spec:
   wildcardPolicy: None
 ---
 {{- end }}
-{{- if and .Values.idm.enabled (ne (.Values.platform.route.idm.enabled | toString) "false") }}
+{{- if and .Values.idm.enabled $idmOn }}
 {{/* IDM + idm-admin-ui paths, mirroring templates/idm-ingress.yaml. IDM
      serves plain HTTP on 8080; edge termination keeps TLS at the router. */}}
 apiVersion: route.openshift.io/v1
@@ -211,7 +225,7 @@ spec:
   wildcardPolicy: None
 ---
 {{- end }}
-{{- if and .Values.login_ui.enabled (ne (.Values.platform.route.loginUi.enabled | toString) "false") }}
+{{- if and .Values.login_ui.enabled $loginUiOn }}
 apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
@@ -232,7 +246,7 @@ spec:
   wildcardPolicy: None
 ---
 {{- end }}
-{{- if and .Values.enduser_ui.enabled (ne (.Values.platform.route.endUserUi.enabled | toString) "false") }}
+{{- if and .Values.enduser_ui.enabled $endUserUiOn }}
 apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
@@ -253,7 +267,7 @@ spec:
   wildcardPolicy: None
 ---
 {{- end }}
-{{- if and .Values.admin_ui.enabled (ne (.Values.platform.route.adminUi.enabled | toString) "false") }}
+{{- if and .Values.admin_ui.enabled $adminUiOn }}
 apiVersion: route.openshift.io/v1
 kind: Route
 metadata:

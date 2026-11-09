@@ -2,7 +2,7 @@
 #
 # DELTAS-ONLY FILE: every key below differs from chart defaults and carries the
 # reason; anything not mentioned here stays stock. Keys equal to defaults were
-# removed (review 2026-11-09) — this file contains changes from the default, not
+# removed — this file contains changes from the default, not
 # a restatement of it. Live-proven end-to-end 2026-11-04/05 (full platform Ready,
 # Routes serving, user journey passing under a default-deny NetworkPolicy with
 # this chart's own NetworkPolicy templates enabled).
@@ -18,7 +18,7 @@
 # 6. ds_*.volumeClaimSpec.storageClassName  — set YOUR cluster's storage class
 # 7. ds_set_passwords: null securityContexts — see SECURITY-CONTEXT NOTE below
 #
-# SECRETS ARE NOT IN THIS FILE (review 2026-11-09): secret material belongs to
+# SECRETS ARE NOT IN THIS FILE: secret material belongs to
 # the chart's generation path, never in a values file — generate passwords and
 # keypairs before first install and pass them as prefill, per
 # values-helm-generated-secrets.yaml and the forgeops env command. The
@@ -59,12 +59,13 @@
 #   helm install cert-manager jetstack/cert-manager -n cert-manager \
 #     --create-namespace --set crds.enabled=true
 #
-# STORAGE CLASSES (review 2026-11-09): the intended home for these two keys is
-# flags on the `forgeops env` command (--idrepo-storage-class,
-# --cts-storage-class) plus an --openshift-enable/--openshift-disable pair that
-# consumes this file; those flags are a separate change from chart templates
-# and are not built here. Until they land, edit the two storageClassName values
-# below by hand.
+# STORAGE CLASSES: the intended home for these two keys is flags on the
+# `forgeops env` command (--idrepo-storage-class, --cts-storage-class) plus
+# an --openshift-enable/--openshift-disable pair that consumes this file;
+# those flags are a separate change from chart templates and are not built
+# here. Until they land, edit the two storageClassName values below by hand.
+# (Tracking: this file's PR records the deferral; the flags land in the
+# forgeops CLI repo's env-command surface, not in this chart.)
 #
 # BRING-UP (fresh project, cert-manager present, this file adapted):
 #   helm install identity-platform <chart-dir> -n forgeops \
@@ -81,7 +82,13 @@ platform:
       - identity-platform.apps-crc.testing   # <- YOUR platform FQDN (see above)
 
   route:
-    enabled: true             # FC2e: chart-rendered OpenShift Routes (edge)
+    enabled: true             # FC2e: chart-rendered OpenShift Routes (edge).
+                              # AM termination STAYS edge (the default): AM's
+                              # 8081 is plain HTTP behind Tomcat's TLS-offload
+                              # connector — reencrypt Routes 503 and
+                              # passthrough fails the TLS handshake. Security
+                              # teams mandating reencrypt need an AM
+                              # TLS-enabled image first.
 
   networkPolicy:
     enabled: true             # FC2e: the four tested policies; coexists with
@@ -102,13 +109,18 @@ ds_cts:
   volumeClaimSpec:
     storageClassName: crc-csi-hostpath-provisioner   # <- YOUR storage class
 
-# SECURITY-CONTEXT NOTE (answers review 2026-11-09 "disabling all security on
-# DS is a bad idea"): this nulls the security contexts of the ds-set-passwords
+# SECURITY-CONTEXT NOTE (answers review "disabling all security on DS is a
+# bad idea"): this nulls the security contexts of the ds-set-passwords
 # JOB ONLY — the DS StatefulSets keep their stock security contexts untouched.
 # The job's stock pod pins runAsUser: 0, which can never sit inside a namespace
 # UID range that keeps 11111 usable; restricted-v2 rejects it under any
-# configuration of this pattern. Nulling both contexts lets the job run under
-# the namespace's injected UID — validated end-to-end 2026-11-04/05. This is a
+# configuration of this pattern. The obvious alternative — pinning the job's
+# runAsUser to 11111 (the UID the namespace grants) — was evaluated and
+# rejected: the job writes amster/DS password material owned by root in the
+# stock image entrypoints, and a UID-pinned run risks a permission failure
+# mid-upgrade for no security gain (the job runs seconds, inside the cluster,
+# with no external surface; nulling the context lets OpenShift's injected UID
+# govern it instead — validated end-to-end 2026-11-04/05). This is a
 # deliberate, documented trade scoped to one short-lived init job, not a
 # blanket security disable.
 ds_set_passwords:
