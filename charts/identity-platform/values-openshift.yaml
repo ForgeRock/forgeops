@@ -1,22 +1,42 @@
-# values-openshift.yaml — ForgeOps on OpenShift (namespace-range pattern), FC4b.
+# values-openshift.yaml — ForgeOps on OpenShift (namespace-range pattern), FC4b/FC5.
 #
-# DELTAS-ONLY FILE: every key below differs from chart defaults and carries the
-# reason; anything not mentioned here stays stock. Keys equal to defaults were
-# removed — this file contains changes from the default, not
-# a restatement of it. Live-proven end-to-end 2026-11-04/05 (full platform Ready,
-# Routes serving, user journey passing under a default-deny NetworkPolicy with
-# this chart's own NetworkPolicy templates enabled).
+# WHAT THIS FILE IS: the reference deltas for an OpenShift deployment. The
+# chart's platform.openshift.enabled flag applies the tested exposure posture
+# (Routes, NetworkPolicies, the AM https port) from one key — this file shows
+# everything THAT DOES NOT follow the flag, every delta annotated with its
+# reason. Live-proven end-to-end 2026-11-04/05 (full platform Ready, Routes
+# serving, user journey passing under a default-deny NetworkPolicy with the
+# chart's NetworkPolicy templates enabled).
+#
+# HOW IT'S CONSUMED: values-*.yaml files in this chart are merge inputs for
+# the `forgeops env` command — env copies/merges them with your environment
+# settings into helm/<ENV_NAME>/values.yaml, and that merged file is what
+# deploys. Until the env command grows an --openshift flag (see STORAGE
+# CLASSES / TRACKING below), the equivalent manual step is copying these
+# keys into your environment's values file (helm/<ENV_NAME>/values.yaml) and
+# redeploying with the standard forgeops flow — do NOT hand-assemble a
+# multi-file -f chain for a real deployment.
+#
+# WHAT platform.openshift.enabled: true APPLIES (set it once; these keys stay
+# untouched in this file because the mode owns them):
+#   - platform.route.enabled: true           — chart-rendered edge Routes (FC2e)
+#   - platform.networkPolicy.enabled: true   — the four tested netpol policies
+#   - am.service.httpsPort: 81               — Route port-name resolution (FC2d)
+# Any of the three can still be overridden explicitly (e.g. route.enabled:
+# false under the mode renders no Routes). On non-OpenShift clusters the
+# flag stays false and none of this fires.
 #
 # WHAT THIS FILE CHANGES VS CHART DEFAULTS (and why):
-# 1. platform.ingress.enabled: false        — exposure is Routes, not Ingress
-# 2. platform.route.enabled: true           — chart-rendered edge Routes (FC2e);
-#                                             am/idm names, termination, and the
-#                                             UI route gates keep their defaults
-# 3. platform.networkPolicy.enabled: true   — the four tested netpol policies (FC2e)
-# 4. am.service.httpsPort: 81               — Route port-name resolution (FC2d)
-# 5. platform.disable_secret_agent_config: true — no operator; secret prefill instead
-# 6. ds_*.volumeClaimSpec.storageClassName  — set YOUR cluster's storage class
-# 7. ds_set_passwords: null securityContexts — see SECURITY-CONTEXT NOTE below
+# 1. platform.openshift.enabled: true       — the mode flag itself (applies the
+#                                             three keys above)
+# 2. platform.ingress.enabled: false        — exposure is Routes, not Ingress
+#                                             (NOT mode-owned: routes-vs-ingress
+#                                             is a per-deployer exposure choice;
+#                                             see the values.yaml openshift block)
+# 3. platform.ingress.hosts[0]              — YOUR platform FQDN (see FQDN below)
+# 4. platform.disable_secret_agent_config: true — no operator; secret prefill instead
+# 5. ds_*.volumeClaimSpec.storageClassName  — set YOUR cluster's storage class
+# 6. ds_set_passwords: null securityContexts — see SECURITY-CONTEXT NOTE below
 #
 # SECRETS ARE NOT IN THIS FILE: secret material belongs to
 # the chart's generation path, never in a values file — generate passwords and
@@ -61,43 +81,34 @@
 #
 # STORAGE CLASSES: the intended home for these two keys is flags on the
 # `forgeops env` command (--idrepo-storage-class, --cts-storage-class) plus
-# an --openshift-enable/--openshift-disable pair that consumes this file;
-# those flags are a separate change from chart templates and are not built
-# here. Until they land, edit the two storageClassName values below by hand.
-# (Tracking: this file's PR records the deferral; the flags land in the
-# forgeops CLI repo's env-command surface, not in this chart.)
+# an --openshift-enable/--openshift-disable pair that sets
+# platform.openshift.enabled and merges this file's deltas into the
+# environment; those flags are a separate change from chart templates and
+# are not built here. Until they land, edit the two storageClassName values
+# below by hand. (Tracking: this file's PR records the deferral; the flags
+# land in the forgeops CLI's env-command surface, not in this chart.)
 #
-# BRING-UP (fresh project, cert-manager present, this file adapted):
-#   helm install identity-platform <chart-dir> -n forgeops \
-#     -f values-openshift.yaml -f values-helm-generate-secrets.yaml --timeout 15m
-# (the second -f is REQUIRED: this file carries no secret material, so without
-# the generated-secrets file the workloads reference Secrets nothing creates
-# and pods sit in CreateContainerConfigError)
+# BRING-UP (fresh project, cert-manager present): bring-up runs through the
+# standard forgeops flow with these deltas merged into your environment's
+# values (see HOW IT'S CONSUMED above) plus the generated-secrets file —
+# without the generated secrets the workloads reference Secrets nothing
+# creates and pods sit in CreateContainerConfigError.
 # Expected: ~8-15 min to all-Ready. If helm reports an amster hook timeout,
 # the resources ARE installed — let workloads converge, then re-run
 # `helm upgrade` with the same values to settle release state. Do NOT
 # uninstall on a hook timeout.
 
 platform:
+  openshift:
+    enabled: true             # FC5: applies route.enabled + networkPolicy.enabled
+                              # + am.service.httpsPort: 81 (override any of the
+                              # three explicitly if you need something else)
+
   ingress:
-    enabled: false            # exposure is Routes (below), not nginx Ingress
+    enabled: false            # exposure is Routes (the mode applies them), not
+                              # nginx Ingress
     hosts:
       - identity-platform.apps-crc.testing   # <- YOUR platform FQDN (see above)
-
-  route:
-    enabled: true             # FC2e: chart-rendered OpenShift Routes (edge).
-                              # AM termination STAYS edge (the default): AM's
-                              # 8081 is plain HTTP behind Tomcat's TLS-offload
-                              # connector — reencrypt Routes 503 and
-                              # passthrough fails the TLS handshake. Security
-                              # teams mandating reencrypt need an AM
-                              # TLS-enabled image first.
-
-  networkPolicy:
-    enabled: true             # FC2e: the four tested policies; coexists with
-                              # a default-deny-all policy in the namespace.
-                              # Includes kubeapi egress for the chart's own
-                              # kubectl-sidecar jobs (keystore-create, amster).
 
   disable_secret_agent_config: true
   secrets_enabled: true
@@ -129,14 +140,6 @@ ds_cts:
 ds_set_passwords:
   podSecurityContext: null
   securityContext: null
-
-# Route targetPort resolution (FC2d): the second Service port literally NAMED
-# "https" is what the chart-rendered AM Route resolves against. Without it the
-# Route falls back to the "http" port (still functional chart-side, but the
-# live-proven 503 root cause and fix pair is Route + this named port).
-am:
-  service:
-    httpsPort: 81
 
 # IMAGE LINE: under this namespace-pinning pattern the DEFAULT image line
 # works as-is (validated). To use the alpine line instead (only needed for

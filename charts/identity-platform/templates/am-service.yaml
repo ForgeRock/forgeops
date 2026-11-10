@@ -19,7 +19,8 @@ spec:
       targetPort: https
       protocol: TCP
       name: http
-{{- if .Values.am.service.httpsPort }}
+{{- $httpsPort := dig "service" "httpsPort" (dig "openshift" "enabled" false .Values.platform | ternary 81 nil) .Values.am }}
+{{- if $httpsPort }}
 {{/* OpenShift Route port-name resolution (FC2d): the OpenShift router
      resolves a Route's targetPort against the SERVICE PORT NAME, not the
      container port. This chart names the service port "http" while targeting
@@ -30,13 +31,11 @@ spec:
      (live-proven 2026-11-04 on OpenShift 4.22.14: adding a port literally
      NAMED https converted the Route from 503 to 200). This conditional adds
      one port entry named "https" to THIS Service so Routes resolve natively
-     — not a second Service resource. Default (unset): the ports list renders
-     exactly as before — zero change for non-OpenShift deployers and for
-     existing Scripts that reference port name http. GKE Ingress is
-     unaffected either way: it resolves by port NUMBER on the Service. */}}
-{{- /* comment moved above the if (trimming a comment inside a list can emit
-     a stray blank line between entries) */}}
-    - port: {{ .Values.am.service.httpsPort }}
+     — not a second Service resource. httpsPort is mode-owned: UNSET follows
+     platform.openshift.enabled (81 there, absent elsewhere); an explicit
+     number overrides the mode. GKE Ingress is unaffected either way: it
+     resolves by port NUMBER on the Service. */}}
+    - port: {{ $httpsPort }}
       targetPort: https
       protocol: TCP
       name: https

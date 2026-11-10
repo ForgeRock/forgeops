@@ -115,18 +115,34 @@ platform:
       #    crt: # base64 encoded string (Ex: base64 -w 0 <domain-file>.pem)
       #    key: # base64 encoded string (Ex: base64 -w 0 <domain-file>.key)
 
-  # OpenShift Routes (FC2e, opt-in). On OpenShift, expose the platform via
-  # native Routes instead of (or alongside) Ingress objects. All Route
-  # hostnames are platform.ingress.hosts[0] — AM FQDN-validates OAuth2
-  # requests, so a Route under any other hostname returns 400 "FQDN ...
-  # is not valid" (make the Route match the chart FQDN, never the reverse).
-  # AM's Route is EDGE termination by design: AM's 8081 ("https" container
-  # port) is plain HTTP behind Tomcat's TLS-offload connector, so
-  # passthrough fails the handshake and reencrypt 503s (tested on OpenShift
-  # 4.22.14, 2026-11-04). Edge puts TLS at the router; pair with the AM
-  # service httpsPort (below) so the Route's targetPort resolves.
-  route:
+  # OpenShift mode (FC5, opt-in). One flag that switches the platform's
+  # exposure surface to the tested OpenShift posture: native Routes instead
+  # of Ingress, the four NetworkPolicy allowlist policies, and the AM Service
+  # https port the Routes resolve against. The three mode-owned keys below
+  # (platform.route.enabled, platform.networkPolicy.enabled,
+  # am.service.httpsPort) follow the mode when UNSET and honor an explicit
+  # value when one is given — set platform.openshift.enabled: true and the
+  # chart applies the tested posture; override any single key and your value
+  # wins. Cluster-specific inputs (the FQDN in platform.ingress.hosts,
+  # storage classes) and platform.ingress.enabled are NOT mode-owned: set
+  # them explicitly (the reference deltas file values-openshift.yaml shows
+  # the complete tested set). On non-OpenShift clusters the flag does
+  # nothing (its owned keys stay at their unset/default posture).
+  openshift:
     enabled: false
+  route:
+    # enabled is mode-owned: UNSET means "follow platform.openshift.enabled"
+    # (Routes on OpenShift, off elsewhere); an explicit true/false overrides
+    # the mode. All Route hostnames are platform.ingress.hosts[0] — AM
+    # FQDN-validates OAuth2 requests, so a Route under any other hostname
+    # returns 400 "FQDN ... is not valid" (make the Route match the chart
+    # FQDN, never the reverse). AM's Route is EDGE termination by design:
+    # AM's 8081 ("https" container port) is plain HTTP behind Tomcat's
+    # TLS-offload connector, so passthrough fails the handshake and
+    # reencrypt 503s (tested on OpenShift 4.22.14, 2026-11-04). Edge puts
+    # TLS at the router; pair with the AM service httpsPort (below) so the
+    # Route's targetPort resolves.
+    # enabled: false
     am:
       enabled: true
       name: "am"
@@ -145,13 +161,13 @@ platform:
     adminUi:
       enabled: true
     tls:
-      # true: Route uses the router's default certificate (or cert-manager
-      # wiring the deployer adds). false: set secretName + key/cert values
-      # to pin an explicit certificate Secret's material inline.
-      certManager: true
-      secretName: # "identity-platform-route-tls"
       # insecurePolicy: "Allow" would enable HTTP redirect; default None
       insecurePolicy: "None"
+      # (certManager/secretName keys were removed pre-merge: they were
+      # documented but consumed by no template — Routes render edge
+      # termination with the router's default certificate only. Pinning an
+      # explicit cert on a Route is follow-up work; see the PR that removed
+      # these.)
 
   # NetworkPolicy templates (FC2e, opt-in): the four policies live-tested
   # under a default-deny posture with the full user journey re-passing
@@ -161,9 +177,10 @@ platform:
   # minimal allowlist, written to coexist with a default-deny-all policy.
   # allowKubeApi covers the chart's own kubectl-sidecar jobs
   # (keystore-create, amster); disable only if a platform-level policy
-  # already grants API egress.
+  # already grants API egress. enabled is mode-owned: UNSET follows
+  # platform.openshift.enabled; an explicit true/false overrides it.
   networkPolicy:
-    enabled: false
+    # enabled: false
     namePrefix: "identity-platform"
     allowKubeApi: true
 
@@ -419,7 +436,9 @@ am:
     # the Service renders exactly as before — zero change on non-OpenShift
     # (GKE resolves by port NUMBER) and for existing consumers of port
     # name http. Pair with platform.route.enabled for native Routes.
-    httpsPort: # 81
+    # httpsPort is mode-owned: UNSET follows platform.openshift.enabled
+    # (81 in OpenShift mode); an explicit number overrides the mode.
+    # httpsPort: # 81
 
   prometheus:
     servicemonitor:

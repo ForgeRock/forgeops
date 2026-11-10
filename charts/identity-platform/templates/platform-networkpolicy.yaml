@@ -1,6 +1,8 @@
-{{- if .Values.platform.networkPolicy.enabled }}
-{{/* NetworkPolicy templates (FC2e, opt-in via platform.networkPolicy.enabled):
-     the four policies live-tested on OpenShift 4.22.14 (2026-11-04/05) under
+{{- if dig "networkPolicy" "enabled" (dig "openshift" "enabled" false .Values.platform) .Values.platform }}
+{{/* NetworkPolicy templates (FC2e, opt-in). Gate: UNSET
+     platform.networkPolicy.enabled follows platform.openshift.enabled; an
+     explicit true/false overrides the mode. The four policies live-tested
+     on OpenShift 4.22.14 (2026-11-04/05) under
      a default-deny posture, with the full user journey re-passing while they
      were applied. The chart ships zero NetworkPolicy templates today, so a
      bank-default deny-all kills the platform in three distinct ways: AM loses
@@ -84,7 +86,7 @@ spec:
             matchLabels:
               kubernetes.io/metadata.name: openshift-ingress
 ---
-{{- if ne (.Values.platform.networkPolicy.allowKubeApi | toString) "false" }}
+{{- if .Values.platform.networkPolicy.allowKubeApi }}
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
