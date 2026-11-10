@@ -8,13 +8,15 @@
 # serving, user journey passing under a default-deny NetworkPolicy with the
 # chart's NetworkPolicy templates enabled).
 #
-# HOW IT'S CONSUMED: values-*.yaml files in this chart are merge inputs for
-# the `forgeops env` command — env copies/merges them with your environment
-# settings into helm/<ENV_NAME>/values.yaml, and that merged file is what
-# deploys. Until the env command grows an --openshift flag (see STORAGE
-# CLASSES / TRACKING below), the equivalent manual step is copying these
-# keys into your environment's values file (helm/<ENV_NAME>/values.yaml) and
-# redeploying with the standard forgeops flow — do NOT hand-assemble a
+# HOW IT'S CONSUMED: the `forgeops env` command merges SPECIFIC values files
+# (values-small/medium/large.yaml, values-secret-agent.yaml,
+# values-helm-generate-secrets.yaml) with your environment settings into
+# helm/<ENV_NAME>/values.yaml, and that merged file is what deploys. THIS
+# FILE IS NOT YET ONE OF THEM — env does not read values-openshift.yaml
+# until the --openshift-enable/--openshift-disable flag lands (see STORAGE
+# CLASSES / TRACKING below). Until then the equivalent manual step is copying
+# these keys into your environment's values file (helm/<ENV_NAME>/values.yaml)
+# and redeploying with the standard forgeops flow — do NOT hand-assemble a
 # multi-file -f chain for a real deployment.
 #
 # WHAT platform.openshift.enabled: true APPLIES (set it once; these keys stay
@@ -35,8 +37,11 @@
 #                                             see the values.yaml openshift block)
 # 3. platform.ingress.hosts[0]              — YOUR platform FQDN (see FQDN below)
 # 4. platform.disable_secret_agent_config: true — no operator; secret prefill instead
-# 5. ds_*.volumeClaimSpec.storageClassName  — set YOUR cluster's storage class
-# 6. ds_set_passwords: null securityContexts — see SECURITY-CONTEXT NOTE below
+# 5. platform.secrets_enabled: true          — chart default is false; the prefill
+#                                             model above requires chart-rendered
+#                                             Secrets for the prefilled material
+# 6. ds_*.volumeClaimSpec.storageClassName  — set YOUR cluster's storage class
+# 7. ds_set_passwords: null securityContexts — see SECURITY-CONTEXT NOTE below
 #
 # SECRETS ARE NOT IN THIS FILE: secret material belongs to
 # the chart's generation path, never in a values file — generate passwords and
