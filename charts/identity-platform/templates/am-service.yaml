@@ -19,23 +19,16 @@ spec:
       targetPort: https
       protocol: TCP
       name: http
-{{- $httpsPort := dig "service" "httpsPort" (dig "openshift" "enabled" false .Values.platform | ternary 81 nil) .Values.am }}
-{{- if $httpsPort }}
-{{/* OpenShift Route port-name resolution (FC2d): the OpenShift router
-     resolves a Route's targetPort against the SERVICE PORT NAME, not the
-     container port. This chart names the service port "http" while targeting
-     the container port named "https" (AM's TLS-offload connector on 8081), so
-     every naive Route (oc expose / oc create route --port) resolves against
-     the name "https", finds no service port by that name, and renders an
-     empty haproxy backend: 503 on every AM Route, all termination modes
-     (live-proven 2026-11-04 on OpenShift 4.22.14: adding a port literally
-     NAMED https converted the Route from 503 to 200). This conditional adds
-     one port entry named "https" to THIS Service so Routes resolve natively
-     — not a second Service resource. httpsPort is mode-owned: UNSET follows
+{{- /* am.service.httpsPort is mode-owned (platform.amHttpsPort): UNSET follows
      platform.openshift.enabled (81 there, absent elsewhere); an explicit
-     number overrides the mode. GKE Ingress is unaffected either way: it
-     resolves by port NUMBER on the Service. */}}
-    - port: {{ $httpsPort }}
+     number overrides the mode. The OpenShift router resolves a Route's
+     targetPort against the SERVICE PORT NAME — AM's service port is named
+     "http" while targeting the container port "https", so without this entry
+     Routes resolve against a nonexistent name and 503 (live-proven 4.22.14,
+     2026-11-04). The Route's targetPort branch resolves through the same
+     helper. */}}
+{{- with include "platform.amHttpsPort" . }}
+    - port: {{ . }}
       targetPort: https
       protocol: TCP
       name: https

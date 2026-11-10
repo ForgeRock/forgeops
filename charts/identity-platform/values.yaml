@@ -115,34 +115,29 @@ platform:
       #    crt: # base64 encoded string (Ex: base64 -w 0 <domain-file>.pem)
       #    key: # base64 encoded string (Ex: base64 -w 0 <domain-file>.key)
 
-  # OpenShift mode (FC5, opt-in). One flag that switches the platform's
-  # exposure surface to the tested OpenShift posture: native Routes instead
-  # of Ingress, the four NetworkPolicy allowlist policies, and the AM Service
-  # https port the Routes resolve against. The three mode-owned keys below
-  # (platform.route.enabled, platform.networkPolicy.enabled,
-  # am.service.httpsPort) follow the mode when UNSET and honor an explicit
-  # value when one is given — set platform.openshift.enabled: true and the
-  # chart applies the tested posture; override any single key and your value
-  # wins. Cluster-specific inputs (the FQDN in platform.ingress.hosts,
-  # storage classes) and platform.ingress.enabled are NOT mode-owned: set
-  # them explicitly (the reference deltas file values-openshift.yaml shows
-  # the complete tested set). On non-OpenShift clusters the flag does
-  # nothing (its owned keys stay at their unset/default posture).
+  # OpenShift mode (FC5, opt-in): one flag that switches the exposure
+  # surface to the tested OpenShift posture — native Routes, the four
+  # NetworkPolicy allowlist policies, and the AM Service https port the
+  # Routes resolve against. The mode-owned keys (platform.route.enabled,
+  # platform.networkPolicy.enabled, am.service.httpsPort) follow the mode
+  # when UNSET and honor an explicit value — set
+  # platform.openshift.enabled: true and the chart applies the tested
+  # posture; override any single key and your value wins. The FQDN
+  # (platform.ingress.hosts), storage classes, and platform.ingress.enabled
+  # are NOT mode-owned — set them explicitly (values-openshift.yaml is the
+  # annotated reference set). On non-OpenShift clusters the flag does
+  # nothing.
   openshift:
     enabled: false
   route:
-    # enabled is mode-owned: UNSET means "follow platform.openshift.enabled"
-    # (Routes on OpenShift, off elsewhere); an explicit true/false overrides
-    # the mode. All Route hostnames are platform.ingress.hosts[0] — AM
-    # FQDN-validates OAuth2 requests, so a Route under any other hostname
-    # returns 400 "FQDN ... is not valid" (make the Route match the chart
-    # FQDN, never the reverse). AM's Route is EDGE termination by design:
-    # AM's 8081 ("https" container port) is plain HTTP behind Tomcat's
-    # TLS-offload connector, so passthrough fails the handshake and
-    # reencrypt 503s (tested on OpenShift 4.22.14, 2026-11-04). Edge puts
-    # TLS at the router; pair with the AM service httpsPort (below) so the
-    # Route's targetPort resolves.
-    # enabled: false
+    # Mode-owned (see platform.openshiftMode in _helpers.tpl): UNSET follows
+    # platform.openshift.enabled; an explicit true/false overrides. All
+    # Route hostnames are platform.ingress.hosts[0] — AM FQDN-validates
+    # OAuth2 requests, so the Route host must match the chart FQDN, never
+    # the reverse. AM's Route is EDGE termination by design (AM's 8081 is
+    # plain HTTP behind Tomcat's TLS-offload connector — reencrypt 503s,
+    # passthrough fails; tested on OpenShift 4.22.14, 2026-11-04).
+    enabled:
     am:
       enabled: true
       name: "am"
@@ -161,29 +156,23 @@ platform:
     adminUi:
       enabled: true
     tls:
-      # insecurePolicy: "Allow" would enable HTTP redirect; default None
+      # "Allow" would enable HTTP redirect; None is the tested default.
       insecurePolicy: "None"
-      # (certManager/secretName keys were removed pre-merge: they were
-      # documented but consumed by no template — Routes render edge
-      # termination with the router's default certificate only. Pinning an
-      # explicit cert on a Route is follow-up work; see the PR that removed
-      # these.)
 
   # NetworkPolicy templates (FC2e, opt-in): the four policies live-tested
   # under a default-deny posture with the full user journey re-passing
-  # (OpenShift 4.22.14, 2026-11-04/05). The chart ships none by default;
-  # a default-deny namespace kills the platform (AM loses CTS, DNS dies,
-  # kubectl-sidecar jobs hang on API calls) — these four are the tested
-  # minimal allowlist, written to coexist with a default-deny-all policy.
-  # allowKubeApi covers the chart's own kubectl-sidecar jobs
-  # (keystore-create, amster); disable only if a platform-level policy
-  # already grants API egress. enabled is mode-owned: UNSET follows
+  # (OpenShift 4.22.14, 2026-11-04/05). A default-deny namespace kills the
+  # platform (AM loses CTS, DNS dies, kubectl-sidecar jobs hang on API
+  # calls) — these four are the tested minimal allowlist, written to
+  # coexist with a default-deny-all policy. allowKubeApi covers the chart's
+  # own kubectl-sidecar jobs (keystore-create, amster); disable only if a
+  # platform-level policy already grants API egress. enabled is mode-owned
+  # (see platform.openshiftMode in _helpers.tpl): UNSET follows
   # platform.openshift.enabled; an explicit true/false overrides it.
   networkPolicy:
-    # enabled: false
+    enabled:
     namePrefix: "identity-platform"
     allowKubeApi: true
-
 
   service:
     annotations:
@@ -428,17 +417,13 @@ am:
     port: 80
     # OpenShift Route resolution (FC2d): when set, the am Service renders a
     # SECOND port literally NAMED "https" (targeting AM's 8081) so OpenShift
-    # Routes resolve their targetPort against a matching service port name.
-    # Without it, the router finds no port named "https" (the service port is
-    # named "http"), the haproxy backend renders empty, and every AM Route
-    # 503s in every termination mode (live-proven on OpenShift 4.22.14:
-    # adding the named port converted the Route 503 -> 200). Default unset:
-    # the Service renders exactly as before — zero change on non-OpenShift
-    # (GKE resolves by port NUMBER) and for existing consumers of port
-    # name http. Pair with platform.route.enabled for native Routes.
-    # httpsPort is mode-owned: UNSET follows platform.openshift.enabled
-    # (81 in OpenShift mode); an explicit number overrides the mode.
-    # httpsPort: # 81
+    # Routes resolve their targetPort against a matching service port name —
+    # the router finds no port named "https" otherwise and every AM Route
+    # 503s (live-proven 4.22.14: adding the named port converted 503->200).
+    # Mode-owned (platform.amHttpsPort in _helpers.tpl): UNSET follows
+    # platform.openshift.enabled (81 there, absent elsewhere — GKE resolves
+    # by port number and is unaffected); an explicit number overrides.
+    httpsPort:
 
   prometheus:
     servicemonitor:

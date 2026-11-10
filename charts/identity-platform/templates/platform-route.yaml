@@ -1,90 +1,59 @@
-{{- $routeEnabled := dig "route" "enabled" (dig "openshift" "enabled" false .Values.platform) .Values.platform }}
-{{- if $routeEnabled }}
-{{/* OpenShift Routes (FC2e, opt-in). Renders the Route set live-tested on
-     OpenShift 4.22.14 (2026-11-04/05): AM edge + the IDM/UI path set, all
-     hostnames equal to platform.ingress.hosts[0]. Gate: UNSET
-     platform.route.enabled follows platform.openshift.enabled; an explicit
-     true/false overrides the mode (platform.openshift.enabled: true +
-     route.enabled: false renders no Routes).
-
-     Three constraints this template encodes, all live-proven:
-
-     1. EDGE-ONLY termination for AM. AM's 8081 port (the "https" container
-        port) is PLAIN HTTP behind Tomcat's TLS-offload connector
-        (SSLEnabled=false): it does NOT terminate TLS. passthrough Routes
-        fail the handshake (nothing at the pod terminates TLS) and reencrypt
-        Routes 503 (the backend speaks plaintext to a TLS expectation).
-        Edge termination (TLS at the router) is the only working mode. The
-        platform.route.am.termination value exists so a future AM
-        TLS-enabled image can opt into reencrypt without editing this file;
-        the default "edge" is the tested mode.
-
-     2. The route hostname MUST equal platform.ingress.hosts[0] (the chart
-        FQDN, rendered into the platform-config ConfigMap's FQDN key). AM
-        FQDN-validates OAuth2 requests: a discovery request arriving under
-        any other hostname returns 400 "FQDN ... is not valid" — make the
-        Route match the chart's FQDN (a DNS alias), never the reverse.
-        UI callback/cookie domains follow the same FQDN.
-
-     3. ONE HOST, PATH-SPLIT: OpenShift grants the first Route claiming a
-        host an exclusive claim; a second Route for the SAME host with no
-        path renders HostAlreadyClaimed and never routes. The AM Route
-        claims the whole host (it owns /am, /am/XUI); IDM and the UIs route
-        by PATH (/openidm, /upload, /export, /admin, /api, /openicf,
-        /enduser, /platform) exactly as the Ingress templates above split
-        them. The AM Route therefore carries no path (whole-host claim) and
-        every other Route carries the path list from the corresponding
-        Ingress.
-
-     Certificates: Routes carry no explicit cert; the router's default
-     certificate serves TLS (or cert-manager wiring the deployer adds).
-     Pinning an explicit certificate on a Route is follow-up work (the
-     certManager/secretName keys this header once described were removed
-     pre-merge: documented, consumed by no template). */}}
-{{- $fqdn := first .Values.platform.ingress.hosts }}
-{{- if not $fqdn }}
-{{- fail (printf "platform.route.enabled is true but platform.ingress.hosts is empty - the Route hostnames come from hosts[0] (the chart FQDN; AM FQDN-validates OAuth2 requests against it). Set platform.ingress.hosts[0] even with ingress disabled.") }}
+{{- if eq (include "platform.routeEnabled" .) "true" }}
+{{/* OpenShift Routes (FC2e, opt-in via platform.route.enabled; unset follows
+     platform.openshift.enabled via platform.routeEnabled in _helpers.tpl).
+     Renders the Route set live-tested on OpenShift 4.22.14 (2026-11-04/05):
+     AM edge + the IDM/UI path set, all hostnames equal to
+     platform.ingress.hosts[0] (the chart FQDN — AM FQDN-validates OAuth2
+     requests against it, so Route host must match the chart FQDN, never the
+     reverse; single-host contract, multi-host values render Routes for
+     hosts[0] only). Termination: AM's 8081 ("https" container port) is PLAIN
+     HTTP behind Tomcat's TLS-offload connector, so edge is the only working
+     mode — passthrough fails the handshake, reencrypt 503s (live-proven
+     4.22.14); platform.route.am.termination exists so a future AM TLS image
+     can opt into reencrypt. ONE HOST, PATH-SPLIT: the first Route claiming
+     a host gets an exclusive claim (a second whole-host Route renders
+     HostAlreadyClaimed), so AM claims the whole host and the others split
+     paths exactly as the Ingress templates do. Certificates: Routes carry
+     no explicit cert — the router's default certificate serves TLS; pinning
+     an explicit cert is follow-up work. */}}
+{{- $hosts := .Values.platform.ingress.hosts }}
+{{- if not $hosts }}
+{{- fail (printf "platform.route.enabled is true but platform.ingress.hosts is empty or unset - the Route hostnames come from hosts[0] (the chart FQDN; AM FQDN-validates OAuth2 requests against it). Set platform.ingress.hosts[0] even with ingress disabled.") }}
 {{- end }}
+{{- $fqdn := first $hosts }}
 {{- $term := .Values.platform.route.am.termination | default "edge" }}
-{{- $insecure := .Values.platform.route.tls.insecurePolicy | default "None" }}
 {{- /* The OpenShift Route API rejects passthrough + insecureEdgeTerminationPolicy:
      Allow outright ("cannot have both spec.tls.termination: passthrough and
      spec.tls.insecureEdgeTerminationPolicy: Allow"; None and Redirect are
      compatible - openshift/api route validation). Fail at render rather than
      letting the API reject the object at apply time. */}}
-{{- if and (eq $term "passthrough") (eq $insecure "Allow") }}
+{{- if and (eq $term "passthrough") (eq .Values.platform.route.tls.insecurePolicy "Allow") }}
 {{- fail "platform.route.am.termination: passthrough cannot combine with platform.route.tls.insecurePolicy: Allow (the OpenShift Route API rejects it). Use insecurePolicy None or Redirect, or drop passthrough - note AM's 8081 is plain HTTP so passthrough cannot serve AM anyway (see template header)." }}
 {{- end }}
-{{- /* Per-component Route guards are plain boolean tests on the values
-     keys (house style — every sibling Ingress template uses the same
-     shape). Chart values are documented as booleans: quoted-string spellings
-     like enabled: "false" are unsupported (sprig renders any non-empty
-     string truthy; the chart does not defend against them). NOTE on the
-     removed guards: the previous revision used ne (X | toString) "false"
-     to also suppress quoted spellings, at the cost of an idiom no sibling
-     template shares; the maintainers' call was house style over
-     defensive-stringification, and the contract (booleans only) is now
-     stated here instead. The AM Route requires the am Service: when the
-     component is disabled the Route would dangle (a Route to a
-     non-existent Service), so the AM guard also tests am.enabled. */}}
+{{- /* Per-component guards are plain boolean tests (house style). The AM
+     Route requires the am Service (else it dangles), so its guard also tests
+     am.enabled. The end-user-ui guard honors the deprecated end_user_ui
+     alias exactly as every sibling end-user-ui template does. */}}
+{{- $eui := .Values.enduser_ui }}
+{{- $eui = mustMergeOverwrite (deepCopy $eui) (deepCopy (.Values.end_user_ui | default dict)) }}
 {{- if and .Values.am.enabled .Values.platform.route.am.enabled }}
 apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
-  name: {{ .Values.platform.route.am.name | default "am" }}
+  name: {{ .Values.platform.route.am.name }}
   labels:
     {{- include "identity-platform.labels" . | nindent 4 }}
 spec:
   host: {{ $fqdn | quote }}
   tls:
     termination: {{ $term }}
-    insecureEdgeTerminationPolicy: {{ .Values.platform.route.tls.insecurePolicy | default "None" }}
+    insecureEdgeTerminationPolicy: {{ .Values.platform.route.tls.insecurePolicy }}
   to:
     kind: Service
     name: am
     weight: 100
   port:
-    {{- if dig "service" "httpsPort" (dig "openshift" "enabled" false .Values.platform | ternary 81 nil) .Values.am }}
+    {{- if include "platform.amHttpsPort" . }}
     targetPort: https
     {{- else }}
     targetPort: http
@@ -98,7 +67,7 @@ spec:
 apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
-  name: {{ .Values.platform.route.idm.name | default "idm" }}
+  name: {{ .Values.platform.route.idm.name }}
   labels:
     {{- include "identity-platform.labels" . | nindent 4 }}
 spec:
@@ -117,7 +86,7 @@ spec:
 apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
-  name: {{ .Values.platform.route.idm.name | default "idm" }}-upload
+  name: {{ .Values.platform.route.idm.name }}-upload
   labels:
     {{- include "identity-platform.labels" . | nindent 4 }}
 spec:
@@ -136,7 +105,7 @@ spec:
 apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
-  name: {{ .Values.platform.route.idm.name | default "idm" }}-export
+  name: {{ .Values.platform.route.idm.name }}-export
   labels:
     {{- include "identity-platform.labels" . | nindent 4 }}
 spec:
@@ -155,7 +124,7 @@ spec:
 apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
-  name: {{ .Values.platform.route.idm.name | default "idm" }}-admin
+  name: {{ .Values.platform.route.idm.name }}-admin
   labels:
     {{- include "identity-platform.labels" . | nindent 4 }}
 spec:
@@ -179,7 +148,7 @@ spec:
 apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
-  name: {{ .Values.platform.route.idm.name | default "idm" }}-api
+  name: {{ .Values.platform.route.idm.name }}-api
   labels:
     {{- include "identity-platform.labels" . | nindent 4 }}
 spec:
@@ -199,7 +168,7 @@ spec:
 apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
-  name: {{ .Values.platform.route.idm.name | default "idm" }}-openicf
+  name: {{ .Values.platform.route.idm.name }}-openicf
   labels:
     {{- include "identity-platform.labels" . | nindent 4 }}
 spec:
@@ -237,11 +206,11 @@ spec:
   wildcardPolicy: None
 ---
 {{- end }}
-{{- if and .Values.enduser_ui.enabled .Values.platform.route.endUserUi.enabled }}
+{{- if and $eui.enabled .Values.platform.route.endUserUi.enabled }}
 apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
-  name: end-user-ui
+  name: {{ include "platform.endUserUiName" . }}
   labels:
     {{- include "identity-platform.labels" . | nindent 4 }}
 spec:
@@ -251,7 +220,7 @@ spec:
     termination: edge
   to:
     kind: Service
-    name: end-user-ui
+    name: {{ include "platform.endUserUiName" . }}
     weight: 100
   port:
     targetPort: http

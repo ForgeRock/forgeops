@@ -199,6 +199,53 @@ Define a variable that determines if we should enable the ssh_keygen job.
 {{- end -}}
 {{- end -}}
 
+{{/* OpenShift mode resolution (FC5): platform.openshift.enabled gates the
+     exposure posture (Routes, NetworkPolicies, the AM https port). Mode-owned
+     keys (platform.route.enabled, platform.networkPolicy.enabled) follow the
+     mode when UNSET and honor an explicit value; platform.amHttpsPort does
+     the same for the port. Returns "true"/"false" as a string. */}}
+{{- define "platform.openshiftMode" -}}
+{{- if eq (.Values.platform.openshift.enabled | toString) "true" -}}
+{{- printf "true" -}}
+{{- else -}}
+{{- printf "false" -}}
+{{- end -}}
+{{- end -}}
+
+{{/* Mode-owned boolean: key at .key.enabled follows the OpenShift mode when
+     unset, explicit value wins. Usage: include "platform.modeOwnedBool" (list
+     . "route") / (list . "networkPolicy"). */}}
+{{- define "platform.modeOwnedBool" -}}
+{{- $root := index . 0 -}}
+{{- $key := index . 1 -}}
+{{- $v := index $root.Values.platform $key "enabled" -}}
+{{- if kindIs "invalid" $v -}}
+{{- include "platform.openshiftMode" $root -}}
+{{- else -}}
+{{- $v | toString -}}
+{{- end -}}
+{{- end -}}
+
+{{/* Route gate: platform.route.enabled is mode-owned (platform.routeEnabled
+     for readability at the template's outer gate). */}}
+{{- define "platform.routeEnabled" -}}
+{{- include "platform.modeOwnedBool" (list . "route") -}}
+{{- end -}}
+
+{{/* AM Service https port under OpenShift mode (FC2d/FC5): the Route
+     targetPort and the Service port entry must agree — both resolve through
+     this helper so the 81 lives in exactly one place. An explicit
+     am.service.httpsPort value overrides the mode default; unset renders no
+     https port off-mode. */}}
+{{- define "platform.amHttpsPort" -}}
+{{- $explicit := index .Values.am "service" "httpsPort" -}}
+{{- if $explicit -}}
+{{- $explicit -}}
+{{- else if eq (include "platform.openshiftMode" .) "true" -}}
+{{- 81 -}}
+{{- end -}}
+{{- end -}}
+
 {{/* Tomcat install directory: the Debian images put it at
      /usr/local/tomcat; the alpine pingbase-tomcat images use
      /opt/tomcat (CATALINA_HOME). */}}

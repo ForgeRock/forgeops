@@ -1,7 +1,8 @@
-{{- if dig "networkPolicy" "enabled" (dig "openshift" "enabled" false .Values.platform) .Values.platform }}
-{{/* NetworkPolicy templates (FC2e, opt-in). Gate: UNSET
-     platform.networkPolicy.enabled follows platform.openshift.enabled; an
-     explicit true/false overrides the mode. The four policies live-tested
+{{- if eq (include "platform.modeOwnedBool" (list . "networkPolicy")) "true" }}
+{{/* NetworkPolicy templates (FC2e, opt-in). Gate: platform.networkPolicy.enabled
+     is mode-owned — UNSET follows platform.openshift.enabled (see
+     platform.modeOwnedBool in _helpers.tpl); an explicit true/false overrides
+     the mode. The four policies live-tested
      on OpenShift 4.22.14 (2026-11-04/05) under
      a default-deny posture, with the full user journey re-passing while they
      were applied. The chart ships zero NetworkPolicy templates today, so a
@@ -44,6 +45,7 @@ metadata:
     {{- include "identity-platform.labels" . | nindent 4 }}
 spec:
   podSelector: {}
+  policyTypes: ["Ingress", "Egress"]
   ingress:
     - from:
         - podSelector: {}

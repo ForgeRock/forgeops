@@ -128,20 +128,14 @@ ds_cts:
   volumeClaimSpec:
     storageClassName: crc-csi-hostpath-provisioner   # <- YOUR storage class
 
-# SECURITY-CONTEXT NOTE (answers review "disabling all security on DS is a
-# bad idea"): this nulls the security contexts of the ds-set-passwords
-# JOB ONLY — the DS StatefulSets keep their stock security contexts untouched.
-# The job's stock pod pins runAsUser: 0, which can never sit inside a namespace
-# UID range that keeps 11111 usable; restricted-v2 rejects it under any
-# configuration of this pattern. The obvious alternative — pinning the job's
-# runAsUser to 11111 (the UID the namespace grants) — was evaluated and
-# rejected: the job writes amster/DS password material owned by root in the
-# stock image entrypoints, and a UID-pinned run risks a permission failure
-# mid-upgrade for no security gain (the job runs seconds, inside the cluster,
-# with no external surface; nulling the context lets OpenShift's injected UID
-# govern it instead — validated end-to-end 2026-11-04/05). This is a
-# deliberate, documented trade scoped to one short-lived init job, not a
-# blanket security disable.
+# SECURITY-CONTEXT NOTE: nulls the security contexts of the ds-set-passwords
+# JOB ONLY — the DS StatefulSets keep their stock security contexts. The
+# job's stock pod pins runAsUser: 0, which restricted-v2 rejects under this
+# pattern's namespace UID range. Pinning the job to 11111 instead was
+# evaluated and rejected: the stock entrypoints write password material
+# owned by root, so a UID-pinned run risks a mid-upgrade permission failure
+# for no security gain (short-lived in-cluster job, no external surface;
+# the injected namespace UID governs it — validated 2026-11-04/05).
 ds_set_passwords:
   podSecurityContext: null
   securityContext: null
