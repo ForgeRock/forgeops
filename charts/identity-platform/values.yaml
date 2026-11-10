@@ -162,12 +162,16 @@ platform:
   # NetworkPolicy templates (FC2e, opt-in): the four policies live-tested
   # under a default-deny posture with the full user journey re-passing
   # (OpenShift 4.22.14, 2026-11-04/05). A default-deny namespace kills the
-  # platform (AM loses CTS, DNS dies, kubectl-sidecar jobs hang on API
-  # calls) — these four are the tested minimal allowlist, written to
-  # coexist with a default-deny-all policy. allowKubeApi covers the chart's
-  # own kubectl-sidecar jobs (keystore-create, amster); disable only if a
-  # platform-level policy already grants API egress. enabled is mode-owned
-  # (see platform.openshiftMode in _helpers.tpl): UNSET follows
+  # platform (AM loses CTS within seconds, DNS dies, kubectl-sidecar jobs
+  # hang on API calls) — these four are the tested minimal allowlist,
+  # written to coexist with a default-deny-all policy; they are additive
+  # allow rules and never deny. allowKubeApi egress (default namespace:443)
+  # exists because the chart's own jobs run kubectl (keystore-create, amster
+  # hang on `kubectl get secret` without it); disable only if a
+  # platform-level policy already grants API egress. Applying BEFORE first
+  # install is recommended (hung jobs burn their backoff budget) but either
+  # order works with the allowlist present. enabled is mode-owned (see
+  # platform.modeOwnedBool in _helpers.tpl): UNSET follows
   # platform.openshift.enabled; an explicit true/false overrides it.
   networkPolicy:
     enabled:

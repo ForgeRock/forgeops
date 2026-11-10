@@ -40,7 +40,7 @@
 apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
-  name: {{ .Values.platform.route.am.name }}
+  name: {{ .Values.platform.route.am.name | default "am" }}
   labels:
     {{- include "identity-platform.labels" . | nindent 4 }}
 spec:
@@ -67,7 +67,7 @@ spec:
 apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
-  name: {{ .Values.platform.route.idm.name }}
+  name: {{ .Values.platform.route.idm.name | default "idm" }}
   labels:
     {{- include "identity-platform.labels" . | nindent 4 }}
 spec:
@@ -86,7 +86,7 @@ spec:
 apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
-  name: {{ .Values.platform.route.idm.name }}-upload
+  name: {{ .Values.platform.route.idm.name | default "idm" }}-upload
   labels:
     {{- include "identity-platform.labels" . | nindent 4 }}
 spec:
@@ -105,7 +105,7 @@ spec:
 apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
-  name: {{ .Values.platform.route.idm.name }}-export
+  name: {{ .Values.platform.route.idm.name | default "idm" }}-export
   labels:
     {{- include "identity-platform.labels" . | nindent 4 }}
 spec:
@@ -124,7 +124,7 @@ spec:
 apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
-  name: {{ .Values.platform.route.idm.name }}-admin
+  name: {{ .Values.platform.route.idm.name | default "idm" }}-admin
   labels:
     {{- include "identity-platform.labels" . | nindent 4 }}
 spec:
@@ -148,7 +148,7 @@ spec:
 apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
-  name: {{ .Values.platform.route.idm.name }}-api
+  name: {{ .Values.platform.route.idm.name | default "idm" }}-api
   labels:
     {{- include "identity-platform.labels" . | nindent 4 }}
 spec:
@@ -168,7 +168,7 @@ spec:
 apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
-  name: {{ .Values.platform.route.idm.name }}-openicf
+  name: {{ .Values.platform.route.idm.name | default "idm" }}-openicf
   labels:
     {{- include "identity-platform.labels" . | nindent 4 }}
 spec:
@@ -210,7 +210,7 @@ spec:
 apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
-  name: {{ include "platform.endUserUiName" . }}
+  name: end-user-ui
   labels:
     {{- include "identity-platform.labels" . | nindent 4 }}
 spec:
@@ -220,7 +220,7 @@ spec:
     termination: edge
   to:
     kind: Service
-    name: {{ include "platform.endUserUiName" . }}
+    name: end-user-ui
     weight: 100
   port:
     targetPort: http

@@ -179,11 +179,6 @@ Define a variable that determines if we should enable the ssh_keygen job.
      files keep byte-identical semantics, new files are for fresh adoption.
      Templates inline this merge (a per-template $eui variable) because
      helpers cannot return maps for field access; keep the two in sync. */}}
-{{- define "platform.endUserUi" -}}
-{{- $merged := mustMergeOverwrite (deepCopy (.Values.enduser_ui | default dict)) (deepCopy (.Values.end_user_ui | default dict)) -}}
-{{- $merged | toYaml -}}
-{{- end -}}
-
 {{/* Default image NAME for the end-user-ui component: the alpine line
      (platform.imageMode=forgeops) publishes "enduser-ui" (the product's
      spelling), while the base lineage

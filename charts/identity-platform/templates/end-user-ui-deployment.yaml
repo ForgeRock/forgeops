@@ -1,5 +1,5 @@
 {{- /* Values alias: prefer enduser_ui, fall back to the deprecated
-     end_user_ui key (see platform.endUserUi in _helpers.tpl). */}}
+     end_user_ui key (the deprecated end_user_ui key merges in; enduser_ui wins). */}}
 {{- $eui := .Values.enduser_ui }}
 {{- $eui = mustMergeOverwrite (deepCopy $eui) (deepCopy (.Values.end_user_ui | default dict)) }}
 {{- if $eui.enabled }}
