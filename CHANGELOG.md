@@ -13,6 +13,11 @@ Expected removal: 12 months after 2026.3.2 release
 
 ## New Features/Updated functionality
 
+### New secret-agent version
+
+The secret-agent has been patched for security vulnerabilities, and v1.2.14 has
+been released.
+
 ### New forgeops realm command
 
 Realms are a complicated configuration task, and this new command streamlines
