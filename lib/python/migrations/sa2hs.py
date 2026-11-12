@@ -129,7 +129,10 @@ def run_helm_cmd(msg, values_file, chart_name, chart_version, chart_repo,
     cmd = 'helm'
     repo_opt = chart_repo
     if chart_repo.startswith('http'):
-        repo_opt = f"identity-platform --repo {chart_repo} --version {chart_version}"
+        version_opt = ""
+        if chart_version:
+            version_opt = f"--version {chart_version}"
+        repo_opt = f"{chart_name} --repo {chart_repo} {version_opt}"
     cmd_opts = f"upgrade -i {chart_name} {repo_opt} --values {values_file} {namespace_opt}"
     if force_ds_passwords:
         cmd_opts = f"{cmd_opts} --set ds_set_passwords.force=true"
@@ -298,14 +301,11 @@ def setup_args(subparsers, common_args):
                                             common_args['helm_path'],
                                             common_args['kustomize_path'],
                                             common_args['namespace'],
-                                            common_args['no_kustomize']],
+                                            common_args['no_kustomize'],
+                                            common_args['chart_name'],
+                                            common_args['chart_repo'],
+                                            common_args['chart_version']],
                                    formatter_class=MigrateFormatter)
-    parser.add_argument('--chart-name', '-c', default="identity-platform",
-                        help='Name of Helm chart as installed')
-    parser.add_argument('--chart-version', '-v', default="2026.3.0",
-                        help='Version of Helm chart to apply')
-    parser.add_argument('--chart-repo', '-o', default="https://ForgeRock.github.io/forgeops",
-                        help='Helm repository to use')
     return parser
 
 
@@ -333,10 +333,10 @@ Before continuing make sure you have done the following:
         * ds-passwords
         * idm-env-secrets
         * idm
-    * Upgrade to ForgeOps 2025.3.0
+    * Upgrade to ForgeOps 2026.3.2
     * Deploy DS image with no downtime password rotation capability
         * Not required, but useful
-        * Can use `forgeops build` in 2025.3.0 to build a new image
+        * Can use `forgeops build` in 2026.3.2 to build a new image
         * Must deploy the image after building
 
 Would you like to continue? (Y/N)
