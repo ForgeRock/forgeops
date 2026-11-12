@@ -195,10 +195,15 @@ Define a variable that determines if we should enable the ssh_keygen job.
 {{- end -}}
 
 {{/* OpenShift mode resolution (FC5): platform.openshift.enabled gates the
-     exposure posture (Routes, NetworkPolicies, the AM https port). Mode-owned
-     keys (platform.route.enabled, platform.networkPolicy.enabled) follow the
-     mode when UNSET and honor an explicit value; platform.amHttpsPort does
-     the same for the port. Returns "true"/"false" as a string. */}}
+     exposure posture (Routes, NetworkPolicies, the AM https port, Ingress
+     suppression, the ds-set-passwords SCC pin-strip in
+     ds-set-passwords-job.yaml). Mode-owned keys
+     (platform.route.enabled, platform.networkPolicy.enabled) follow the
+     mode when UNSET and honor an explicit value; platform.ingress.enabled
+     is mode-owned in the ON direction only (platform.ingressEnabled — its
+     historical default is true, so off-mode unset must stay true);
+     platform.amHttpsPort and the pin-strip do the same. Returns
+     "true"/"false" as a string. */}}
 {{- define "platform.openshiftMode" -}}
 {{- if eq (.Values.platform.openshift.enabled | toString) "true" -}}
 {{- printf "true" -}}
@@ -225,6 +230,28 @@ Define a variable that determines if we should enable the ssh_keygen job.
      for readability at the template's outer gate). */}}
 {{- define "platform.routeEnabled" -}}
 {{- include "platform.modeOwnedBool" (list . "route") -}}
+{{- end -}}
+
+{{/* Ingress gate (mode-owned in the ON direction, FC5): platform.ingress.enabled
+     left UNSET keeps the chart's historical default (true) when the mode is
+     off — every existing deployer's render is unchanged — and applies the
+     tested OpenShift posture (false: Routes are the exposure surface) when
+     the mode is on. An explicit true/false wins in both modes (Ingress-based
+     exposure on OpenShift: set platform.ingress.enabled: true explicitly).
+     values.yaml leaves the key unset (nil) so this helper can detect
+     "unset" — chart defaults and deployer values are indistinguishable
+     after Helm's merge, which is why the default moved out of values.yaml. */}}
+{{- define "platform.ingressEnabled" -}}
+{{- $v := .Values.platform.ingress.enabled -}}
+{{- if kindIs "invalid" $v -}}
+{{- if eq (include "platform.openshiftMode" .) "true" -}}
+{{- printf "false" -}}
+{{- else -}}
+{{- printf "true" -}}
+{{- end -}}
+{{- else -}}
+{{- $v | toString -}}
+{{- end -}}
 {{- end -}}
 
 {{/* AM Service https port under OpenShift mode (FC2d/FC5): the Route

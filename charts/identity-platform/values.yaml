@@ -77,7 +77,13 @@ platform:
   ds_certs:
     enabled: true
   ingress:
-    enabled: true
+    # enabled is mode-owned in the ON direction (platform.ingressEnabled in
+    # _helpers.tpl): UNSET keeps the historical default (true) off-mode and
+    # applies the OpenShift posture (false) under
+    # platform.openshift.enabled; an explicit true/false wins in both
+    # modes. The key is deliberately ABSENT here (nil) — Helm's merge makes
+    # a chart default and a deployer value indistinguishable, so unset-
+    # detection requires absence. Do not re-add `enabled: true` here.
     className: "nginx"
     annotations:
       # kubernetes.io/tls-acme: "true"
@@ -117,16 +123,23 @@ platform:
 
   # OpenShift mode (FC5, opt-in): one flag that switches the exposure
   # surface to the tested OpenShift posture — native Routes, the four
-  # NetworkPolicy allowlist policies, and the AM Service https port the
-  # Routes resolve against. The mode-owned keys (platform.route.enabled,
-  # platform.networkPolicy.enabled, am.service.httpsPort) follow the mode
-  # when UNSET and honor an explicit value — set
+  # NetworkPolicy allowlist policies, the AM Service https port the Routes
+  # resolve against, Ingress suppressed (Routes are the exposure surface),
+  # and the ds-set-passwords job's stock runAsUser: 0 pin omitted (the
+  # namespace's UID range governs it under restricted-v2). The mode-owned
+  # keys (platform.route.enabled, platform.networkPolicy.enabled) follow
+  # the mode when UNSET and honor an explicit value; platform.ingress.enabled
+  # is mode-owned in the ON direction only (platform.ingressEnabled — its
+  # historical default true is preserved off-mode; set it explicitly to true
+  # for Ingress-based exposure on OpenShift); am.service.httpsPort and the
+  # ds-set-passwords security-context strip do the same. Set
   # platform.openshift.enabled: true and the chart applies the tested
   # posture; override any single key and your value wins. The FQDN
-  # (platform.ingress.hosts), storage classes, and platform.ingress.enabled
-  # are NOT mode-owned — set them explicitly (values-openshift.yaml is the
-  # annotated reference set). On non-OpenShift clusters the flag does
-  # nothing.
+  # (platform.ingress.hosts) and storage classes are NOT mode-owned —
+  # no chart-knowable default exists; set them explicitly. On
+  # non-OpenShift clusters the flag does nothing. The tested deployment
+  # procedure (namespace UID-range annotations, cert-manager ordering,
+  # secret prefill, gotchas) is documented in how-tos/deploying-on-openshift.md.
   openshift:
     enabled: false
   route:
@@ -514,6 +527,15 @@ ds_set_passwords:
   restartPolicy: OnFailure
   ttlSecondsAfterFinished: 43200
 
+  # podSecurityContext / securityContext are deliberately ABSENT (nil): the
+  # job template resolves them mode-owned — off-mode it renders the stock
+  # pins (runAsUser: 0 / fsGroup: 0 on the pod, {} on the container);
+  # under platform.openshift.enabled it OMITS both blocks so the namespace's
+  # UID range governs the pod under restricted-v2 (see the template comment).
+  # An explicit map on either key always wins. Do not re-add the stock pins
+  # here — Helm's merge makes a chart default and a deployer value
+  # indistinguishable, which is what the template's unset-detection needs.
+
   resources: {}
     # limits:
     #   cpu: 100m
@@ -555,17 +577,8 @@ ds_set_passwords:
     app.kubernetes.io/component: ldif-importer
     app: ldif-importer
 
-  podSecurityContext:
-    fsGroup: 0
-    runAsUser: 0
-
-  securityContext: {}
-    # capabilities:
-    #   drop:
-    #   - ALL
-    # readOnlyRootFilesystem: true
-    # runAsNonRoot: true
-    # runAsUser: 1000
+  # podSecurityContext / securityContext: absent by design — see the
+  # ds_set_passwords block above for the mode-owned resolution contract.
 
 idm:
   enabled: true

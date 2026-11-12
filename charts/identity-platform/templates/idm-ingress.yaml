@@ -1,4 +1,4 @@
-{{- if and .Values.idm.enabled .Values.platform.ingress.enabled -}}
+{{- if and .Values.idm.enabled (eq (include "platform.ingressEnabled" .) "true") -}}
 {{- $svcPort := .Values.idm.service.port -}}
 {{- $adminUiSvcPort := .Values.idm_admin_ui.service.port -}}
 apiVersion: networking.k8s.io/v1

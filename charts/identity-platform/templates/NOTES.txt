@@ -1,23 +1,23 @@
 {{- if .Values.platform.notes.enabled }}
 1. Get the application URL by running these commands:
-{{- if .Values.platform.ingress.enabled }}
+{{- if eq (include "platform.ingressEnabled" .) "true" }}
 {{- range $host := .Values.platform.ingress.hosts }}
   https://{{ $host }}/platform
 {{- end }}
 {{- end }}
-{{- if .Values.am.ingress.enabled }}
+{{- if and .Values.am.ingress.enabled (eq (include "platform.ingressEnabled" .) "true") }}
 {{- range $host := .Values.platform.ingress.hosts }}
   https://{{ $host }}/am
 {{- end }}
 {{- end }}
-{{- if .Values.idm.ingress.enabled }}
+{{- if and .Values.idm.ingress.enabled (eq (include "platform.ingressEnabled" .) "true") }}
 {{- range $host := .Values.platform.ingress.hosts }}
   https://{{ $host }}/admin
 {{- end }}
 {{- end }}
 {{- $eui := .Values.enduser_ui }}
 {{- $eui = mustMergeOverwrite (deepCopy $eui) (deepCopy (.Values.end_user_ui | default dict)) }}
-{{- if $eui.ingress.enabled }}
+{{- if and $eui.ingress.enabled (eq (include "platform.ingressEnabled" .) "true") }}
 {{- range $host := .Values.platform.ingress.hosts }}
   https://{{ $host }}/enduser
 {{- end }}

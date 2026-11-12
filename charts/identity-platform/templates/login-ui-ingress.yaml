@@ -1,4 +1,4 @@
-{{- if and .Values.login_ui.enabled .Values.platform.ingress.enabled -}}
+{{- if and .Values.login_ui.enabled (eq (include "platform.ingressEnabled" .) "true") -}}
 {{- $svcPort := .Values.login_ui.service.port -}}
 apiVersion: networking.k8s.io/v1
 kind: Ingress

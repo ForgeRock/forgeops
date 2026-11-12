@@ -2,9 +2,12 @@
 
 The Helm chart supports OpenShift deployments natively: `platform.openshift.enabled: true`
 switches the platform's exposure surface to the tested OpenShift posture (Routes, the
-NetworkPolicy allowlist, the AM Service https port). This page carries the deployment
-procedure and the gotchas; `charts/identity-platform/values-openshift.yaml` is the annotated
-reference deltas file.
+NetworkPolicy allowlist, the AM Service https port, Ingress suppressed, the ds-set-passwords
+job's SCC pin omitted). This page is the reference for the procedure and the gotchas —
+everything a deployer must set or decide is documented here; there is no dedicated OpenShift
+values file (per platform review decision 2026-11-11: the mode flag applies the chart-side
+posture, and the remaining per-deployer inputs — FQDN, storage classes — have no
+chart-knowable default).
 
 These steps were validated end-to-end on OpenShift 4.22.14 (CRC) with the full platform Ready
 and the user journey passing (OIDC discovery, client credentials grant, user provisioning, DS
@@ -30,13 +33,15 @@ persistence, authentication) under a default-deny NetworkPolicy.
   supported-by-construction form. Choose per your security team's posture.
 
 - **cert-manager must be installed before the platform** (the chart's DS certificates are
-  minted by pre-install hooks that fire only at install time):
+  minted by pre-install hooks that fire only at install time). Install it the same way the
+  other how-tos do:
 
   ```
-  helm repo add jetstack https://charts.jetstack.io
-  helm install cert-manager jetstack/cert-manager -n cert-manager \
-    --create-namespace --set crds.enabled=true
+  forgeops prereqs cert-manager
   ```
+
+  The command installs the chart with CRDs enabled and is idempotent (a re-run upgrades an
+  existing install).
 
 - **Set your FQDN before first install** — it is expensive to change later. All chart-rendered
   Routes use `platform.ingress.hosts[0]` as their hostname, and AM FQDN-validates OAuth2
@@ -59,9 +64,18 @@ persistence, authentication) under a default-deny NetworkPolicy.
   router resolves a Route's `targetPort` against the **service port name**; the chart's AM
   Service port is named `http` while targeting the container port `https`, so without this
   entry every AM Route renders an empty haproxy backend and 503s in every termination mode.
+  (The number 81 never appears in any Route — the Route's `targetPort` is the *name* `https`.
+  443 is the router's own edge-TLS listener, external to the chart; 81 is an internal alias
+  for AM's real container port 8081 and could be any legal port number.)
+- `platform.ingress.enabled: false` — exposure is Routes, not Ingress. Set
+  `platform.ingress.enabled: true` explicitly if you need Ingress-based exposure on OpenShift.
+- The `ds-set-passwords` job's stock `runAsUser: 0` pod pin is omitted — under the
+  namespace-range pattern restricted-v2 rejects that pin; omitting the block lets the
+  namespace's own UID range govern the job. An explicit `ds_set_passwords.podSecurityContext`
+  in your values always wins.
 
-Any of the three can still be overridden explicitly (e.g. `platform.route.enabled: false`
-under the mode renders no Routes).
+Any of these can still be overridden explicitly (e.g. `platform.route.enabled: false` under
+the mode renders no Routes).
 
 ## TLS termination: edge, by design
 
@@ -92,10 +106,17 @@ host match the chart FQDN (a DNS alias), never the reverse.
 
 ## Installing
 
-Apply the reference deltas (FQDN, storage classes, ingress off, secret prefill model —
-everything the mode flag does not own) from `charts/identity-platform/values-openshift.yaml`
-into your environment's values file, and install through the standard ForgeOps flow with the
-generated-secrets file alongside. Expected: ~8-15 minutes to all-Ready.
+Set your per-deployer inputs in your environment's values file (`helm/<ENV_NAME>/values.yaml`
+through the standard `forgeops env` flow):
+
+- `platform.ingress.hosts[0]` — your platform FQDN (the Routes' hostname; see above)
+- `ds_idrepo.volumeClaimSpec.storageClassName` and `ds_cts.volumeClaimSpec.storageClassName` —
+  your cluster's storage classes (StatefulSet `volumeClaimTemplates` are immutable; a wrong
+  class means uninstall/reinstall)
+
+Then install through the standard ForgeOps flow with the generated-secrets file alongside
+(`values-helm-generate-secrets.yaml` provides the secret model the prefill requires).
+Expected: ~8-15 minutes to all-Ready.
 
 If Helm reports an amster hook timeout, the resources ARE installed — let workloads converge,
 then re-run `helm upgrade` with the same values to settle release state. Do **not** uninstall

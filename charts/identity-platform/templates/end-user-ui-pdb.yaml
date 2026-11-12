@@ -1,5 +1,6 @@
 {{- /* Values alias: prefer enduser_ui, fall back to the deprecated
-     end_user_ui key (the deprecated end_user_ui key merges in; enduser_ui wins). */}}
+     end_user_ui key (the deprecated end_user_ui key merges IN OVER enduser_ui —
+     it wins conflicts, the conservative deprecation rule; see values.yaml). */}}
 {{- $eui := .Values.enduser_ui }}
 {{- $eui = mustMergeOverwrite (deepCopy $eui) (deepCopy (.Values.end_user_ui | default dict)) }}
 {{- if and $eui.enabled $eui.pdb.enabled }}
