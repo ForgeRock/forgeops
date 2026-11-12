@@ -24,15 +24,11 @@ they encounter one.
 # Old alpha/bravo realm setup
 
 Previously, a DS config was provided for alpha and bravo realms as an example,
-and was baked into DS images. Unfortunately, the alpha config contained an
-error, and the DS config is a tiny part of the overall process of creating a
-realm. Going forward, that config has been converted into templates that are
-used by `forgeops realm create`. This means that the DS entries for alpha and
-bravo will no longer be present in fresh DS installs.
-
-If you made changes to `alpha_bravo.ldif` and/or `orgs.ldif`, please follow the
-instructions in the "Existing deployments with realms" section of this
-document.
+and was baked into DS images. The `alpha_bravo.ldif` was broken up into
+`alpha.ldif` and `bravo.ldif` to be compatible with `forgeops realm create`.
+Same with `orgs.ldif`.  If you made changes to `alpha_bravo.ldif` and/or
+`orgs.ldif`, please follow the instructions in the "Existing deployments with
+realms" section of this document.
 
 # Setup
 
