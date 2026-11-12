@@ -128,11 +128,14 @@ platform:
   # and the ds-set-passwords job's stock runAsUser: 0 pin omitted (the
   # namespace's UID range governs it under restricted-v2). The mode-owned
   # keys (platform.route.enabled, platform.networkPolicy.enabled) follow
-  # the mode when UNSET and honor an explicit value; platform.ingress.enabled
-  # is mode-owned in the ON direction only (platform.ingressEnabled — its
-  # historical default true is preserved off-mode; set it explicitly to true
-  # for Ingress-based exposure on OpenShift); am.service.httpsPort and the
-  # ds-set-passwords security-context strip do the same. Set
+  # the mode when UNSET and honor an explicit value; the other posture
+  # pieces share the direction of mode ownership with different fallbacks —
+  # platform.ingress.enabled is mode-owned in the ON direction only
+  # (platform.ingressEnabled: its historical default true is preserved
+  # off-mode; set it explicitly to true for Ingress-based exposure on
+  # OpenShift), am.service.httpsPort defaults to absence off-mode and 81
+  # under it, and the ds-set-passwords security-context strip renders the
+  # stock pins off-mode and omits them under the mode. Set
   # platform.openshift.enabled: true and the chart applies the tested
   # posture; override any single key and your value wins. The FQDN
   # (platform.ingress.hosts) and storage classes are NOT mode-owned —

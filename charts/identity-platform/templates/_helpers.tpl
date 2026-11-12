@@ -197,13 +197,15 @@ Define a variable that determines if we should enable the ssh_keygen job.
 {{/* OpenShift mode resolution (FC5): platform.openshift.enabled gates the
      exposure posture (Routes, NetworkPolicies, the AM https port, Ingress
      suppression, the ds-set-passwords SCC pin-strip in
-     ds-set-passwords-job.yaml). Mode-owned keys
-     (platform.route.enabled, platform.networkPolicy.enabled) follow the
-     mode when UNSET and honor an explicit value; platform.ingress.enabled
-     is mode-owned in the ON direction only (platform.ingressEnabled — its
-     historical default is true, so off-mode unset must stay true);
-     platform.amHttpsPort and the pin-strip do the same. Returns
-     "true"/"false" as a string. */}}
+     ds-set-passwords-job.yaml). platform.route.enabled and
+     platform.networkPolicy.enabled follow the mode when UNSET and honor an
+     explicit value; the others share the DIRECTION of mode ownership but
+     with different fallbacks — platform.ingress.enabled is mode-owned in
+     the ON direction only (platform.ingressEnabled: historical default
+     true off-mode, false under the mode), am.service.httpsPort defaults to
+     absence off-mode and 81 under it, and the pin-strip's stock payload
+     (runAsUser: 0 / fsGroup: 0) renders off-mode and is omitted under the
+     mode. Returns "true"/"false" as a string. */}}
 {{- define "platform.openshiftMode" -}}
 {{- if eq (.Values.platform.openshift.enabled | toString) "true" -}}
 {{- printf "true" -}}

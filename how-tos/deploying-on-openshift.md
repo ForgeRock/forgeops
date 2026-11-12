@@ -33,15 +33,15 @@ persistence, authentication) under a default-deny NetworkPolicy.
   supported-by-construction form. Choose per your security team's posture.
 
 - **cert-manager must be installed before the platform** (the chart's DS certificates are
-  minted by pre-install hooks that fire only at install time). Install it the same way the
-  other how-tos do:
+  minted by pre-install hooks that fire only at install time). Install it with the repo's
+  prereqs command:
 
   ```
   forgeops prereqs cert-manager
   ```
 
-  The command installs the chart with CRDs enabled and is idempotent (a re-run upgrades an
-  existing install).
+  The command installs the chart with CRDs enabled; a re-run is a no-op if cert-manager is
+  already installed (pass `--upgrade` to upgrade an existing install).
 
 - **Set your FQDN before first install** — it is expensive to change later. All chart-rendered
   Routes use `platform.ingress.hosts[0]` as their hostname, and AM FQDN-validates OAuth2
@@ -72,7 +72,8 @@ persistence, authentication) under a default-deny NetworkPolicy.
 - The `ds-set-passwords` job's stock `runAsUser: 0` pod pin is omitted — under the
   namespace-range pattern restricted-v2 rejects that pin; omitting the block lets the
   namespace's own UID range govern the job. An explicit `ds_set_passwords.podSecurityContext`
-  in your values always wins.
+  map in your values always wins (an explicit `null` does not — it means "unset" to the
+  template and falls through to mode resolution).
 
 Any of these can still be overridden explicitly (e.g. `platform.route.enabled: false` under
 the mode renders no Routes).
@@ -106,17 +107,23 @@ host match the chart FQDN (a DNS alias), never the reverse.
 
 ## Installing
 
-Set your per-deployer inputs in your environment's values file (`helm/<ENV_NAME>/values.yaml`
-through the standard `forgeops env` flow):
+The one mandatory chart key — set it in your environment's values file
+(`helm/<ENV_NAME>/values.yaml` through the standard `forgeops env` flow; the env command has
+no `--openshift-enable` flag yet, so add the key by hand for now):
+
+- `platform.openshift.enabled: true` — applies the whole tested posture (see the list above)
+
+Plus the per-deployer inputs (no chart-knowable default exists for either):
 
 - `platform.ingress.hosts[0]` — your platform FQDN (the Routes' hostname; see above)
 - `ds_idrepo.volumeClaimSpec.storageClassName` and `ds_cts.volumeClaimSpec.storageClassName` —
   your cluster's storage classes (StatefulSet `volumeClaimTemplates` are immutable; a wrong
   class means uninstall/reinstall)
 
-Then install through the standard ForgeOps flow with the generated-secrets file alongside
-(`values-helm-generate-secrets.yaml` provides the secret model the prefill requires).
-Expected: ~8-15 minutes to all-Ready.
+Deploy through the standard ForgeOps flow — the env command merges your environment's values
+with the generated-secrets file (`values-helm-generate-secrets.yaml`, consumed via its
+`--helm-secrets` option) into `helm/<ENV_NAME>/values.yaml`; do **not** hand-assemble a
+multi-file `-f` chain. Expected: ~8-15 minutes to all-Ready.
 
 If Helm reports an amster hook timeout, the resources ARE installed — let workloads converge,
 then re-run `helm upgrade` with the same values to settle release state. Do **not** uninstall

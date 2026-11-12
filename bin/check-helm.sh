@@ -48,6 +48,32 @@ runOrPrint helm template release-name "${ROOT_DIR}/charts/identity-platform" \
   > /dev/null
   if [ $? -ne 0 ] ; then NUM_ERROR=$((NUM_ERROR+1)) ; fi
 
+echo "==> helm template (OpenShift mode: exposure surface is Routes, not Ingress)"
+# platform.ingress.enabled and the ds_set_passwords security contexts are
+# deliberately ABSENT from values.yaml (mode-owned under
+# platform.openshift.enabled — see the values.yaml comments). This render
+# asserts the mode posture: any re-added chart default for those keys
+# breaks unset-detection and fails here with Ingress objects in the render.
+# (helm is invoked directly, not via runOrPrint, because the stdout must be
+# captured for the assertion; runOrPrint evals inline and prints to the
+# terminal instead.)
+OPENSHIFT_TEMPLATE=$(helm template release-name "${ROOT_DIR}/charts/identity-platform" \
+  --set platform.openshift.enabled=true) || NUM_ERROR=$((NUM_ERROR+1))
+# grep -c (NOT grep -q): under `set -o pipefail`, grep -q exits on its first
+# match and SIGPIPEs the producer mid-stream, turning a SUCCESSFUL match into
+# a nonzero pipeline — the assertion would pass on the very defect it exists
+# to catch. grep -c reads to EOF, so the pipeline status is trustworthy; the
+# || true covers grep's exit 1 when the count is zero.
+INGRESS_COUNT=$(printf '%s\n' "${OPENSHIFT_TEMPLATE}" | grep -c '^kind: Ingress') || true
+if [ "${INGRESS_COUNT}" -ne 0 ] ; then
+  echo "ERROR: platform.openshift.enabled=true must not render Ingress objects (found ${INGRESS_COUNT})."
+  echo "  platform.ingress.enabled is mode-owned (platform.ingressEnabled in _helpers.tpl);"
+  echo "  a value set in values.yaml (or a sibling values-*.yaml) defeats unset-detection."
+  NUM_ERROR=$((NUM_ERROR+1))
+else
+  echo "==> on-mode render contains no Ingress objects: OK"
+fi
+
 echo
 if [ ${NUM_ERROR} -eq 0 ] ; then
   echo "==> All Helm validations passed."
