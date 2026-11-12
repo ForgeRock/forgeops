@@ -98,6 +98,13 @@ resolve the path to the config profile. Now, providing just the name of the
 config profile properly resolves the path to
 `docker/amster/config-profiles/PROFILE_NAME`.
 
+### idm-admin-ui doesn't start with security features
+
+The idm-admin-ui previously listened on port 80 which doesn't work with the
+security features enabled. The port has been changed to 8080, and the image was
+rebuilt to listen on that port. As part of the upgrade, you need to use
+`forgeops image` to select the latest image for idm-admin-ui.
+
 ### DS upgrade no longer crash-loops in add-schema when the instance schema lags the binary
 
 On an upgrade with existing data, `add-schema` created `fr-idm-reference-6..10` indexes for
