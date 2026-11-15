@@ -117,34 +117,22 @@ ig:
     #- secretRef:
   #    name: "my_ig_secret"
 
-  # Extra volumes / mounts appended to the ig deployment (helm-standard
-  # pattern). Primary use: mount a JVM truststore secret so IG's AM-AGENT
-  # BOOTSTRAP can validate the AM server certificate — the bootstrap runs on
-  # JSSE defaults (it does NOT go through the heap's ForgeRockClientHandler
-  # TrustAllManager, probed 2026-11-15), so with a non-publicly-trusted cert
-  # (staging LE, per-namespace CA) it dies with
-  # "unable to find valid certification path to requested target" during the
-  # TLS handshake and IG exits 0 in a crash loop. Pair extraVolumes with an
-  # ig.env IG_OPTS entry, e.g.
-  #   env:
-  #   - name: IG_OPTS
-  #     value: "-Djavax.net.ssl.trustStore=/truststore/cacerts.p12
-  #             -Djavax.net.ssl.trustStorePassword=changeit"
-  # NOTE (2026-11-15): the javax.net.ssl.trustStore system properties were
-  # observed NOT to reach vertx's SSLContext init in PingGateway 2026.11.0
-  # ("No X509TrustManager implementation available" from
-  # DummyX509TrustManager despite a valid PKCS12 with a trustedCertEntry) —
-  # verify against your IG build before relying on them; the alternative is
-  # importing the CA into the image's cacerts via an initContainer writing a
-  # copy of $JAVA_HOME/lib/security/cacerts.
+  # Extra volumes for the ig pod, paired with extraVolumeMounts (both lists
+  # or neither — a mount without its volume fails pod admission). Read by the
+  # image's /opt/gateway/bin/start.sh consumers via env; the typical use is
+  # mounting a secret for JVM options to reference, e.g. JVM args passed
+  # through an ig.env IG_OPTS entry (IG_OPTS is read by the image's
+  # /opt/gateway/bin/start.sh and appended to the java command line).
+  # ig-only by design: there is no platform-level volumes default to fall
+  # back to. See the PR for the truststore use case and its caveats.
   extraVolumes: []
-    #- name: truststore
-    #  secret:
-    #    secretName: my-truststore
+  #- name: truststore
+  #  secret:
+  #    secretName: my-truststore
   extraVolumeMounts: []
-    #- name: truststore
-    #  mountPath: /truststore
-    #  readOnly: true
+  #- name: truststore
+  #  mountPath: /truststore
+  #  readOnly: true
 
   resources:
     limits:
