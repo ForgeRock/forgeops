@@ -284,9 +284,4 @@ if [ -f ldif-ext/idm-repo/*.ldif ]; then
     cat ldif-ext/idm-repo/*.ldif >> template/setup-profiles/IDM/repo/7.3/base-entries.ldif
 fi
 
-# add mtls objectclass to bind accounts in template ldifs (note the difference in case between templates)
-sed -i '/objectClass: inetOrgPerson/aobjectClass: ds-certificate-user' template/setup-profiles/AM/cts/6.5/base-entries.ldif
-sed -i '/objectClass: inetOrgPerson/aobjectClass: ds-certificate-user' template/setup-profiles/AM/identity-store/7.0/base-entries.ldif
-sed -i '/objectclass: inetOrgPerson/aobjectClass: ds-certificate-user' template/setup-profiles/AM/config/6.5/base-entries.ldif
-
 echo 'source <(/opt/opendj/bin/bash-completion)' >> ~/.bashrc
