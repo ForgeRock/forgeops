@@ -51,7 +51,14 @@ RUN if [ -f /home/forgerock/openam/config/services/realm/root/iplanetamauthservi
     fi
 
 
-ENV CATALINA_OPTS="${CATALINA_OPTS} -Dlogback.configurationFile=/home/forgerock/logging/logback.xml"
+# CVE-2026-114938 (Java4Shell, FORGEOPS-7044): the base image's JDK predates
+# the November 2026 fix (25.0.5.1+ on the 25 line), so disable the
+# AVX-512-accelerated java.util.Base64 intrinsics until the base is
+# rebuilt. No security benefit on ARM64 or on x86-64 without AVX-512 (the
+# vulnerable path is the AVX-512 Base64 intrinsic), and there the flag
+# costs some Base64 throughput; remove once the base image ships a patched
+# JDK.
+ENV CATALINA_OPTS="${CATALINA_OPTS} -Dlogback.configurationFile=/home/forgerock/logging/logback.xml -XX:-UseBASE64Intrinsics"
 
 WORKDIR /home/forgerock
 

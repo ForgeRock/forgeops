@@ -33,6 +33,18 @@ USER ${PING_UID}:${PING_GID}
 # to /opt/opendj/data; restated here for clarity.
 ENV DS_DATA_DIR /opt/opendj/data
 
+# CVE-2026-114938 (Java4Shell, FORGEOPS-7044): the base image's JDK predates
+# the November 2026 fix (25.0.5.1+ on the 25 line), so disable the
+# AVX-512-accelerated java.util.Base64 intrinsics until the base is rebuilt.
+# No security benefit on ARM64 or on x86-64 without AVX-512 (the
+# vulnerable path is the AVX-512 Base64 intrinsic), and there the flag
+# costs some Base64 throughput; remove once the base image ships a patched
+# JDK. DS_JAVA_ADDITIONAL_ARGS is the extension slot in
+# env.sh's DEFAULT_DS_JAVA_ARGS, so this survives both the image-baked and
+# the chart-mounted env.sh; a runtime DS_JAVA_ADDITIONAL_ARGS override
+# replaces this value -- include the flag there too.
+ENV DS_JAVA_ADDITIONAL_ARGS=-XX:-UseBASE64Intrinsics
+
 # The PingDS deployment uses PEM based certificates. This sets the location
 # of the certs. The base does not set these (its PKCS12 providers stay in
 # place); our ds-setup.sh replaces them with the PEM managers and bakes these

@@ -1,5 +1,16 @@
 FROM us-docker.pkg.dev/forgeops-public/images-base/ds:latest
 
+# CVE-2026-114938 (Java4Shell, FORGEOPS-7044): the base image's JDK predates
+# the November 2026 fix (25.0.5.1+ on the 25 line), so disable the
+# AVX-512-accelerated java.util.Base64 intrinsics until the base is rebuilt.
+# No security benefit on ARM64 or on x86-64 without AVX-512 (the
+# vulnerable path is the AVX-512 Base64 intrinsic), and there the flag
+# costs some Base64 throughput; remove once the base image ships a patched
+# JDK. DS_JAVA_ADDITIONAL_ARGS is the extension slot in the
+# base's env.sh DEFAULT_DS_JAVA_ARGS; a runtime override replaces this
+# value -- include the flag there too.
+ENV DS_JAVA_ADDITIONAL_ARGS=-XX:-UseBASE64Intrinsics
+
 COPY debian-buster-sources.list /etc/apt/sources.list
 
 # If you want to update any o/s software, or require root access, uncomment the lines below
