@@ -237,7 +237,9 @@ def setup_args(common_args):
     subparser.add_parser('clean',
                          parents=shared_args,
                          help='clean up and remove amster pods')
-    parser_upgrade = subparser.add_parser('upgrade', help='replace placeholders of given configs')
+    parser_upgrade = subparser.add_parser('upgrade',
+                                          parents=shared_args,
+                                          help='replace placeholders of given configs')
     parser_upgrade.add_argument('src', help='source file or directory to update')
     parser_upgrade.add_argument('--fqdn', help='set the FQDN to use as placeholder', required=True)
 
@@ -265,7 +267,7 @@ def run(args, config):
         if Path(args.src).is_absolute():
             src = Path(args.src) / 'config'
         else:
-            src = config['forgeops_data'] / f'docker/amster/config-profiles/{args.src}/config'
+            src = config['build_path'] / f'amster/config-profiles/{args.src}/config'
 
         amster_import(namespace, src, amster_job_path, args.retain)
         return
@@ -276,7 +278,7 @@ def run(args, config):
         if Path(args.dst).is_absolute():
             dst = Path(args.dst)
         else:
-            dst = config['forgeops_data'] / f"docker/amster/config-profiles/{args.dst}"
+            dst = config['build_path'] / f"amster/config-profiles/{args.dst}"
 
         amster_export(namespace, dst, amster_job_path, args.glob, args.full, args.retain)
         return
@@ -286,9 +288,9 @@ def run(args, config):
         if Path(args.src).is_absolute():
             src = Path(args.src)
         else:
-            src = config['forgeops_data'] / f"docker/amster/config-profiles/{args.src}"
+            src = config['build_path'] / f"amster/config-profiles/{args.src}"
 
-        upgrade_all_amster_files(args.src, args.fqdn)
+        upgrade_all_amster_files(src, args.fqdn)
         return
 
 
