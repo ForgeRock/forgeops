@@ -82,11 +82,11 @@ def pre_check(params, settings):
 def create_ldifs(params, settings):
     """ Create the ldif file for the new realm """
     files = [
-        'docker/ds/ldif-ext/am-config/realm.ldif.tmpl',
-        'docker/ds/ldif-ext/identities/realm-orgs.ldif.tmpl']
+        'ds/ldif-ext/am-config/realm.ldif.tmpl',
+        'ds/ldif-ext/identities/realm-orgs.ldif.tmpl']
 
     for file in files:
-        source = settings['root_path'] / file
+        source = settings['build_path'] / file
         file_n = f"{params.realm}.ldif"
         if 'realm-orgs' in file:
             file_n = f"{params.realm}-orgs.ldif"
@@ -108,7 +108,7 @@ def create_amster_profile(params, settings):
         Needed configs are:
             OAuth clients
     """
-    profile_root = settings['root_path'] / 'docker/amster/config-profiles'
+    profile_root = settings['build_path'] / 'amster/config-profiles'
     default_profile = profile_root / 'default'
     target_profile = profile_root / f'realm-{params.realm}'
 
@@ -188,7 +188,7 @@ def update_idm_managed_json(params, settings):
         "group",
         "aiagent",
         "aiagentprivilege"]
-    idm_profiles = settings['root_path'] / "docker/idm/config-profiles"
+    idm_profiles = settings['build_path'] / "idm/config-profiles"
     target_profile = idm_profiles / params.config_profile
     managed_path = target_profile / "conf/managed.json"
     if not managed_path.is_file():
@@ -309,7 +309,7 @@ def update_idm_repo_ds_json(params, settings):
             "aiagentprivilege": f"ou=aiagentprivilege,o={params.realm},o=root,ou=identities",
     }
 
-    profile_path = settings['root_path'] / f"docker/idm/config-profiles/{params.config_profile}"
+    profile_path = settings['build_path'] / f"idm/config-profiles/{params.config_profile}"
     repo_path = profile_path / "conf/repo.ds.json"
     if not repo_path.is_file():
         print(f"{ERR_STR} Can't find {repo_path}. Exiting.")
@@ -443,7 +443,7 @@ def update_am_fbc(params, settings):
     if params.dryrun:
         print(f"Dryrun given. Not attempting to update am config-profile ({params.realm})")
         return
-    profile_root = settings['root_path'] / "docker/am/config-profiles"
+    profile_root = settings['build_path'] / "am/config-profiles"
     profile_path = profile_root / params.config_profile
     if params.config_profile.startswith("/"):
         profile_path = Path(params.config_profile)
@@ -527,13 +527,13 @@ def setup_args(subparsers, common_args):
 
   Examples:
     Create accounting realm:
-    ./{prog} -e test-env-single -p test accounting
+    ./{prog} -e test-env-single -p test -r my-container-registry accounting
 
     Create acct-recv subrealm:
-    ./{prog} -e test-env-single -p test -P accounting acct-recv
+    ./{prog} -e test-env-single -p test -P accounting -r my-container-registry acct-recv
 
     Create admin realm with aliases:
-    ./{prog} -e test-env-single -p test -a alias1,alias2 admin
+    ./{prog} -e test-env-single -p test -a alias1,alias2 -r my-container-registry admin
 
 """
     parser = subparsers.add_parser('create',
@@ -543,7 +543,9 @@ def setup_args(subparsers, common_args):
                                    parents=[common_args['debug'],
                                             common_args['dryrun'],
                                             common_args['env_name_req'],
-                                            common_args['config_profile_req'], common_args['helm_path'],
+                                            common_args['config_profile_req'],
+                                            common_args['build_path'],
+                                            common_args['helm_path'],
                                             common_args['kustomize_path'],
                                             common_args['namespace'],
                                             common_args['push_to'],
@@ -592,8 +594,12 @@ def run(args, config):
 
     pre_check(args, config)
     create_ldifs(args, config)
-    apply_ldifs(args.realm, config['namespace'], config['root_path'],
-                debug=args.debug, dryrun=args.dryrun)
+    apply_ldifs(args.realm,
+                config['namespace'],
+                config['root_path'],
+                config['build_path'],
+                debug=args.debug,
+                dryrun=args.dryrun)
     create_amster_profile(args, config)
     export_fbc('idm', args, config)
     update_idm_managed_json(args, config)
@@ -604,7 +610,7 @@ def run(args, config):
     build_image('am', args, config)
     build_image('idm', args, config)
 
-    profile_root = config['root_path'] / 'docker/amster/config-profiles'
+    profile_root = config['build_path'] / 'amster/config-profiles'
     amster_profile = profile_root / f'realm-{args.realm}'
     utils.apply_amster_profile(amster_profile, args.env_name, config['namespace'],
                                config['root_path'], getattr(args, 'helm_path', None),

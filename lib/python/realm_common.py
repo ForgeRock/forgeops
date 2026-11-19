@@ -1,6 +1,7 @@
 """ Common realm functions """
 
 import json
+from pathlib import Path
 import sys
 from lib.python import utils, defaults
 
@@ -10,7 +11,7 @@ ERR_STR = "ERROR!!"
 WARN_STR = "WARNING!!"
 
 
-def apply_ldifs(realm: str, namespace: str, root_path: str, debug:bool=False, dryrun:bool=False):
+def apply_ldifs(realm: str, namespace: str, root_path:Path, build_path:Path, debug:bool=False, dryrun:bool=False):
     """ Apply the ldifs to the DS idrepo pods """
     pods_all = utils.get_pod_names("app.kubernetes.io/component=ds-idrepo", namespace)
     if not pods_all:
@@ -22,8 +23,8 @@ def apply_ldifs(realm: str, namespace: str, root_path: str, debug:bool=False, dr
     if utils.check_realm_in_ds(realm, pod, namespace, conn_str, debug=debug, dryrun=dryrun):
         print(f"Realm {realm} already exists on {pod}. Not applying ldif.")
     else:
-        am_config_ldif = root_path / f'docker/ds/ldif-ext/am-config/{realm}.ldif'
-        orgs_ldif = root_path / f'docker/ds/ldif-ext/identities/{realm}-orgs.ldif'
+        am_config_ldif = build_path / f'ds/ldif-ext/am-config/{realm}.ldif'
+        orgs_ldif = build_path / f'ds/ldif-ext/identities/{realm}-orgs.ldif'
         if not am_config_ldif.is_file():
             print(f"ERROR!! Missing {am_config_ldif}. Exiting.")
             sys.exit(1)

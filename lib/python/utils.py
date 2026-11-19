@@ -922,7 +922,7 @@ def ldif_apply(files: list, namespace: str, conn_str: str, debug=False, dryrun=F
         if is_k8s_resource('pod', file['pod'], namespace):
             print(f"Apply ldif: {file['dst']}")
             run(KUBECTL,
-                f"exec {file['pod']} -n {namespace} -- ldapmodify -a {conn_str} {file['dst']}",
+                f"exec {file['pod']} -n {namespace} -- ldapmodify {conn_str} {file['dst']}",
                 debug=debug, dryrun=dryrun)
     #print("Removing ldif files from pod(s)")
     #kube_rm(files_rm, namespace, debug=debug, dryrun=dryrun)
@@ -945,11 +945,13 @@ def check_realm_in_ds(realm: str, pod: str, namespace: str, conn_str: str,
 
 
 def apply_amster_profile(profile: str , env_name: str , namespace: str, root_path: str,
-                         helm_path:str=None, kustomize_path:str=None,
+                         helm_path:str=None, kustomize_path:str=None, build_path:str=None,
                          debug:bool=False, dryrun:bool=False):
     """ Apply the amster profile created in create_amster_profile """
     forgeops_cmd = root_path / 'bin/forgeops'
     cmd_opts = f"amster import -e {env_name} -n {namespace}"
+    if build_path:
+        cmd_opts += f" -b {build_path}"
     if helm_path:
         cmd_opts += f" -H {helm_path}"
     if kustomize_path:

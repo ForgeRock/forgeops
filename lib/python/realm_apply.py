@@ -85,6 +85,7 @@ def setup_args(subparsers, common_args):
                                             common_args['dryrun'],
                                             common_args['env_name_req'],
                                             common_args['source_req'],
+                                            common_args['build_path'],
                                             common_args['helm_path'],
                                             common_args['kustomize_path'],
                                             common_args['namespace'],
@@ -121,6 +122,7 @@ def run(args, config):
                 utils.apply_amster_profile(f"realm-{realm}", args.env_name, config['namespace'],
                                            config['root_path'], getattr(args, 'helm_path', None),
                                            getattr(args, 'kustomize_path', None),
+                                           getattr(args, 'build_path', None),
                                            args.debug, args.dryrun)
         else:
             print(f"Could not find the {args.chart_name} Helm chart in {config['namespace']}. Not running helm.")
