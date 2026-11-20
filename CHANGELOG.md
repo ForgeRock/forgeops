@@ -79,6 +79,11 @@ annotations work unchanged. `/igadmin` keeps its previous regex + rewrite behavi
 `ig-admin` ingress. If you override `ig.ingress.annotations` yourself, do not set
 `rewrite-target`, or requests will be double-prefixed.
 
+## New product patch release versions
+
+PingDS 8.1.3, 8.5.0
+PingIDM 7.5.4, 8.0.3, 8.1.2
+
 ## Removed Features
 
 ### Removed flags for base-generate.sh
@@ -121,103 +126,28 @@ The optional `amster-config` ConfigMap's tarball was subPath-mounted at
 kubelet materialises the missing subPath target's parent directory —
 `/opt/amster/config` — as root-owned (`root:root` 0755), and the job's
 non-root runtime uid can then not write anything into it: applying the
-staged config profile failed with `Permission denied` (observed
-2026-10-09 on a clean install with the alpine amster image). The tarball
+staged config profile failed with `Permission denied`. The tarball
 is now mounted at a neutral path (`/amster-import`) and the init
 container copies it into `/opt/amster/config` before the import, so the
 ConfigMap's content wins over the image's own config — the same
 precedence the in-place mount's extraction had (import.sh extracts the
-tarball at import time, overwriting). This applies in both image modes:
-a base-mode deployment supplying an `amster-config` ConfigMap keeps
-working (its tarball is staged the same way), and a ConfigMap without
-the expected `amster-import.tar.gz` key now fails the job loudly with
-the keys that were found — the old subPath mount failed the pod in that
-case, and a plain directory mount without this check would have
-imported none of the supplied config. Note that base mode also gains
-the loud-fail-for-empty guard this series introduced for forgeops mode
-(base mode previously ran the import unguarded): a base-mode deployment
-that pins `amster.image.repository` to an amster image with no pre-baked
-`/opt/amster/config` and supplies no `amster-config` ConfigMap now
-fails its install instead of completing with a no-op import — the
-default `platform.imageRepository` images all bake the profile, so the
-default path is unaffected. The copy runs for
-`import` runs only (an `export` neither needs nor writes the tarball).
-The tarball extraction in `import.sh` is unchanged. Note the new
-precondition: importing requires the image's runtime uid to be able to
-create/write `/opt/amster/config` — true for the images this chart
-deploys (the staged-profile copy creates the directory owned by the
-runtime uid, and the upstream amster image chmods `/opt/amster` 0777),
-but a deployment that overrides the image with one shipping a
-root-owned config directory, or enables `readOnlyRootFilesystem`,
-fails the copy — loudly, with the failing uid in the message.
-
-### identity-platform amster job applies the staged config profile again
-
-With `platform.imageMode: forgeops`, the `pingamster` image now stages the
-forgeops config profile (the realm oauth2 clients `idm-admin-ui`,
-`end-user-ui`, `resource-server`, `idm-resource-server`, `idm-provisioning`,
-the IG agent, and the policy applications) unapplied at
-`/opt/amster-forgeops`, expecting the image entrypoint wrapper to apply it in
-`IMAGE_MODE=forgeops`. The `amster` job's init container overrides the image
-entrypoint with its own command, so the wrapper never ran and amster imported
-an empty config: AM ended up with no oauth2 clients, the platform admin UI's
-authorize call failed with `400 invalid_client` (a blank `/platform` page),
-and PingGateway could not authenticate to AM. Upstream
-(`docker/amster/Dockerfile`) never had this gap because it copies the
-profile directly into `/opt/amster` at build time.
-
-In forgeops image mode the job's init container now applies the staged
-profile before running the import. Older amster images that bake the profile
-into `/opt/amster` at build time (and any deployment that supplies its own
-`amster-import.tar.gz` ConfigMap) keep working unchanged; an `export` run is
-unaffected, and the hook only fails loudly when there is nothing to import
-at all, instead of silently importing nothing. The job's script mounts also
-resolve their files through `platform.filesDir` like the `amster-scripts`
-ConfigMap does — both sides derive from the same directory, so the mount
-subPaths (sha256 hashes of the relative filenames) can no longer drift from
-the ConfigMap keys. The client
-passwords stay in their `&{...}` env-substitution form (amster resolves
-them at import from the job's own environment, and `bin/commands/amster
-export` writes them back in that form).
+tarball at import time, overwriting).
 
 ### identity-platform keystore secret replaced when stale after a failed install
 
-The `keystore-create` job pushed its built keystore into the `keystore`
-secret with create-if-absent semantics, and that secret is not part of the
-release manifest — a failed `--atomic` install uninstalls the release but
-leaves the secret behind. The next install generated a fresh
-`KEYSTORE_PASSWORD`, rebuilt the keystore with it, then skipped the push
-(the secret existed): platform components booted against a keystore
-encrypted with the *previous* install's password and failed with
-`Keystore was tampered with, or password was incorrect` (IDM's datasource
-module in particular), which the install's `--wait` can never satisfy.
-
-The job's init container now probes the existing secret (if any) with the
-current store password before building: on INSTALL (no deployed release),
-a secret that opens is left in place and one that does not (left behind by
-an uninstalled failed install) is replaced instead of skipped; on UPGRADE
-the secret is always left in place as before — a password mismatch there
-can be a live deployment whose `KEYSTORE_PASSWORD` changed on purpose
-(e.g. a custom-secrets migration), where rebuilding would silently
-regenerate the JWT-signing and IDM symmetric keys, so it keeps failing
-loudly until the operator sets `keystore_create.config.secret.replace:
-true`. The push is atomic (`--dry-run=client` piped to `kubectl apply`),
-so a failed create can no longer leave the namespace with no keystore
-secret. This fix is Helm-only; the deprecated Kustomize overlay retains
-the old behavior.
+keystore-create could leave a stale keystore secret after a failed atomic install,  
+causing password-mismatch failures. On INSTALL, the init container tests existing  
+secrets with the current password, keeping valid ones and replacing invalid ones.  
+On UPGRADE, it preserves the secret to avoid silently regenerating JWT-signing and  
+IDM keys; operators can opt into replacement with `keystore_create.config.secret.replace: true`.  
+Secret creation is now atomic, preventing failed creates from leaving the namespace without  
+a secret. The fix applies to Helm only; the deprecated Kustomize overlay retains the old behavior.
 
 ### DS init no longer logs add-schema errors on ds-cts
 
 The DS entrypoint ran the per-pod `add-schema` script unconditionally, logging
 `No such file or directory` on every ds-cts boot. The add-schema script ships for ds-idrepo only; the call
 is now guarded.
-
-### ds-idrepo read the wrong values for IMAGE_MODE
-
-The ds-idrepo StatefulSet scanned `ds_cts.env` instead of `ds_idrepo.env` when deciding whether
-to inject `IMAGE_MODE`, so a deployer-supplied IMAGE_MODE could not override it. The chart's DS
-entrypoint ConfigMap is also only mounted in forgeops mode now, so base-mode deployments keep
-using the entrypoint baked into their image.
 
 ### DS snapshot cron job works on busybox and releases cloned PVCs
 
