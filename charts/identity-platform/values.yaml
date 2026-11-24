@@ -54,10 +54,11 @@ platform:
   base:
     enabled: true
   configMap:
-    enabled: false
+    enabled: true
     # Provide extra ENV vars to add to platform-config ConfigMap
-    data: {}
-      #ENVIRONMENT: "test"
+    data:
+      AM_OAUTH2_AIAGENTS_ENABLED: "true"
+      ENABLE_AI_AGENTS: "true"
   cert_manager:
     # If disabled, the ingress tls issuer and the PingDS certificates will be not be created/deployed
     # (DS certificates are ds-master-keypair and ds-ssl-keypair)

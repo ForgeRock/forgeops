@@ -79,6 +79,18 @@ annotations work unchanged. `/igadmin` keeps its previous regex + rewrite behavi
 `ig-admin` ingress. If you override `ig.ingress.annotations` yourself, do not set
 `rewrite-target`, or requests will be double-prefixed.
 
+### Enabling AI Agents by default in Helm and Kustomize
+
+Previously, only new Helm environments were configured with AI Agents enabled
+by default. Now, the Helm chart has them enabled by default and the Kustomize
+base has them enabled.
+
+To disable them in Helm, use `forgeops env -e my-env --ai-disable`.
+
+To disable them in Kustomize, you need to create a patch to remove the
+`AM_OAUTH2_AIAGENTS_ENABLED` and `ENABLE_AI_AGENTS` env vars from the
+platform-config ConfigMap.
+
 ## New product patch release versions
 
 PingDS 7.5.6, 8.1.3, 8.5.0

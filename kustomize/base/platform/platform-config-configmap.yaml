@@ -36,3 +36,5 @@ data:
   DSBACKUP_HOSTS: ""
   DISASTER_RECOVERY_ID: "initial-restore"
   CERT_ISSUER: default-issuer
+  AM_OAUTH2_AIAGENTS_ENABLED: "true"
+  ENABLE_AI_AGENTS: "true"

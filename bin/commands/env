@@ -690,7 +690,7 @@ To: {config['overlay_path']}
                 }
             }
         }
-    elif do_create or getattr(args, 'ai_enable', None):
+    elif getattr(args, 'ai_enable', None):
         values_ai = {
             "platform": {
                 "configMap": {
