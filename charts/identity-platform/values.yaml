@@ -142,7 +142,7 @@ platform:
   # no chart-knowable default exists; set them explicitly. On
   # non-OpenShift clusters the flag does nothing. The tested deployment
   # procedure (namespace UID-range annotations, cert-manager ordering,
-  # secret prefill, gotchas) is documented in how-tos/deploying-on-openshift.md.
+  # secret prefill, gotchas) is documented in how-tos/openshift-deployment.md.
   openshift:
     enabled: false
   route:

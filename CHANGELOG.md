@@ -81,7 +81,7 @@ annotations work unchanged. `/igadmin` keeps its previous regex + rewrite behavi
 
 ## New product patch release versions
 
-PingDS 8.1.3, 8.5.0
+PingDS 7.5.6, 8.1.3, 8.5.0
 PingIDM 7.5.4, 8.0.3, 8.1.2
 
 ## Removed Features

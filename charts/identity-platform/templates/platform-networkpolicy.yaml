@@ -6,7 +6,7 @@
      platform.openshift.enabled (platform.modeOwnedBool in _helpers.tpl); an
      explicit true/false overrides. Additive allow rules only; they coexist
      with a default-deny-all policy. Per-policy rationale, application
-     timing, and the allowKubeApi tradeoff: how-tos/deploying-on-openshift.md
+     timing, and the allowKubeApi tradeoff: how-tos/openshift-deployment.md
      and the platform.networkPolicy comments in values.yaml. */}}
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
